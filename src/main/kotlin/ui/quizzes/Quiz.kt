@@ -5,58 +5,42 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.RadioButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import helpers.DateHelpers
 import helpers.startCountDown
-import kotlinx.coroutines.*
 import models.video.CourseComponent
 import models.video.Module
-import models.video.Question
 import models.video.QuizComponent
 import ui.NavHelper
-import ui.Route
-import ui.utilities.*
+import ui.utilities.QuestionCards
+import ui.utilities.SubmitQuizButton
 
 
 @Composable
 fun Quiz(navhelper: NavHelper, onClick: (NavHelper) -> Unit) {
 
-    var timeEntry by remember { mutableStateOf("") }
     var course : CourseComponent? by remember { mutableStateOf(null) }
     var module : Module? by remember { mutableStateOf(null) }
 
-    var questionEntry by remember { mutableStateOf("") }
-
-    var shouldAddEntries by remember { mutableStateOf(false) }
-
-    var assertionEntryOne by remember { mutableStateOf("") }
-    var assertionEntryTwo by remember { mutableStateOf("") }
-    var assertionEntryThree by remember { mutableStateOf("") }
-    var assertionEntryFour by remember { mutableStateOf("") }
-    var assertionEntryFive by remember { mutableStateOf("") }
     var selectedQuiz: QuizComponent? by remember { mutableStateOf(null) }
     var totalMinutes by remember { mutableStateOf(0) }
     var countDownText: String?  by remember {  mutableStateOf(null) }
-
-
-    val coroutineScope = rememberCoroutineScope()
+    var selectedOptions by remember { mutableStateOf<Map<Int, Int>>(emptyMap()) }
 
     val quizViewModel = QuizViewModel()
 
     if (navhelper.dataMap.isNotEmpty() && navhelper.dataMap.containsKey("course")) {
-       // courseMap["module"] = module
-        //courseMap["course"] = course as CourseComponent
         course = navhelper.dataMap["course"] as CourseComponent
         if(navhelper.dataMap.containsKey("module")) {
             module = navhelper.dataMap["module"] as Module
@@ -103,6 +87,7 @@ fun Quiz(navhelper: NavHelper, onClick: (NavHelper) -> Unit) {
                     }
                 }
             }
+            Spacer(Modifier.height(10.dp))
         }
 
         if(selectedQuiz != null && selectedQuiz!!.time > 0 && totalMinutes == 0) {
@@ -123,119 +108,47 @@ fun Quiz(navhelper: NavHelper, onClick: (NavHelper) -> Unit) {
 
     }
 
-    LazyColumn(horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center) {
-
-        item {
-
-            Column(Modifier
-                .widthIn(300.dp, 800.dp)
-                .fillMaxHeight(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center) {
+    if(selectedQuiz != null && selectedQuiz!!.problems?.isNotEmpty() == true) {
+        Spacer(Modifier.height(10.dp))
+        //Questions
+        LazyColumn(horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center) {
+            items(selectedQuiz!!.problems!!) { problem ->
 
                 Column(Modifier
                     .fillMaxWidth()
-                    .fillMaxHeight()
-                    .background(Color.White)
-                    .padding(10.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center) {
-
-                    QuestionFields(questionEntry) {
-                        questionEntry = it
-                    }
-
-                    Spacer(Modifier.height(10.dp))
-
-                    AssertionFields(assertionEntryOne) {
-                        assertionEntryOne = it
-                    }
-
-                    AssertionFields(assertionEntryTwo) {
-                        assertionEntryTwo = it
-                    }
-
-                    AssertionFields(assertionEntryThree) {
-                        assertionEntryThree = it
-                    }
-
-                    AssertionFields(assertionEntryFour) {
-                        assertionEntryFour = it
-                    }
-
-                    AssertionFields(assertionEntryFive) {
-                        assertionEntryFive = it
-                    }
-
-                }
-
-                Spacer(Modifier.height(20.dp))
-
-                Row(Modifier
-                    .wrapContentWidth()
-                    .wrapContentHeight()) {
-
-                    ConfirmButton("Add to List to be submitted") {
-                        //Todo add to a list of question to submit
-                         shouldAddEntries = quizViewModel.validateFields(questionEntry,
-                            assertionEntryOne,
-                            assertionEntryTwo,
-                            assertionEntryThree,
-                            assertionEntryFour,
-                            assertionEntryFive)
-
-                        if(shouldAddEntries) {
-
-                            val assertions = mutableListOf<String>()
-
-                            assertions.add(assertionEntryOne)
-                            assertions.add(assertionEntryTwo)
-                            assertions.add(assertionEntryThree)
-                            assertions.add(assertionEntryFour)
-                            assertions.add(assertionEntryFive)
-
-                            quizViewModel.addQuestion(
-                                Question(
-                                    questionEntry,
-                                    assertionEntryOne ,
-                                    assertions
+                    .wrapContentHeight()
+                    .padding(start = 40.dp, end = 40.dp, top = 10.dp)) {
+                    QuestionCards {
+                        Text("${problem.positon}. ${problem.question}", style = MaterialTheme.typography.body2)
+                        Spacer(Modifier.height(10.dp))
+                        problem.assertions?.forEachIndexed { index, option ->
+                            Row {
+                                RadioButton(
+                                    selected = selectedOptions[problem.positon] == index,
+                                    onClick = {
+                                        selectedOptions = selectedOptions.toMutableMap().apply {
+                                            put(problem.positon, index)
+                                        }
+                                    }
                                 )
-                            )
-                            questionEntry = ""
-                            assertionEntryOne =""
-                            assertionEntryTwo =""
-                            assertionEntryThree =""
-                            assertionEntryFour =""
-                            assertionEntryFive =""
-                        }
-                    }
-                }
-
-                Row(Modifier
-                    .wrapContentWidth()
-                    .wrapContentHeight()) {
-                    ConfirmButton("Save All") {
-                        //todo http call to save
-                        coroutineScope.launch(Dispatchers.IO) {
-                            if(course != null && module?._id != null) {
-                               val result=  quizViewModel.addOrUpdateQuiz(
-                                    courseComponent = course!!,
-                                    moduleId = module?._id!!,
-                                    quizId = "",
-                                    timeEntry = timeEntry
-                                )
-                                withContext(Dispatchers.Main) {
-                                    print(""+ result)
-                                    //onClick.invoke(NavHelper(Route.Dashboard))
-                                }
+                                Spacer(Modifier.width(5.dp))
+                                Text(option)
                             }
                         }
                     }
+                }
+            }
 
-                    DenyButton("Cancel") {
-                        //todo clear map and make http call delete that quiz
-                        onClick.invoke(NavHelper(Route.Dashboard))
+            item {
+                //Submit quiz
+                Spacer(Modifier.height(30.dp))
+                Row(Modifier
+                    .sizeIn(150.dp, 70.dp, 300.dp, 90.dp)
+                    .padding(20.dp)) {
+
+                    SubmitQuizButton("SUBMIT QUIZ") {
+                        //quizViewModel.addOrUpdateQuiz()
                     }
                 }
             }

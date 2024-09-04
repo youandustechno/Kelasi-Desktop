@@ -127,7 +127,7 @@ fun Videos(
                     }
                 }
 
-            if(!isFullSize) {
+            if(!isFullSize && (course?.modules?.size?: 0) > 1) {
                 //Module
                 LazyRow(Modifier.fillMaxWidth()
                         .heightIn(50.dp, 70.dp)) {
@@ -239,7 +239,8 @@ fun Videos(
 
                     Spacer(Modifier.width(10.dp))
 
-                    if(!isFullSize) {
+                    //Show video list if player is not full size and there are more than one video.
+                    if(!isFullSize && (selectedModule?.videos?.size?:0) > 1) {
                         LazyColumn(
                             Modifier
                                 .padding(top = 20.dp)
@@ -281,18 +282,20 @@ fun Videos(
                                 }
                             }
 
-                            item {
-                                Spacer(Modifier.height(50.dp))
-                                Row {
-                                    Box(Modifier.fillMaxWidth()
-                                        .heightIn(50.dp, 70.dp)) {
-                                        Box(Modifier.align(Alignment.CenterEnd)) {
-                                            TabButton("Take a Quiz") {
-                                                val courseMap = mutableMapOf<String, Any>()
-                                                courseMap["module"] = selectedModule!!
-                                                courseMap["course"] = course as CourseComponent
+                            if(selectedModule?.quiz?.isNotEmpty() == true) {
+                                item {
+                                    Spacer(Modifier.height(50.dp))
+                                    Row {
+                                        Box(Modifier.fillMaxWidth()
+                                            .heightIn(50.dp, 70.dp)) {
+                                            Box(Modifier.align(Alignment.CenterEnd)) {
+                                                TabButton("Take a Quiz") {
+                                                    val courseMap = mutableMapOf<String, Any>()
+                                                    courseMap["module"] = selectedModule!!
+                                                    courseMap["course"] = course as CourseComponent
 
-                                                onClick.invoke(NavHelper(Route.Quiz, courseMap))
+                                                    onClick.invoke(NavHelper(Route.Quiz, courseMap))
+                                                }
                                             }
                                         }
                                     }

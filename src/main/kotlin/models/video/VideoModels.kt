@@ -47,7 +47,8 @@ data class QuizComponent(
 data class Question(
     var question: String = "",
     var answer: String = "",
-    var assertions: List<String>? = null
+    var assertions: List<String>? = null,
+    var positon: Int = 0
 )
 
 

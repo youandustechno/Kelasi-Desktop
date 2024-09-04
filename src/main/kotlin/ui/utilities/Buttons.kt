@@ -58,7 +58,7 @@ fun NavigationButton(value: String, click: () -> Unit) {
 }
 
 @Composable
-fun DashboardButton(value: String, click: () -> Unit) {
+fun SubmitQuizButton(value: String, click: () -> Unit) {
 
     Row {
         Button( { click()},

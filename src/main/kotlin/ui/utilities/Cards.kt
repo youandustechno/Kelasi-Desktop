@@ -37,6 +37,18 @@ fun AddCoursesCards(content: @Composable() () -> Unit) {
 }
 
 @Composable
+fun QuestionCards(content: @Composable() () -> Unit) {
+    Cards {
+        Column(Modifier
+            .widthIn(300.dp, 600.dp)
+            .wrapContentHeight()
+            .padding(3.dp)) {
+            content()
+        }
+    }
+}
+
+@Composable
 fun SubscriptionCards(content: @Composable() () -> Unit) {
     Cards {
         Column(Modifier
