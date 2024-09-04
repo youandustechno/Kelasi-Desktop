@@ -22,13 +22,13 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun PhoneText(phoneNumber: String, onChange: (String) -> Unit) {
     var text by remember { mutableStateOf(TextFieldValue(phoneNumber)) }
-    TextFieldWithIcons(text.text, Icons.Default.Phone, "phone", onChange)
+    TextFieldWithIcons(text.text, Icons.Default.Phone, "Phone", onChange)
 }
 
 @Composable
 fun OrgaAuthText(phoneNumber: String, onChange: (String) -> Unit) {
     var text by remember { mutableStateOf(TextFieldValue(phoneNumber)) }
-    TextFieldWithIcons(text.text, Icons.Default.Edit, "AUthCode", onChange)
+    TextFieldWithIcons(text.text, Icons.Default.Edit, "Auth Code", onChange)
 }
 
 @Composable

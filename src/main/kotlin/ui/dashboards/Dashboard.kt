@@ -16,6 +16,10 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import models.CoursesListResponse
 import ui.NavHelper
 import ui.Route
@@ -27,11 +31,14 @@ fun Dashboard(courses: (CoursesListResponse?)-> Unit,
 
     var coursesList: CoursesListResponse? by remember { mutableStateOf(CoursesListResponse())}
     var isCoursesAvailable: Boolean? by remember { mutableStateOf(null) }
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
-        coursesList = DashboardViewModel().getCoursesList()
-        courses(coursesList)
-        isCoursesAvailable = true
+        if(isCoursesAvailable != true) {
+            coursesList = DashboardViewModel().getCoursesList()
+            courses(coursesList)
+            isCoursesAvailable = true
+        }
     }
 
     LazyColumn(Modifier
@@ -40,19 +47,22 @@ fun Dashboard(courses: (CoursesListResponse?)-> Unit,
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
-
-//        item {
-//            Row( Modifier
-//                .fillMaxWidth()
-//                .padding(20.dp),
-//                horizontalArrangement = Arrangement.End,
-//                verticalAlignment = Alignment.Top) {
-//                //todo  replace with plus icon
-//                ResourceImage50by50("image/upload.png") {
-//                    onClick(NavHelper(Route.ManageVideo))
-//                }
-//            }
-//        }
+        item {
+            Row(Modifier.fillMaxWidth()
+                .wrapContentHeight(),
+                horizontalArrangement = Arrangement.End) {
+                ResourceImageDashboard("image/black_people.webp")  {
+                     coroutineScope.launch(Dispatchers.IO) {
+                        val classes = DashboardViewModel().getCoursesList()
+                         withContext(Dispatchers.Main) {
+                             coursesList = classes
+                             courses(classes )
+                         }
+                    }
+                }
+                Spacer(Modifier.height(10.dp))
+            }
+        }
 
         item {
 
@@ -71,21 +81,20 @@ fun Dashboard(courses: (CoursesListResponse?)-> Unit,
                         Column(
                             Modifier.wrapContentHeight()
                                 .wrapContentWidth()
-                                .clickable {
-                                    val map = mutableMapOf<String, Any>()
-                                    map["course"] = course
-                                    onClick.invoke(NavHelper(Route.VideosList, map))
-                                }
                                 .padding(10.dp),
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center) {
 
                             AddCoursesCards {
-                                Box(Modifier.fillMaxSize()) {
+                                Box(Modifier
+                                    .clickable {
+                                        val map = mutableMapOf<String, Any>()
+                                        map["course"] = course
+                                        onClick.invoke(NavHelper(Route.VideosList, map))
+                                    }.fillMaxSize()) {
                                     Row(Modifier.fillMaxWidth(),
                                         verticalAlignment = Alignment.CenterVertically,
                                         horizontalArrangement = Arrangement.Start ) {
-                                        //CouseImageUrl("https://picsum.photos/id/237/100/200")
                                         Column(Modifier
                                             .padding(start = 5.dp, end = 5.dp, top = 3.dp, bottom = 1.dp)) {
                                             ResourceImageDashboard("image/black_people.webp")
@@ -102,16 +111,6 @@ fun Dashboard(courses: (CoursesListResponse?)-> Unit,
                                                 .copy(fontSize = 12.sp, lineHeight = 15.sp))
                                         }
                                     }
-
-//                                    Row(Modifier
-//                                        .padding(start = 5.dp, end = 5.dp, top = 3.dp, bottom = 1.dp)
-//                                        .align(Alignment.BottomCenter)) {
-//                                        DashboardButton("SELECT") {
-//                                            val map = mutableMapOf<String, Any>()
-//                                            map["course"] = course
-//                                            onClick.invoke(NavHelper(Route.VideosList, map))
-//                                        }
-//                                    }
                                 }
                             }
                         }

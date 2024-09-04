@@ -24,7 +24,7 @@ fun App() {
 }
 
 fun main() = application {
-    Window(onCloseRequest = ::exitApplication, title = "Mateya") {
+    Window(onCloseRequest = ::exitApplication, title = "MATEYA") {
        // App()
         //LoginPreview()
         AppTheme {

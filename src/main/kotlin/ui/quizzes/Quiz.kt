@@ -1,21 +1,29 @@
 package ui.quizzes
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import androidx.compose.ui.unit.sp
+import helpers.DateHelpers
+import helpers.startCountDown
+import kotlinx.coroutines.*
 import models.video.CourseComponent
 import models.video.Module
 import models.video.Question
+import models.video.QuizComponent
 import ui.NavHelper
 import ui.Route
 import ui.utilities.*
@@ -37,6 +45,10 @@ fun Quiz(navhelper: NavHelper, onClick: (NavHelper) -> Unit) {
     var assertionEntryThree by remember { mutableStateOf("") }
     var assertionEntryFour by remember { mutableStateOf("") }
     var assertionEntryFive by remember { mutableStateOf("") }
+    var selectedQuiz: QuizComponent? by remember { mutableStateOf(null) }
+    var totalMinutes by remember { mutableStateOf(0) }
+    var countDownText: String?  by remember {  mutableStateOf(null) }
+
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -51,24 +63,62 @@ fun Quiz(navhelper: NavHelper, onClick: (NavHelper) -> Unit) {
         }
     }
 
+    if(totalMinutes != 0) {
+        LaunchedEffect(totalMinutes) {
+            startCountDown(totalMinutes) { remainingTime  ->
+                countDownText = remainingTime
+            }
+        }
+    }
+
     Box(Modifier.fillMaxWidth()
         .wrapContentHeight()
     ) {
+        if(module != null) {
+            LazyRow {
+                items(module!!.quiz) { interro ->
+                    Row(Modifier.wrapContentWidth()
+                        .padding(start = 10.dp, end = 10.dp, top = 5.dp)) {
+                        Row(
+                            Modifier
+                                .sizeIn(minWidth = 60.dp, minHeight = 60.dp, maxWidth = 100.dp, maxHeight = 100.dp)
+                                .background(color = Color.LightGray, shape = RoundedCornerShape(5.dp))
+                                .clickable {
+                                    totalMinutes = 0
+                                    countDownText = ""
+                                    selectedQuiz = interro
+                                }
+                                .padding(start = 10.dp, top= 5.dp, bottom = 5.dp, end = 10.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(interro._id!!.substring(interro._id!!.length -1, interro._id!!.length -1),
+                                style = MaterialTheme.typography.caption.copy(
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight(200),
+                                    fontFamily = FontFamily.Serif,
+                                    lineHeight = 24.sp
+                                ))
+                        }
+                    }
+                }
+            }
+        }
+
+        if(selectedQuiz != null && selectedQuiz!!.time > 0 && totalMinutes == 0) {
+            totalMinutes = selectedQuiz!!.time
+        }
 
         Column(modifier = Modifier
-            .wrapContentHeight()
-            .width(300.dp)
-            .align(Alignment.CenterEnd),
-            horizontalAlignment = Alignment.Start,
-            verticalArrangement = Arrangement.Center){
+                .wrapContentHeight()
+                .width(300.dp)
+                .align(Alignment.CenterEnd),
+                horizontalAlignment = Alignment.Start,
+                verticalArrangement = Arrangement.Center){
 
-            TimeFields(timeEntry) {
-               timeEntry = it
-            }
-            Spacer(Modifier.height(5.dp))
-            Text("Eg. 60 for 1 hours and 120 for 2 hours" ,
-                modifier = Modifier.padding(start = 10.dp),
-                style = MaterialTheme.typography.caption)
+                Text(countDownText?:"" ,
+                    modifier = Modifier.padding(start = 10.dp),
+                    style = MaterialTheme.typography.caption)
         }
 
     }

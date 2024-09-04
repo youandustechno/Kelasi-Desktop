@@ -1,6 +1,8 @@
 package ui.videos
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -52,6 +54,8 @@ fun Videos(
     var selectedModule: Module? by remember { mutableStateOf(null) }
     var selectedVideo: VideoComponent? by remember { mutableStateOf(null) }
 
+    var isFullSize : Boolean by remember { mutableStateOf(false) }
+
     if (navhelper.dataMap.isNotEmpty() && navhelper.dataMap.containsKey("course")) {
         course = navhelper.dataMap.get("course") as CourseComponent
         course?.modules?.forEach { module ->
@@ -91,61 +95,113 @@ fun Videos(
     Column(Modifier.fillMaxSize()) {
 
         if (state) {
-                Row(modifier = Modifier
-                   .fillMaxWidth(),
-                   horizontalArrangement = Arrangement.Center,
-                   verticalAlignment = Alignment.CenterVertically) {
-                      Text(""+if(course != null) course?.name?.toUpperCase(Locale.current)
-                      else "", style = MaterialTheme.typography.h5)
+               //Course Title
+                Box(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp)) {
+
+                     Box(Modifier.wrapContentSize()
+                         .align(Alignment.Center)) {
+                        Text(""+if(course != null) course?.name?.toUpperCase(Locale.current)
+                        else "",
+                            style = MaterialTheme.typography.h5)
+                    }
+
+                    if(selectedModule != null) {
+                        Box (Modifier
+                            .then(if(isFullSize) Modifier
+                                .width(30.dp)
+                                .height(20.dp)
+                                .border(BorderStroke(3.dp, Color.DarkGray))
+                            //.background(Color.Transparent, RoundedCornerShape(10.dp))
+                            else Modifier
+                                .width(40.dp)
+                                .height(25.dp)
+                                .border(BorderStroke(3.dp, Color.DarkGray))
+                                // .background(Color.Transparent, RoundedCornerShape(10.dp))
+                            )
+                            .align(Alignment.CenterEnd)
+                            .clickable {
+                                isFullSize = ! isFullSize
+                            }) {}
+                    }
                 }
 
+            if(!isFullSize) {
                 //Module
                 LazyRow(Modifier.fillMaxWidth()
-                    .heightIn(50.dp, 70.dp)) {
-                    if (course != null) {
-                        items(course!!.modules) { module ->
-                            Row(Modifier.wrapContentWidth()
-                                .clickable {
-                                    selectedModule = module
-                                }
-                                .padding(start = 10.dp, end = 10.dp, top = 5.dp)) {
-                                Row(
-                                    Modifier
-                                        .sizeIn(minWidth = 60.dp, minHeight = 60.dp, maxWidth = 100.dp, maxHeight = 100.dp)
-                                        .background(color = Color.LightGray, shape = RoundedCornerShape(5.dp))
-                                        .padding(start = 10.dp, top= 5.dp, bottom = 5.dp, end = 10.dp),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(module.name, style = MaterialTheme.typography.caption
-                                        .copy(
-                                            fontSize = 16.sp,
-                                            fontWeight = FontWeight(200),
-                                            fontFamily = FontFamily.Serif,
-                                            lineHeight = 24.sp
-                                        ))
+                        .heightIn(50.dp, 70.dp)) {
+                        if (course != null) {
+                            items(course!!.modules) { module ->
+                                Row(Modifier.wrapContentWidth()
+                                    .padding(start = 10.dp, end = 10.dp, top = 5.dp)) {
+                                    Row(
+                                        Modifier
+                                            .sizeIn(minWidth = 60.dp, minHeight = 60.dp, maxWidth = 100.dp, maxHeight = 100.dp)
+                                            .background(color = Color.LightGray, shape = RoundedCornerShape(5.dp))
+                                            .clickable {
+                                                selectedModule = module
+                                            }
+                                            .padding(start = 10.dp, top= 5.dp, bottom = 5.dp, end = 10.dp),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(module.name, style = MaterialTheme.typography.caption
+                                            .copy(
+                                                fontSize = 16.sp,
+                                                fontWeight = FontWeight(200),
+                                                fontFamily = FontFamily.Serif,
+                                                lineHeight = 24.sp
+                                            ))
+                                    }
                                 }
                             }
                         }
                     }
-                }
 
                 Spacer(Modifier.height(10.dp))
+            }
+
+
             if (selectedModule != null) {
                 Row {
-                    Column(Modifier.fillMaxWidth(.7F)
-                        .wrapContentHeight()
-                        .heightIn(600.dp, 800.dp)
+                    Column(Modifier
+                        .then(if(isFullSize) Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight()
+                        else Modifier
+                            .fillMaxWidth(.7F)
+                            .wrapContentHeight()
+                            .heightIn(600.dp, 800.dp))
                         .padding(20.dp)
                         .background(Color(0XFFf7f7f7)),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Top) {
 
+                        Row(Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp),
+                            horizontalArrangement = Arrangement.Start,
+                            verticalAlignment = Alignment.CenterVertically) {
+
+                            Text("SELECTED : ${ selectedVideo?.title }", style = MaterialTheme.typography.caption
+                                .copy(
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight(200),
+                                    fontFamily = FontFamily.Serif,
+                                    lineHeight = 24.sp
+                                ))
+                        }
+
                         Column(
                             Modifier
-                                .defaultMinSize(minWidth = 700.dp, minHeight = 300.dp)
+                                .then(if (isFullSize) Modifier
+                                    .fillMaxWidth(.8F)
+                                    .fillMaxHeight(.8F)
+                                else Modifier
+                                    .defaultMinSize(minWidth = 700.dp, minHeight = 300.dp)
+                                    .heightIn(300.dp, 400.dp))
                                 .fillMaxWidth()
-                                .heightIn(300.dp, 400.dp)
                                 .padding(15.dp)
                         ) {
                             if(selectedVideo != null) {
@@ -182,63 +238,79 @@ fun Videos(
                     }
 
                     Spacer(Modifier.width(10.dp))
-                    LazyColumn(
-                        Modifier
-                            .padding(top = 20.dp)
-                            .wrapContentWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
 
-                        items(selectedModule!!.videos) { video ->
-                            Column(
-                                Modifier
-                                    .wrapContentWidth()
-                                    .wrapContentHeight()
-                                    .padding(top = 8.dp)
-                                    .clickable {
-                                        selectedVideo = video
-                                    },
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center
-                            ) {
-                                CourseCard {
-                                    // VideoImageUrl()
-                                    ResourceImageDashboard("image/image_java.png") {
-                                        selectedVideo = video
+                    if(!isFullSize) {
+                        LazyColumn(
+                            Modifier
+                                .padding(top = 20.dp)
+                                .wrapContentWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+
+                            items(selectedModule!!.videos) { video ->
+                                Column(
+                                    Modifier
+                                        .wrapContentWidth()
+                                        .wrapContentHeight()
+                                        .padding(top = 8.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center
+                                ) {
+
+                                    CourseCard {
+                                        Box(Modifier
+                                            // .fillMaxWidth()
+                                            .fillMaxSize()
+                                            .clickable {
+                                                selectedVideo = video
+                                            }) {
+                                            // VideoImageUrl()
+                                            ResourceImageDashboard("image/image_java.png") {
+                                                selectedVideo = video
+                                            }
+                                            Text(text = "  ${video.title}", style = MaterialTheme.typography.caption
+                                                .copy(
+                                                    fontSize = 14.sp,
+                                                    fontWeight = FontWeight(200),
+                                                    fontFamily = FontFamily.Serif,
+                                                    lineHeight = 24.sp
+                                                ))
+                                        }
                                     }
-                                    Text(text = "  ${video.title}", style = MaterialTheme.typography.caption
-                                        .copy(
-                                            fontSize = 14.sp,
-                                            fontWeight = FontWeight(200),
-                                            fontFamily = FontFamily.Serif,
-                                            lineHeight = 24.sp
-                                        ))
+                                }
+                            }
+
+                            item {
+                                Spacer(Modifier.height(50.dp))
+                                Row {
+                                    Box(Modifier.fillMaxWidth()
+                                        .heightIn(50.dp, 70.dp)) {
+                                        Box(Modifier.align(Alignment.CenterEnd)) {
+                                            TabButton("Take a Quiz") {
+                                                val courseMap = mutableMapOf<String, Any>()
+                                                courseMap["module"] = selectedModule!!
+                                                courseMap["course"] = course as CourseComponent
+
+                                                onClick.invoke(NavHelper(Route.Quiz, courseMap))
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
                 }
-
-                Spacer(Modifier.height(20.dp))
-                Row {
-                        Box(Modifier.fillMaxWidth()
-                            .heightIn(50.dp, 70.dp)) {
-                            Box(Modifier.align(Alignment.CenterEnd)) {
-                                TabButton("Take a Quiz") {
-                                    val courseMap = mutableMapOf<String, Any>()
-                                    courseMap["module"] = selectedModule?._id ?: ""
-                                    courseMap["course"] = course as CourseComponent
-
-                                    onClick.invoke(NavHelper(Route.Quiz, courseMap))
-                                }
-                            }
-                        }
-                    }
 
                 }
                 else {
-                     Row { Text("No Video Available") }
+                     Row(Modifier
+                         .fillMaxWidth()
+                         .height(60.dp),
+                         horizontalArrangement = Arrangement.Center,
+                         verticalAlignment = Alignment.CenterVertically) {
+                         Text("No Video Available")
+                     }
                 }
             }
 
