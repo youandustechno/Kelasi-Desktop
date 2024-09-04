@@ -36,7 +36,7 @@ fun Quiz(navhelper: NavHelper, onClick: (NavHelper) -> Unit) {
     var selectedQuiz: QuizComponent? by remember { mutableStateOf(null) }
     var totalMinutes by remember { mutableStateOf(0) }
     var countDownText: String?  by remember {  mutableStateOf(null) }
-    var selectedOptions by remember { mutableStateOf<Map<Int, Int>>(emptyMap()) }
+    var selectedOptions by remember { mutableStateOf<Map<String, Int>>(emptyMap()) }
 
     val quizViewModel = QuizViewModel()
 
@@ -125,10 +125,10 @@ fun Quiz(navhelper: NavHelper, onClick: (NavHelper) -> Unit) {
                         problem.assertions?.forEachIndexed { index, option ->
                             Row {
                                 RadioButton(
-                                    selected = selectedOptions[problem.positon] == index,
+                                    selected = selectedOptions[problem.question] == index,
                                     onClick = {
                                         selectedOptions = selectedOptions.toMutableMap().apply {
-                                            put(problem.positon, index)
+                                            put(problem.question, index)
                                         }
                                     }
                                 )

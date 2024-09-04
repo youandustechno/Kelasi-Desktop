@@ -240,43 +240,43 @@ fun Videos(
                     Spacer(Modifier.width(10.dp))
 
                     //Show video list if player is not full size and there are more than one video.
-                    if(!isFullSize && (selectedModule?.videos?.size?:0) > 1) {
-                        LazyColumn(
+                    LazyColumn(
                             Modifier
                                 .padding(top = 20.dp)
                                 .wrapContentWidth(),
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center
                         ) {
+                            if(!isFullSize && (selectedModule?.videos?.size?:0) > 1) {
+                                items(selectedModule!!.videos) { video ->
+                                    Column(
+                                        Modifier
+                                            .wrapContentWidth()
+                                            .wrapContentHeight()
+                                            .padding(top = 8.dp),
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        verticalArrangement = Arrangement.Center
+                                    ) {
 
-                            items(selectedModule!!.videos) { video ->
-                                Column(
-                                    Modifier
-                                        .wrapContentWidth()
-                                        .wrapContentHeight()
-                                        .padding(top = 8.dp),
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.Center
-                                ) {
-
-                                    CourseCard {
-                                        Box(Modifier
-                                            // .fillMaxWidth()
-                                            .fillMaxSize()
-                                            .clickable {
-                                                selectedVideo = video
-                                            }) {
-                                            // VideoImageUrl()
-                                            ResourceImageDashboard("image/image_java.png") {
-                                                selectedVideo = video
+                                        CourseCard {
+                                            Box(Modifier
+                                                // .fillMaxWidth()
+                                                .fillMaxSize()
+                                                .clickable {
+                                                    selectedVideo = video
+                                                }) {
+                                                // VideoImageUrl()
+                                                ResourceImageDashboard("image/image_java.png") {
+                                                    selectedVideo = video
+                                                }
+                                                Text(text = "  ${video.title}", style = MaterialTheme.typography.caption
+                                                    .copy(
+                                                        fontSize = 14.sp,
+                                                        fontWeight = FontWeight(200),
+                                                        fontFamily = FontFamily.Serif,
+                                                        lineHeight = 24.sp
+                                                    ))
                                             }
-                                            Text(text = "  ${video.title}", style = MaterialTheme.typography.caption
-                                                .copy(
-                                                    fontSize = 14.sp,
-                                                    fontWeight = FontWeight(200),
-                                                    fontFamily = FontFamily.Serif,
-                                                    lineHeight = 24.sp
-                                                ))
                                         }
                                     }
                                 }
@@ -302,7 +302,7 @@ fun Videos(
                                 }
                             }
                         }
-                    }
+
                 }
 
                 }
