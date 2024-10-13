@@ -288,6 +288,17 @@ fun Videos(
                                     Row {
                                         Box(Modifier.fillMaxWidth()
                                             .heightIn(50.dp, 70.dp)) {
+
+                                            Box(Modifier.align(Alignment.CenterStart)) {
+                                                TabButton("Documentation") {
+                                                    val courseMap = mutableMapOf<String, Any>()
+                                                    courseMap["module"] = selectedModule!!
+                                                    courseMap["course"] = course as CourseComponent
+
+                                                    onClick.invoke(NavHelper(Route.ViewDocument, courseMap))
+                                                }
+                                            }
+
                                             Box(Modifier.align(Alignment.CenterEnd)) {
                                                 TabButton("Take a Quiz") {
                                                     val courseMap = mutableMapOf<String, Any>()

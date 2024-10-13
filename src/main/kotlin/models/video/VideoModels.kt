@@ -32,6 +32,7 @@ data class Module(
     var name: String = "",
     var url: String = "",
     var videos: List<VideoComponent> = listOf(),
+    var documents: List<DocumentComponent> = listOf(),
     var quiz: List<QuizComponent> = listOf(),
     var description: String =""
 )
@@ -61,3 +62,21 @@ data class QuizRequest(
     var isUpdate: Boolean? = null,
     var quiz: QuizComponent? = null
 )
+
+data class DocumentComponent(
+    var _id: String? = null,
+    var url: String = "",
+    @SerializedName("cloudinary_id")
+    var referenceId: String?= null,
+    var title: String = "",
+    var path: String = "",
+    var description: String = "",
+    var module: String = "",
+    var courseId: String = "")
+
+data class DocumentFieldsComponent(
+    var _id: String? = null,
+    var title: String = "",
+    var description: String = "",
+    var module: String = "",
+    var courseId: String = "")

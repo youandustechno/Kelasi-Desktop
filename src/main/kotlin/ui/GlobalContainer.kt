@@ -28,6 +28,7 @@ import ui.quizzes.Quiz
 import ui.utilities.FieldsValidation.isValid
 import ui.utilities.Headers
 import ui.utilities.TabButton
+import ui.videos.Documents
 import ui.videos.Videos
 import java.util.prefs.Preferences
 
@@ -174,6 +175,15 @@ fun GlobalContainer() {
                         }
                     }
                 }
+                Route.ViewDocument -> {
+                    ContentWrapper(true, navigationState, {
+                        navigationState = it
+                    }) {
+                        Documents(navigationState) {
+
+                        }
+                    }
+                }
                 else -> {}
             }
         }
@@ -224,6 +234,9 @@ fun ContentWrapper(withNav: Boolean, navigationState: NavHelper, onClick:(NavHel
                     }
                     else if(navigationState.route == Route.Subscriptions) {
                         Text("Settings", style = MaterialTheme.typography.h6)
+                    }
+                    else if(navigationState.route == Route.ViewDocument) {
+                        Text("Module Documents", style = MaterialTheme.typography.h6)
                     }
                     else {
                         Text("", style = MaterialTheme.typography.h6)
@@ -332,6 +345,30 @@ fun ContentWrapper(withNav: Boolean, navigationState: NavHelper, onClick:(NavHel
                             onClick.invoke(NavHelper(Route.AuthLogin))
                         }
                     }
+                    else if(navigationState.route == Route.ViewDocument) {
+
+                        if(navigationState.dataMap.containsKey("course")) {
+                            course = navigationState.dataMap["course"] as CourseComponent
+
+                        } else if(navigationState.dataMap.containsKey("courseId")) {
+                            courseId = navigationState.dataMap["courseId"].toString()
+                        }
+
+                        TabButton("Home") {
+                            onClick.invoke(NavHelper(Route.Dashboard))
+                        }
+
+                        TabButton("Videos") {
+                            val courseMap = mutableMapOf<String, Any>()
+                            if(course != null) {
+                                courseMap["course"] = course!!
+
+                            } else if(courseId.isNotEmpty()) {
+                                courseMap["courseId"] = courseId
+                            }
+                            onClick.invoke(NavHelper(Route.VideosList, courseMap))
+                        }
+                    }
                     else {
                     }
                 }
@@ -366,6 +403,7 @@ enum class Route(route: String) {
     AuthOrg ("Org"),
     Organization("Organization"),
     Quiz("Quiz"),
+    ViewDocument("UploadDocument"),
     ManageQuizzes("Quizzes"),
     VideosList("CoursesList"),
     UserSubscription("UserSub"),

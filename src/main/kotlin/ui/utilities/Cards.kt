@@ -2,6 +2,7 @@ package ui.utilities
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
@@ -55,6 +56,18 @@ fun SubscriptionCards(content: @Composable() () -> Unit) {
             .width(200.dp)
             .height(80.dp)
             .padding(5.dp)) {
+            content()
+        }
+    }
+}
+
+@Composable
+fun DocCards(click: () -> kotlin.Unit, content: @Composable() () -> Unit) {
+    CardsWrapHeightWithPadding (click = click ){
+        Column(Modifier
+            .width(200.dp)
+            .wrapContentHeight()
+            .defaultMinSize(minWidth = 150.dp, minHeight = 120.dp)) {
             content()
         }
     }
@@ -187,6 +200,27 @@ private fun VideoCards(content:@Composable() () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center) {
             content()
+        }
+    }
+}
+
+@Composable
+private fun CardsWrapHeightWithPadding(click: () ->Unit, content:@Composable() () -> Unit) {
+
+    Column (Modifier
+        .border(width = 1.dp, color = Color(0XFFDEDBDC), shape = RoundedCornerShape(4.dp))
+        .padding(1.dp)
+        .clickable { click.invoke() },
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center){
+        Card {
+            Column(Modifier
+                .fillMaxWidth()
+                .defaultMinSize(minHeight = 100.dp)
+                .wrapContentHeight()
+                .padding(5.dp)) {
+                content()
+            }
         }
     }
 }

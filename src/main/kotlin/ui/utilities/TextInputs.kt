@@ -32,6 +32,12 @@ fun OrgaAuthText(phoneNumber: String, onChange: (String) -> Unit) {
 }
 
 @Composable
+fun AnswerFields(question: String, onChange: (String) -> Unit) {
+    Spacer(Modifier.height(20.dp))
+    DataQuestionFields(question, "Answer", onChange)
+}
+
+@Composable
 fun InstructorFields(instructor: String, onChange: (String) -> Unit) {
     var text by remember { mutableStateOf(TextFieldValue(instructor)) }
     TextFieldWithIcons(text.text, Icons.Default.Edit, "Instructor Name", onChange)
@@ -119,7 +125,7 @@ private fun DataQuestionFields(value: String, label: String, onChange: (String) 
                 errorLeadingIconColor = MaterialTheme.colors.error,
                 errorCursorColor = MaterialTheme.colors.error
             ),
-            shape = RoundedCornerShape(10.dp)
+            shape = RoundedCornerShape(8.dp)
         )
     }
 }

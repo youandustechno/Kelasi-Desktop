@@ -23,12 +23,13 @@ import models.video.CourseComponent
 import models.video.Module
 import models.video.QuizComponent
 import ui.NavHelper
+import ui.utilities.AnswerFields
 import ui.utilities.QuestionCards
 import ui.utilities.SubmitQuizButton
 
 
 @Composable
-fun Quiz(navhelper: NavHelper, onClick: (NavHelper) -> Unit) {
+fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
 
     var course : CourseComponent? by remember { mutableStateOf(null) }
     var module : Module? by remember { mutableStateOf(null) }
@@ -40,10 +41,10 @@ fun Quiz(navhelper: NavHelper, onClick: (NavHelper) -> Unit) {
 
     val quizViewModel = QuizViewModel()
 
-    if (navhelper.dataMap.isNotEmpty() && navhelper.dataMap.containsKey("course")) {
-        course = navhelper.dataMap["course"] as CourseComponent
-        if(navhelper.dataMap.containsKey("module")) {
-            module = navhelper.dataMap["module"] as Module
+    if (navHelper.dataMap.isNotEmpty() && navHelper.dataMap.containsKey("course")) {
+        course = navHelper.dataMap["course"] as CourseComponent
+        if(navHelper.dataMap.containsKey("module")) {
+            module = navHelper.dataMap["module"] as Module
         }
     }
 
@@ -55,103 +56,116 @@ fun Quiz(navhelper: NavHelper, onClick: (NavHelper) -> Unit) {
         }
     }
 
-    Box(Modifier.fillMaxWidth()
-        .wrapContentHeight()
-    ) {
-        if(module != null) {
-            LazyRow {
-                items(module!!.quiz) { interro ->
-                    Row(Modifier.wrapContentWidth()
-                        .padding(start = 10.dp, end = 10.dp, top = 5.dp)) {
-                        Row(
-                            Modifier
-                                .sizeIn(minWidth = 60.dp, minHeight = 60.dp, maxWidth = 100.dp, maxHeight = 100.dp)
-                                .background(color = Color.LightGray, shape = RoundedCornerShape(5.dp))
-                                .clickable {
-                                    totalMinutes = 0
-                                    countDownText = ""
-                                    selectedQuiz = interro
-                                }
-                                .padding(start = 10.dp, top= 5.dp, bottom = 5.dp, end = 10.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(interro._id!!.substring(interro._id!!.length -1, interro._id!!.length -1),
-                                style = MaterialTheme.typography.caption.copy(
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight(200),
-                                    fontFamily = FontFamily.Serif,
-                                    lineHeight = 24.sp
-                                ))
-                        }
-                    }
-                }
-            }
-            Spacer(Modifier.height(10.dp))
-        }
-
-        if(selectedQuiz != null && selectedQuiz!!.time > 0 && totalMinutes == 0) {
-            totalMinutes = selectedQuiz!!.time
-        }
-
-        Column(modifier = Modifier
-                .wrapContentHeight()
-                .width(300.dp)
-                .align(Alignment.CenterEnd),
-                horizontalAlignment = Alignment.Start,
-                verticalArrangement = Arrangement.Center){
-
-                Text(countDownText?:"" ,
-                    modifier = Modifier.padding(start = 10.dp),
-                    style = MaterialTheme.typography.caption)
-        }
-
-    }
-
-    if(selectedQuiz != null && selectedQuiz!!.problems?.isNotEmpty() == true) {
-        Spacer(Modifier.height(10.dp))
-        //Questions
-        LazyColumn(horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center) {
-            items(selectedQuiz!!.problems!!) { problem ->
-
-                Column(Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .padding(start = 40.dp, end = 40.dp, top = 10.dp)) {
-                    QuestionCards {
-                        Text("${problem.positon}. ${problem.question}", style = MaterialTheme.typography.body2)
-                        Spacer(Modifier.height(10.dp))
-                        problem.assertions?.forEachIndexed { index, option ->
-                            Row {
-                                RadioButton(
-                                    selected = selectedOptions[problem.question] == index,
-                                    onClick = {
-                                        selectedOptions = selectedOptions.toMutableMap().apply {
-                                            put(problem.question, index)
-                                        }
+    Column (Modifier.fillMaxSize()){
+        Column(Modifier.fillMaxWidth()
+            .wrapContentHeight()
+        ) {
+            if(module != null) {
+                LazyRow {
+                    items(module!!.quiz) { interro ->
+                        Row(Modifier.wrapContentWidth()
+                            .padding(start = 10.dp, end = 10.dp, top = 5.dp)) {
+                            Row(
+                                Modifier
+                                    .sizeIn(minWidth = 60.dp, minHeight = 60.dp, maxWidth = 100.dp, maxHeight = 100.dp)
+                                    .background(color = Color.LightGray, shape = RoundedCornerShape(5.dp))
+                                    .clickable {
+                                        totalMinutes = 0
+                                        countDownText = ""
+                                        selectedQuiz = interro
                                     }
-                                )
-                                Spacer(Modifier.width(5.dp))
-                                Text(option)
+                                    .padding(start = 10.dp, top= 5.dp, bottom = 5.dp, end = 10.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(interro._id!!.substring(interro._id!!.length -1, interro._id!!.length -1),
+                                    style = MaterialTheme.typography.caption.copy(
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight(200),
+                                        fontFamily = FontFamily.Serif,
+                                        lineHeight = 24.sp
+                                    ))
                             }
                         }
                     }
                 }
+                Spacer(Modifier.height(10.dp))
             }
 
-            item {
-                //Submit quiz
-                Spacer(Modifier.height(30.dp))
-                Row(Modifier
-                    .sizeIn(150.dp, 70.dp, 300.dp, 90.dp)
-                    .padding(20.dp)) {
+            if(selectedQuiz != null && selectedQuiz!!.time > 0 && totalMinutes == 0) {
+                totalMinutes = selectedQuiz!!.time
+            }
 
-                    SubmitQuizButton("SUBMIT QUIZ") {
-                        //quizViewModel.addOrUpdateQuiz()
+            Box(Modifier.fillMaxWidth()){
+                Column(modifier = Modifier
+                    .wrapContentHeight()
+                    .width(300.dp)
+                    .align(Alignment.CenterEnd),
+                    horizontalAlignment = Alignment.Start,
+                    verticalArrangement = Arrangement.Center){
+
+                    Text(countDownText?:"" ,
+                        modifier = Modifier.padding(start = 10.dp),
+                        style = MaterialTheme.typography.caption)
+                }
+            }
+        }
+
+        //if(selectedQuiz != null && selectedQuiz!!.problems?.isNotEmpty() == true) {
+        if(selectedQuiz != null) {
+            Spacer(Modifier.height(10.dp))
+            //Questions
+            LazyColumn(horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center) {
+
+                items(selectedQuiz!!.problems!!) { problem ->
+                    var answerEntry by remember { mutableStateOf("") }
+
+                    Column(Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .padding(start = 40.dp, end = 40.dp, top = 10.dp)) {
+                        QuestionCards {
+                            Text("${problem.positon}. ${problem.question}", style = MaterialTheme.typography.body2)
+                            Spacer(Modifier.height(10.dp))
+                            problem.assertions?.forEachIndexed { index, option ->
+                                Row(Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.Start,
+                                    verticalAlignment = Alignment.CenterVertically) {
+                                    RadioButton(
+                                        selected = selectedOptions[problem.question] == index,
+                                        onClick = {
+                                            selectedOptions = selectedOptions.toMutableMap().apply {
+                                                put(problem.question, index)
+                                            }
+                                        }
+                                    )
+                                    Spacer(Modifier.width(5.dp))
+                                    Text(option,  style = MaterialTheme.typography.body2)
+                                }
+                            }?: kotlin.run {
+                                AnswerFields(answerEntry) {
+                                    answerEntry = it
+                                }
+                            }
+                        }
+                    }
+                }
+
+                item {
+                    //Submit quiz
+                    Spacer(Modifier.height(30.dp))
+                    Row(Modifier
+                        .sizeIn(150.dp, 70.dp, 300.dp, 90.dp)
+                        .padding(20.dp)) {
+
+                        SubmitQuizButton("SUBMIT QUIZ") {
+                            //quizViewModel.addOrUpdateQuiz()
+                        }
                     }
                 }
             }
         }
     }
+
 }
