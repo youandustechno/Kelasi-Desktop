@@ -125,7 +125,12 @@ fun Documents(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                         horizontalArrangement = Arrangement.End) {
 
                         if(pdfImages?.isNotEmpty() == true) {
-                            ResourceImage50by50("image/upload.png")  {
+                            val iconState = if(isReading == VoiceStates.READING) {
+                                "image/icon_volume_off.svg"
+                            }else {
+                                "image/icon_volume_high.svg"
+                            }
+                            ResourceImage50by50(iconState)  {
                                 //to be replaced.
                                 if(isReading == VoiceStates.READING) {
                                     stopReading()

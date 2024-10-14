@@ -6,8 +6,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -102,43 +101,43 @@ fun AssertionFields(question: String, onChange: (String) -> Unit) {
 
 @Composable
 fun UserPasswordFields(userName: String, onChange: (String) -> Unit) {
-    PaymentTextFieldWithIcon(userName, Icons.Default.Edit, "Password", onChange)
+    PaymentTextFieldWithIcon(userName, Icons.Default.Lock, "Password", onChange)
 }
 
 @Composable
 fun UserNewPasswordFields(userName: String, onChange: (String) -> Unit) {
-    PaymentTextFieldWithIcon(userName, Icons.Default.Edit, "New Password", onChange)
+    PaymentTextFieldWithIcon(userName, Icons.Default.Lock, "New Password", onChange)
 }
 
 @Composable
 fun UserConfirmPasswordFields(userName: String, isRegistration: Boolean = false, onChange: (String) -> Unit) {
-    PaymentTextFieldWithIcon(userName, Icons.Default.Edit,
+    PaymentTextFieldWithIcon(userName, Icons.Default.Lock,
         if(!isRegistration)"Confirm New Password" else "Confirm Password", onChange)
 }
 
 @Composable
 fun UserEmailFields(userName: String, onChange: (String) -> Unit) {
-    PaymentTextFieldWithIcon(userName, Icons.Default.Edit, "Email", onChange)
+    PaymentTextFieldWithIcon(userName, Icons.Default.Email, "Email", onChange)
 }
 
 @Composable
 fun UserPhoneFields(userName: String, onChange: (String) -> Unit) {
-    PaymentTextFieldWithIcon(userName, Icons.Default.Edit, "Phone Number", onChange)
+    PaymentTextFieldWithIcon(userName, Icons.Default.Phone, "Phone Number", onChange)
 }
 
 @Composable
 fun MiddleFields(userName: String, onChange: (String) -> Unit) {
-    PaymentTextFieldWithIcon(userName, Icons.Default.Edit, "Middle Name", onChange)
+    PaymentTextFieldWithIcon(userName, Icons.Default.Person, "Middle Name", onChange)
 }
 
 @Composable
 fun FirstNameFields(userName: String, onChange: (String) -> Unit) {
-    PaymentTextFieldWithIcon(userName, Icons.Default.Edit, "First Name", onChange)
+    PaymentTextFieldWithIcon(userName, Icons.Default.Person, "First Name", onChange)
 }
 
 @Composable
 fun LastNameFields(userName: String, onChange: (String) -> Unit) {
-    PaymentTextFieldWithIcon(userName, Icons.Default.Edit, "Last Name", onChange)
+    PaymentTextFieldWithIcon(userName, Icons.Default.Person, "Last Name", onChange)
 }
 
 @Composable
