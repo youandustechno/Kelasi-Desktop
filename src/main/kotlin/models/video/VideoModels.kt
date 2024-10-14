@@ -40,6 +40,7 @@ data class Module(
 data class QuizComponent(
     var _id: String? = null,
     var topicname: String = "",
+    var title: String ="",
     var modulename: String = "",
     var problems: List<Question>? = null,
     var time: Int = 0

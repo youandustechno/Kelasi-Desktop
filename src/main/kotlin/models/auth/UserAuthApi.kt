@@ -1,17 +1,21 @@
 package models.auth
 
+import helpers.StorageHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import models.BaseValues.BASE_URL
 import models.auth.UserRetrofitClient.getApiService
-import models.video.VideoRetrofitClient
+import models.auth.UserRetrofitClient.setInterceptor
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
+import okhttp3.RequestBody.Companion.asRequestBody
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.io.File
 
 
 object UserRetrofitClient {
-
-    private const val BASE_URL = "https://streaming-app-3nf3.onrender.com/"
 
     private val retrofitBuilder = Retrofit.Builder()
 
@@ -61,6 +65,80 @@ class UserAuthApi {
             }
         } catch (exception: Exception) {
             TokenResponse(null, TokenError(0,
+                exception.message?:"exception"))
+        }
+    }
+
+    suspend fun registerUser(file: File?, userData: UserDataModel): UserResponse {
+
+        val theFile = if(file != null) {
+            val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
+            MultipartBody.Part.createFormData("file", file.name, requestFile)
+        } else null
+
+        return try {
+            withContext(Dispatchers.IO) {
+                val authCode = StorageHelper().retrieveFromStorage(StorageHelper.AUTH_CODE)
+                val token =  if(theFile == null){
+                    UserRetrofitClient
+                        .setInterceptor(authCode!!)
+                        .getApiService()
+                        .registerUser(userData)
+                }
+                else {
+                    UserRetrofitClient
+                        .setInterceptor(authCode!!)
+                        .getApiService()
+                        .registerUserWithPic(theFile, userData)
+                }
+
+                if(token != null){
+                    UserResponse(token)
+                }
+                else {
+                    UserResponse(null, TokenError(0,
+                        "Token is null"))
+                }
+            }
+        } catch (exception: Exception) {
+            UserResponse(null, TokenError(0,
+                exception.message?:"exception"))
+        }
+    }
+
+    suspend fun updateUser(file: File?, userData: UserDataModel): UserResponse  {
+
+        val theFile = if(file != null) {
+            val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
+            MultipartBody.Part.createFormData("file", file.name, requestFile)
+        } else null
+
+        return try {
+            withContext(Dispatchers.IO) {
+                val authCode = StorageHelper().retrieveFromStorage(StorageHelper.AUTH_CODE)
+                val user =  if(theFile == null){
+                    UserRetrofitClient
+                        .setInterceptor(authCode!!)
+                        .getApiService()
+                        .updaterUser(userData)
+                }
+                else {
+                    UserRetrofitClient
+                        .setInterceptor(authCode!!)
+                        .getApiService()
+                        .updaterUserWithPic(theFile,userData._id, userData)
+                }
+
+                if(user != null){
+                    UserResponse(user)
+                }
+                else {
+                    UserResponse (null, TokenError(0,
+                        "Token is null"))
+                }
+            }
+        } catch (exception: Exception) {
+            UserResponse(null, TokenError(0,
                 exception.message?:"exception"))
         }
     }

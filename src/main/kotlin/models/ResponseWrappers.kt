@@ -1,6 +1,7 @@
 package models
 
 import models.group.OrganizationComponent
+import models.userquiz.ScoreData
 import models.video.CourseComponent
 import models.video.VideoComponent
 
@@ -20,3 +21,5 @@ data class CoursesListResponse(val courses:List<CourseComponent>?= null, val err
 data class CourseResponse(val courses: CourseComponent?= null, val errorComponent: ErrorComponent? = null)
 
 data class UpdateUrl(val updatedTopicUrl: String = "")
+
+data class UserQuizResponse(val score: ScoreData?= null, val errorComponent: ErrorComponent? = null)

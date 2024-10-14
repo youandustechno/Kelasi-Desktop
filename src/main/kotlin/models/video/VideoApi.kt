@@ -5,6 +5,7 @@ import helpers.StorageHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import models.*
+import models.BaseValues.BASE_URL
 import models.video.VideoRetrofitClient.getApiService
 import models.video.VideoRetrofitClient.setInterceptor
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -18,8 +19,6 @@ import java.io.File
 
 
 object VideoRetrofitClient {
-
-    private const val BASE_URL = "https://streaming-app-3nf3.onrender.com/"
 
     private val retrofitBuilder = Retrofit.Builder()
 

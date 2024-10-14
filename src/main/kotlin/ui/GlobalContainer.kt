@@ -23,8 +23,8 @@ import ui.manages.*
 import ui.organizations.CoursesSubscriptionList
 import ui.organizations.Subscriptions
 import ui.organizations.UsersSubscription
-import ui.quizzes.ManageQuizzes
 import ui.quizzes.Quiz
+import ui.settings.Settings
 import ui.utilities.FieldsValidation.isValid
 import ui.utilities.Headers
 import ui.utilities.TabButton
@@ -118,15 +118,15 @@ fun GlobalContainer() {
                         }
                     }
                 }
-                Route.ManageQuizzes -> {
-                    ContentWrapper(true, navigationState, {
-                        navigationState = it
-                    }) {
-                        ManageQuizzes(navigationState) { quiz ->
-                            navigationState = quiz
-                        }
-                    }
-                }
+//                Route.ManageQuizzes -> {
+//                    ContentWrapper(true, navigationState, {
+//                        navigationState = it
+//                    }) {
+//                        ManageQuizzes(navigationState) { quiz ->
+//                            navigationState = quiz
+//                        }
+//                    }
+//                }
                 Route.ManageVideo -> {
                     ContentWrapper(true, navigationState, {
                         navigationState = it
@@ -172,6 +172,15 @@ fun GlobalContainer() {
                     }) {
                         Subscriptions { action ->
                             navigationState = action
+                        }
+                    }
+                }
+                Route.Settings -> {
+                    ContentWrapper(true, navigationState,{
+                        navigationState = it
+                    }) {
+                        Settings(navigationState) {
+                            navigationState = it
                         }
                     }
                 }
@@ -232,7 +241,7 @@ fun ContentWrapper(withNav: Boolean, navigationState: NavHelper, onClick:(NavHel
                     else if(navigationState.route == Route.VideosList) {
                         Text("Videos", style = MaterialTheme.typography.h6)
                     }
-                    else if(navigationState.route == Route.Subscriptions) {
+                    else if(navigationState.route == Route.Settings) {
                         Text("Settings", style = MaterialTheme.typography.h6)
                     }
                     else if(navigationState.route == Route.ViewDocument) {
@@ -251,7 +260,7 @@ fun ContentWrapper(withNav: Boolean, navigationState: NavHelper, onClick:(NavHel
                     if(navigationState.route == Route.Dashboard) {
                         TabButton("Settings") {
                             //Todo Settings
-                            onClick.invoke(NavHelper(Route.Subscriptions))
+                            onClick.invoke(NavHelper(Route.Settings))
                         }
 
                         TabButton("Logout") {
@@ -369,6 +378,15 @@ fun ContentWrapper(withNav: Boolean, navigationState: NavHelper, onClick:(NavHel
                             onClick.invoke(NavHelper(Route.VideosList, courseMap))
                         }
                     }
+                    else if(navigationState.route == Route.Settings) {
+                        TabButton("Home") {
+                            onClick.invoke(NavHelper(Route.Dashboard))
+                        }
+
+                        TabButton("LOGOUT") {
+                            onClick.invoke(NavHelper(Route.AuthLogin))
+                        }
+                    }
                     else {
                     }
                 }
@@ -404,6 +422,7 @@ enum class Route(route: String) {
     Organization("Organization"),
     Quiz("Quiz"),
     ViewDocument("UploadDocument"),
+    Settings("Settings"),
     ManageQuizzes("Quizzes"),
     VideosList("CoursesList"),
     UserSubscription("UserSub"),

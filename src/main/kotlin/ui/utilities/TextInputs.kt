@@ -1,5 +1,6 @@
 package ui.utilities
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -12,9 +13,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 //Outlined text field
 
@@ -96,6 +99,53 @@ fun AssertionFields(question: String, onChange: (String) -> Unit) {
 
     DataValueFields(text.text, "Assertion", onChange)
 }
+
+@Composable
+fun UserPasswordFields(userName: String, onChange: (String) -> Unit) {
+    PaymentTextFieldWithIcon(userName, Icons.Default.Edit, "Password", onChange)
+}
+
+@Composable
+fun UserNewPasswordFields(userName: String, onChange: (String) -> Unit) {
+    PaymentTextFieldWithIcon(userName, Icons.Default.Edit, "New Password", onChange)
+}
+
+@Composable
+fun UserConfirmPasswordFields(userName: String, isRegistration: Boolean = false, onChange: (String) -> Unit) {
+    PaymentTextFieldWithIcon(userName, Icons.Default.Edit,
+        if(!isRegistration)"Confirm New Password" else "Confirm Password", onChange)
+}
+
+@Composable
+fun UserEmailFields(userName: String, onChange: (String) -> Unit) {
+    PaymentTextFieldWithIcon(userName, Icons.Default.Edit, "Email", onChange)
+}
+
+@Composable
+fun UserPhoneFields(userName: String, onChange: (String) -> Unit) {
+    PaymentTextFieldWithIcon(userName, Icons.Default.Edit, "Phone Number", onChange)
+}
+
+@Composable
+fun MiddleFields(userName: String, onChange: (String) -> Unit) {
+    PaymentTextFieldWithIcon(userName, Icons.Default.Edit, "Middle Name", onChange)
+}
+
+@Composable
+fun FirstNameFields(userName: String, onChange: (String) -> Unit) {
+    PaymentTextFieldWithIcon(userName, Icons.Default.Edit, "First Name", onChange)
+}
+
+@Composable
+fun LastNameFields(userName: String, onChange: (String) -> Unit) {
+    PaymentTextFieldWithIcon(userName, Icons.Default.Edit, "Last Name", onChange)
+}
+
+@Composable
+fun LevelFields(userName: String, onChange: (String) -> Unit) {
+    PaymentTextFieldWithIcon(userName, Icons.Default.Edit, "Level", onChange)
+}
+
 
 @Composable
 private fun DataQuestionFields(value: String, label: String, onChange: (String) -> Unit) {
@@ -196,6 +246,35 @@ fun TextFieldWithIcons(value: String, icon: ImageVector, description: String, on
             //.background(color = Color.White),
             label = { Text(text = description) },
             // placeholder = { Text(text = description) },
+        )
+    }
+}
+
+@Composable
+fun PaymentTextFieldWithIcon(value: String, icon: ImageVector, description: String, onChange: (String) -> Unit) {
+
+    Column(Modifier.fillMaxWidth()
+        .wrapContentHeight(),
+        horizontalAlignment = Alignment.Start,
+        verticalArrangement = Arrangement.Center) {
+        OutlinedTextField(
+            value = value,
+            leadingIcon = { Icon(imageVector = icon, contentDescription = description) },
+            //trailingIcon = { Icon(imageVector = Icons.Default.Add, contentDescription = null) },
+            keyboardOptions = KeyboardOptions(keyboardType = if(description.equals("phone", true))KeyboardType.Number
+            else KeyboardType.Text),
+            onValueChange = {
+                onChange.invoke(it)
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.Transparent)
+                .height(60.dp),
+            //.background(color = Color.White),
+            label = { Text(text = description, style = TextStyle(fontSize = 10.sp)) },
+            // placeholder = { Text(text = description) },
+            textStyle = TextStyle(fontSize = 12.sp),
+            colors = TextFieldDefaults.outlinedTextFieldColors(backgroundColor = Color.White)
         )
     }
 }

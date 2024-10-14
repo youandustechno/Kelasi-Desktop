@@ -3,6 +3,7 @@ package models.group
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import models.AuthCodeResponse
+import models.BaseValues.BASE_URL
 import models.ErrorComponent
 import models.group.GroupRetrofitClient.getApiService
 import models.group.GroupRetrofitClient.setInterceptor
@@ -12,8 +13,6 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.*
 
 object GroupRetrofitClient {
-
-    private const val BASE_URL = "https://streaming-app-3nf3.onrender.com/"
 
     private val okHttpClient = OkHttpClient.Builder()
 

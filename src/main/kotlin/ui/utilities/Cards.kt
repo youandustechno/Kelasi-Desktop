@@ -134,6 +134,49 @@ fun ErrorCard(content: @Composable() () -> Unit) {
     }
 }
 
+
+@Composable
+fun ChangePasswordCard(content: @Composable() () -> Unit) {
+    Column(Modifier.fillMaxSize()) {
+        UserCards {
+            Column(Modifier
+                .height(300.dp)
+                .padding(5.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ){
+                content()
+            }
+        }
+    }
+}
+
+@Composable
+fun PictureCard(content: @Composable() () -> Unit) {
+    Column(Modifier.fillMaxSize()) {
+        UserCards {
+            content()
+        }
+    }
+}
+
+@Composable
+fun PersonalInformationCard(content: @Composable() () -> Unit) {
+    Column(Modifier.fillMaxSize()) {
+        UserCards {
+            Column(Modifier
+                .fillMaxHeight()
+                .padding(5.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ){
+                content()
+            }
+        }
+    }
+}
+
+
 @Composable
 private fun VidCards(content:@Composable() () -> Unit) {
 
@@ -219,6 +262,25 @@ private fun CardsWrapHeightWithPadding(click: () ->Unit, content:@Composable() (
                 .defaultMinSize(minHeight = 100.dp)
                 .wrapContentHeight()
                 .padding(5.dp)) {
+                content()
+            }
+        }
+    }
+}
+
+@Composable
+private fun UserCards(content:@Composable() () -> Unit) {
+
+    Column (Modifier
+        .border(width = 1.dp, color = Color(0XFFf7f7f7), shape = RoundedCornerShape(4.dp))
+        .padding(1.dp)){
+        Card {
+            Column(Modifier
+                .fillMaxSize()
+                .background(Color(0XFFf7f7f7))
+                .padding(2.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center) {
                 content()
             }
         }
