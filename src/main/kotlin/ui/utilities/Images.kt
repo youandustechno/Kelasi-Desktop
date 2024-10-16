@@ -93,6 +93,24 @@ fun ResourceUserImage(imagePath: String, onClick:(() ->Unit)? = null) {
 }
 
 @Composable
+fun ResourceImageController30by30(res: String, onClick:(() ->Unit)? = null) {
+    //""
+    Image(
+        painter = painterResource(res),
+        contentDescription = "people",
+        contentScale = ContentScale.FillBounds,
+        modifier = Modifier
+            .width(30.dp)
+            .height(30.dp)
+            .padding(5.dp)
+            .clickable {
+                onClick?.invoke()
+                //fileToUpload = showFileChooser()
+            }
+    )
+}
+
+@Composable
 fun UserBackgroundImageUrl(image: String = imageDefault, onClick:(() ->Unit)? = null) {
     var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
 

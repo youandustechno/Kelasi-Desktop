@@ -218,17 +218,32 @@ fun Videos(
                                 }
                             }
                         }
-                        val buttonText = when(playerState) {
-                            VideoState.NONE -> "Play"
-                            VideoState.PAUSE-> "Play"
-                            VideoState.START -> "Stop"
-                        }
 
                         Row {
                             ButtonContainer{
-                                PlayStopButton(buttonText) {
-                                    playerState = if(playerState != VideoState.START) VideoState.START
-                                    else VideoState.PAUSE
+                                PlayStopButton(playerState) {
+                                    playerState = VideoState.REWIND
+                                }
+                            }
+                            Spacer(Modifier.width(5.dp))
+                            ButtonContainer{
+                                PlayStopButton(playerState) {
+                                    playerState = when (playerState) {
+                                        VideoState.START-> VideoState.PAUSE
+                                        VideoState.PAUSE -> VideoState.START
+                                        VideoState.INIT -> VideoState.PAUSE
+                                        VideoState.REWIND -> VideoState.PAUSE
+                                        VideoState.FORWARD -> VideoState.PAUSE
+                                        else -> {
+                                            VideoState.INIT
+                                        }
+                                    }
+                                }
+                            }
+                            Spacer(Modifier.width(5.dp))
+                            ButtonContainer{
+                                PlayStopButton(playerState) {
+                                    playerState = VideoState.FORWARD
                                 }
                             }
                         }
@@ -331,5 +346,5 @@ fun Videos(
     }
 }
 
-enum class VideoState { START, PAUSE, NONE}
+enum class VideoState { START, PAUSE, STOP, REWIND, RESUME, FORWARD, NONE, INIT}
 

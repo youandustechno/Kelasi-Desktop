@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ui.videos.VideoState
 
 @Composable
 fun LoginButton(value: String, click: () -> Unit) {
@@ -71,15 +72,26 @@ fun SubmitQuizButton(value: String, click: () -> Unit) {
 }
 
 @Composable
-fun PlayStopButton(value: String, click: () -> Unit) {
+fun PlayStopButton(videoState: VideoState, click: (VideoState) -> Unit) {
 
     Row {
-        Button( { click()},
+        Button( { click.invoke(videoState)},
             modifier = Modifier.width(100.dp)
                 .background(color = Color.Transparent, shape = RoundedCornerShape(50.dp))
                 .padding(5.dp)) {
 
-            Text(value, style =  MaterialTheme.typography.button)
+            val res: String = when(videoState) {
+                VideoState.RESUME -> "image/icon_pause.svg"
+                VideoState.PAUSE -> "image/icon_play.svg"
+                VideoState.START -> "image/icon_pause.svg"
+                VideoState.STOP -> "image/icon_play.svg"
+                VideoState.FORWARD -> "image/icon_forward.svg"
+                VideoState.REWIND -> "image/icon_rewind.svg"
+                else -> "image/icon_play.svg"
+            }
+
+            ResourceImageController30by30(res) {
+            }
         }
     }
 }

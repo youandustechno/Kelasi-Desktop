@@ -2,12 +2,12 @@ package ui.utilities
 
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.remember
+import androidx.compose.material.Slider
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.SwingPanel
 import androidx.compose.ui.graphics.Color
+import kotlinx.coroutines.delay
 import models.video.VideoComponent
 import ui.videos.VideoState
 import uk.co.caprica.vlcj.factory.discovery.NativeDiscovery
@@ -25,16 +25,57 @@ fun VideoPlayerImpl(
 ) {
     val mediaPlayerComponent = remember { initializeMediaPlayerComponent() }
     val mediaPlayer = remember { mediaPlayerComponent.mediaPlayer() }
+    var isMediaLoaded by remember { mutableStateOf(false)}
 
     val factory = remember { { mediaPlayerComponent } }
+    val skipTimeMillis = 10_000L
+    var totalTime by remember { mutableStateOf(1L) }
+    var currentTime by remember { mutableStateOf(0L) }
 
-    if(videoComponent.playerState == VideoState.PAUSE) {
-         mediaPlayer.media().startPaused(videoComponent.url)
+    LaunchedEffect(Unit) {
+        while (true) {
+            if (mediaPlayer.status().isPlaying) {
+                currentTime = mediaPlayer.status().time()  // Get the current playback time
+                totalTime = mediaPlayer.media().info().duration()  // Get total duration of the video
+            }
+            delay(500L)  // Poll every 500ms for updates
+        }
     }
 
-    if (videoComponent.playerState == VideoState.START) {
-        //mediaPlayer.media().startPaused(videoComponent.url )
-        mediaPlayer.media().play(videoComponent.url )
+    when(videoComponent.playerState) {
+
+        VideoState.START -> {
+            mediaPlayer.controls().play()
+        }
+        VideoState.INIT -> {
+            mediaPlayer.media().play(videoComponent.url)
+        }
+        VideoState.PAUSE -> {
+            if(mediaPlayer.status().isPlaying) {
+                mediaPlayer.controls().pause()
+            }
+        }
+        VideoState.RESUME -> {
+            if(!mediaPlayer.status().isPlaying) {
+                mediaPlayer.controls().play()
+            }
+        }
+        VideoState.STOP -> {
+            mediaPlayer.controls().stop()
+            isMediaLoaded = false
+        }
+        VideoState.REWIND -> {
+            currentTime = mediaPlayer.status().time()
+            val newTime = (currentTime - skipTimeMillis).coerceAtLeast(0)
+            mediaPlayer.controls().setTime(newTime)
+        }
+        VideoState.FORWARD -> {
+            currentTime = mediaPlayer.status().time()
+            totalTime = mediaPlayer.media().info().duration()
+            val newTime = (currentTime + skipTimeMillis).coerceAtMost(totalTime)
+            mediaPlayer.controls().setTime(newTime)
+        }
+        else -> {}
     }
 
     DisposableEffect(Unit) { onDispose(mediaPlayer::release) }
@@ -45,6 +86,16 @@ fun VideoPlayerImpl(
         update = {
 
         }
+    )
+
+    Slider(
+        value = (currentTime / totalTime.toFloat()).coerceIn(0f, 1f),  // Progress ratio
+        onValueChange = { newValue ->
+            // Seek the video to the new position when slider is dragged
+            val seekTime = (newValue * totalTime).toLong()
+            mediaPlayer.controls().setTime(seekTime)
+        },
+        modifier = Modifier.fillMaxWidth(),
     )
 }
 

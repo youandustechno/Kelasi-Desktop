@@ -90,6 +90,11 @@ fun Documents(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                                         pdfImages = images
                                         textToRead = textToBeRead
                                     }
+
+                                    if(isReading == VoiceStates.READING) {
+                                        stopReading()
+                                        isReading = VoiceStates.NONE
+                                    }
                                 }
                             }
                         }) {

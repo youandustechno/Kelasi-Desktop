@@ -143,7 +143,7 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                             .sizeIn(150.dp, 70.dp, 300.dp, 90.dp)
                             .padding(20.dp)) {
 
-                            SubmitQuizButton("CONTINUE") {
+                            SubmitQuizButton("START QUIZ") {
                                 coroutineScope.launch(Dispatchers.IO) {
                                     val response = quizViewModel.submitQuiz(
                                         UserQuizComponent(
