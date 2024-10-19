@@ -190,7 +190,7 @@ fun Settings(navHelper: NavHelper, onClick:((NavHelper) -> Unit)? = null) {
                     val validDataMap = validateEntries(
                         firstName = firstname,
                         lastName = lastname,
-                        middleName = lastname,
+                        middleName = middlename,
                         level = level,
                         email = email,
                         phoneNumber = phone,
@@ -203,7 +203,7 @@ fun Settings(navHelper: NavHelper, onClick:((NavHelper) -> Unit)? = null) {
                                 UserDataModel(
                                     firstName = firstname,
                                     lastName = lastname,
-                                    middleName = lastname,
+                                    middleName = middlename,
                                     level = level,
                                     email = email,
                                     phoneNumber = phone,

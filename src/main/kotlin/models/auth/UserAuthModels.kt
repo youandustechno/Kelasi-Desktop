@@ -21,7 +21,8 @@ data class UserDataModel(
     var password: String = "",
     var confirmPassword: String = "",
     val url: String= "",
-    var scores: List<Score>? = null
+    var scores: List<Score>? = null,
+    var isApproved: Boolean? = false
 )
 
 data class Score(

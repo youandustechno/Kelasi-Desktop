@@ -1,6 +1,7 @@
 package models.auth
 
 import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.http.*
 
 interface UserAuthUrls {
@@ -23,7 +24,13 @@ interface UserAuthUrls {
     @POST("/users/picture")
     suspend fun registerUserWithPic(
         @Part file: MultipartBody.Part,
-        @Body user: UserDataModel
+        @Part ("firstName") firstName : RequestBody?,
+        @Part ("lastName") lastName : RequestBody?,
+        @Part ("middleName") middleName : RequestBody?,
+        @Part ("email") email : RequestBody?,
+        @Part ("level") level : RequestBody?,
+        @Part ("phoneNumber") phoneNumber : RequestBody?,
+        @Part ("isApproved") isApproved : RequestBody?
     ): UserDataModel?
 
     @PATCH("/users/modify")

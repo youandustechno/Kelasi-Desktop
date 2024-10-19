@@ -34,9 +34,13 @@ fun Login(loggedin: (Boolean) -> Unit) {
             .wrapContentHeight()
             .background(Color.White, shape = RoundedCornerShape(10.dp))
             .padding(5.dp)) {
+            Box(Modifier
+                .fillMaxWidth()
+                .padding(start = 4.dp, end = 4.dp)) {
 
-            PhoneText(text) {
-                text = it
+                PhoneText(text) {
+                    text = it
+                }
             }
 
             LoginButton(buttonText) {

@@ -38,14 +38,14 @@ fun readAloud(text: String) {
     val osName = System.getProperty("os.name").lowercase(Locale.getDefault())
 
     if(osName.contains("mac")) {
-        Runtime.getRuntime().exec("say $text")
+        Runtime.getRuntime().exec("say -r 130 $text")
 
     } else if(osName.contains("windows")) {
         Runtime.getRuntime().exec("powershell -Command \"Add-Type -AssemblyName System.Speech; " +
-                "[System.Speech.Synthesis.SpeechSynthesizer]::new().Speak('$text');\"")
+                "[System.Speech.Synthesis.SpeechSynthesizer]::new(); .Speak.Rate = -4; .Speak('$text');\"")
 
     } else {
-        Runtime.getRuntime().exec("espeak \"$text\"")
+        Runtime.getRuntime().exec("espeak -s 100 \"$text\"")
 
     }
 }
@@ -54,18 +54,18 @@ fun readAloudFrench(text: String) {
     val osName = System.getProperty("os.name").lowercase(Locale.getDefault())
 
     if(osName.contains("mac")) {
-        Runtime.getRuntime().exec("say -v Thomas \"$text\"")
+        Runtime.getRuntime().exec("say -v Thomas -r 130 \"$text\"")
 
     } else if(osName.contains("windows")) {
         Runtime.getRuntime().exec("powershell -Command \"Add-Type -AssemblyName System.Speech; " +
-                "[System.Speech.Synthesis.SpeechSynthesizer]::new().Speak('$text');\"")
+                "[System.Speech.Synthesis.SpeechSynthesizer]::new(); .Speak.Rate = -4; "+
+                ".Speak('$text');\"")
 
     } else {
-        Runtime.getRuntime().exec("espeak -v fr \"$text\"")
+        Runtime.getRuntime().exec("espeak -v fr -s 100 \"$text\"")
 
     }
 }
-
 fun stopReading() {
     val osName = System.getProperty("os.name").lowercase(Locale.getDefault())
 

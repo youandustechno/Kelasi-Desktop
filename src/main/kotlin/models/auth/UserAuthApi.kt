@@ -9,7 +9,9 @@ import models.auth.UserRetrofitClient.setInterceptor
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
+import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
@@ -86,10 +88,27 @@ class UserAuthApi {
                         .registerUser(userData)
                 }
                 else {
+                    val firstName = userData.firstName.toRequestBody("text/plain".toMediaTypeOrNull())
+                    val lastName = userData.lastName.toRequestBody("text/plain".toMediaTypeOrNull())
+                    val middleName = userData.middleName.toRequestBody("text/plain".toMediaTypeOrNull())
+                    val email = userData.email.toRequestBody("text/plain".toMediaTypeOrNull())
+                    val level = userData.level.toRequestBody("text/plain".toMediaTypeOrNull())
+                    val phoneNumber = userData.phoneNumber.toRequestBody("text/plain".toMediaTypeOrNull())
+                    val isApproved = userData.isApproved.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+
                     UserRetrofitClient
                         .setInterceptor(authCode!!)
                         .getApiService()
-                        .registerUserWithPic(theFile, userData)
+                        .registerUserWithPic(
+                            file = theFile,
+                            firstName = firstName,
+                            lastName = lastName,
+                            middleName = middleName,
+                            email = email,
+                            level = level,
+                            phoneNumber = phoneNumber,
+                            isApproved =  isApproved
+                        )
                 }
 
                 if(token != null){

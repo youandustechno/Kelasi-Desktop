@@ -10,8 +10,10 @@ import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.toComposeImageBitmap
@@ -23,6 +25,7 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jetbrains.skia.Image
+import ui.videos.VideoState
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.net.HttpURLConnection
@@ -164,6 +167,36 @@ fun CouseImageUrl(image: String = imageDefault) {
         modifier = Modifier
             .width(200.dp)
             .height(100.dp))
+    }
+}
+
+@Composable
+fun PlayStopImageButton(videoState: VideoState, click: () -> Unit) {
+    val res: String = when (videoState) {
+        VideoState.PAUSE -> "image/icon_play.svg"
+        VideoState.START -> "image/icon_pause.svg"
+        VideoState.REWIND -> "image/icon_pause.svg"
+        VideoState.FORWARD -> "image/icon_pause.svg"
+        VideoState.INIT -> "image/icon_pause.svg"
+        else -> "image/icon_play.svg"
+    }
+
+    Box(modifier = Modifier
+        .clip(CircleShape)
+        .size(75.dp),
+        contentAlignment = Alignment.Center) {
+        Image(
+            painter = painterResource(res),
+            contentDescription = "play or pause button",
+            contentScale = ContentScale.Fit,
+            modifier = Modifier
+                .size(35.dp)
+                .clip(CircleShape)
+                .clipToBounds()
+                .clickable {
+                    click.invoke()
+                }
+        )
     }
 }
 

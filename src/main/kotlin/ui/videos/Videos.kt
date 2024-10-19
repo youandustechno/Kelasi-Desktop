@@ -221,29 +221,27 @@ fun Videos(
 
                         Row {
                             ButtonContainer{
-                                PlayStopButton(playerState) {
-                                    playerState = VideoState.REWIND
-                                }
-                            }
-                            Spacer(Modifier.width(5.dp))
-                            ButtonContainer{
-                                PlayStopButton(playerState) {
+                                PlayStopImageButton(playerState) {
                                     playerState = when (playerState) {
-                                        VideoState.START-> VideoState.PAUSE
-                                        VideoState.PAUSE -> VideoState.START
-                                        VideoState.INIT -> VideoState.PAUSE
-                                        VideoState.REWIND -> VideoState.PAUSE
-                                        VideoState.FORWARD -> VideoState.PAUSE
+                                        VideoState.START-> {
+                                            VideoState.PAUSE
+                                        }
+                                        VideoState.PAUSE -> {
+                                            VideoState.START
+                                        }
+                                        VideoState.INIT -> {
+                                            VideoState.START
+                                        }
+                                        VideoState.REWIND ->  {
+                                            VideoState.PAUSE
+                                        }
+                                        VideoState.FORWARD -> {
+                                            VideoState.PAUSE
+                                        }
                                         else -> {
-                                            VideoState.INIT
+                                            VideoState.START
                                         }
                                     }
-                                }
-                            }
-                            Spacer(Modifier.width(5.dp))
-                            ButtonContainer{
-                                PlayStopButton(playerState) {
-                                    playerState = VideoState.FORWARD
                                 }
                             }
                         }

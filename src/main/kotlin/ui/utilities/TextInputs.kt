@@ -24,13 +24,13 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun PhoneText(phoneNumber: String, onChange: (String) -> Unit) {
     var text by remember { mutableStateOf(TextFieldValue(phoneNumber)) }
-    TextFieldWithIcons(text.text, Icons.Default.Phone, "Phone", onChange)
+    AuthTextFieldWithIcons(text.text, Icons.Default.Phone, "Phone", onChange)
 }
 
 @Composable
 fun OrgaAuthText(phoneNumber: String, onChange: (String) -> Unit) {
     var text by remember { mutableStateOf(TextFieldValue(phoneNumber)) }
-    TextFieldWithIcons(text.text, Icons.Default.Edit, "Auth Code", onChange)
+    AuthTextFieldWithIcons(text.text, Icons.Default.Edit, "Auth Code", onChange)
 }
 
 @Composable
@@ -242,6 +242,33 @@ fun TextFieldWithIcons(value: String, icon: ImageVector, description: String, on
             },
             modifier = Modifier
                 .wrapContentWidth(),
+            //.background(color = Color.White),
+            label = { Text(text = description) },
+            // placeholder = { Text(text = description) },
+        )
+    }
+}
+
+@Composable
+fun AuthTextFieldWithIcons(value: String, icon: ImageVector, description: String, onChange: (String) -> Unit) {
+    var text by remember { mutableStateOf(value) }
+
+    Column(Modifier.fillMaxWidth()
+        .wrapContentHeight(),
+        horizontalAlignment = Alignment.Start,
+        verticalArrangement = Arrangement.Center) {
+        OutlinedTextField(
+            value = text,
+            leadingIcon = { Icon(imageVector = icon, contentDescription = description) },
+            //trailingIcon = { Icon(imageVector = Icons.Default.Add, contentDescription = null) },
+            keyboardOptions = KeyboardOptions(keyboardType = if(description.equals("phone", true))KeyboardType.Number
+            else KeyboardType.Text),
+            onValueChange = {
+                text = it
+                onChange.invoke(it)
+            },
+            modifier = Modifier
+                .fillMaxWidth(),
             //.background(color = Color.White),
             label = { Text(text = description) },
             // placeholder = { Text(text = description) },

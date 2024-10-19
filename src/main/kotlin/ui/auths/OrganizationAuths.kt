@@ -43,10 +43,15 @@ fun OrgAuth(orgFound:(NavHelper) -> Unit) {
             .wrapContentHeight()
             .background(Color.White, shape = RoundedCornerShape(10.dp))
             .padding(5.dp)) {
-            OrgaAuthText(text) {
-                text = it
-            }
 
+            Box(Modifier
+                .fillMaxWidth()
+                .padding(start = 4.dp, end = 4.dp)) {
+                OrgaAuthText(text) {
+                    text = it
+                }
+            }
+            
             LoginButton(buttonText) {
                 //Make http call
                 coroutineScope.launch(Dispatchers.IO) {
