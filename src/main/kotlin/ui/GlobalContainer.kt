@@ -93,7 +93,7 @@ fun GlobalContainer() {
                     ContentWrapper(true, navigationState, {
                         navigationState = it
                     }) {
-                        Dashboard({ courses ->
+                        Dashboard(navigationState, { courses ->
                             coursesGlobalList = courses
                         }) {
                             navigationState = it

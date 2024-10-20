@@ -12,6 +12,7 @@ data class CourseComponent(
     var url: String ="",
     var title: String ="",
     var modules: List<Module> = listOf(),
+    var level : List<String>? = null,
     var description: String =""
 )
 

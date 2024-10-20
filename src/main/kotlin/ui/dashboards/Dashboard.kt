@@ -21,23 +21,37 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import models.CoursesListResponse
+import models.auth.UserDataModel
+import models.video.CourseComponent
 import ui.NavHelper
 import ui.Route
 import ui.utilities.*
 
 @Composable
-fun Dashboard(courses: (CoursesListResponse?)-> Unit,
+fun Dashboard(navigationState: NavHelper,
+              courses: (CoursesListResponse?)-> Unit,
               onClick: (NavHelper) -> Unit) {
 
     var coursesList: CoursesListResponse? by remember { mutableStateOf(CoursesListResponse())}
+    var courses: List<CourseComponent>? by remember { mutableStateOf(null)}
     var isCoursesAvailable: Boolean? by remember { mutableStateOf(null) }
+    var user : UserDataModel? by remember { mutableStateOf(null) }
     val coroutineScope = rememberCoroutineScope()
+
+    //courseMap["user"] = userSuccess.user
+    //NavHelper(Route.Dashboard, courseMap)
+
+    if(navigationState.dataMap.containsKey("user")) {
+        user = navigationState.dataMap["user"] as UserDataModel
+    }
 
     LaunchedEffect(Unit) {
         if(isCoursesAvailable != true) {
             coursesList = DashboardViewModel().getCoursesList()
             courses(coursesList)
             isCoursesAvailable = true
+            courses = coursesList?.courses?.filter { it.level?.contains( user?.level) == true }
+            isCoursesAvailable = courses?.isNotEmpty() == true || courses != null
         }
     }
 
@@ -66,7 +80,7 @@ fun Dashboard(courses: (CoursesListResponse?)-> Unit,
 
         item {
 
-            if(coursesList?.courses != null) {
+            if(courses != null) {
                 LazyVerticalGrid(
                     modifier = Modifier
                         .widthIn(1000.dp, 1500.dp)
@@ -75,9 +89,9 @@ fun Dashboard(courses: (CoursesListResponse?)-> Unit,
                     ,
                     columns = GridCells.Fixed(3),
                     horizontalArrangement = Arrangement.Center,
-                    verticalArrangement = Arrangement.Center
+                    verticalArrangement = Arrangement.Top
                 ) {
-                    items(coursesList?.courses!!) { course ->
+                    items(courses!!) { course ->
                         Column(
                             Modifier.wrapContentHeight()
                                 .wrapContentWidth()
@@ -116,7 +130,8 @@ fun Dashboard(courses: (CoursesListResponse?)-> Unit,
                         }
                     }
                 }
-            } else {
+            }
+            else {
                 if(isCoursesAvailable == null){
                     Column {
                         Text("Loading")
