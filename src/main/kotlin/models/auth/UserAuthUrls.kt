@@ -9,9 +9,19 @@ interface UserAuthUrls {
 //    @GET("/auths/{organizationId}")
 //    suspend fun getAuthCode(@Path("organizationId") id: String): OrganizationComponent?
 
-    @POST("/auths")
+    @POST("/auths/phone")
     suspend fun loginWithPhone(
         @Body phoneNumber: PhoneComponent
+    ): TokenComponent?
+
+    @POST("/auths/email")
+    suspend fun loginWithEmail(
+        @Body credentials: EmailAndPassComponent
+    ): TokenComponent?
+
+    @POST("/auths/register")
+    suspend fun register(
+        @Body credentials: EmailAndPassComponent
     ): TokenComponent?
 
 
@@ -45,4 +55,7 @@ interface UserAuthUrls {
         @Path("userId") id: String,
         @Body user: UserDataModel
     ): UserDataModel?
+
+    @GET("users/{email}")
+    suspend fun getUser(@Part email: String) : UserDataModel?
 }

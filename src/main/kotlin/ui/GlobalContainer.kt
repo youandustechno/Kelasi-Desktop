@@ -17,6 +17,7 @@ import models.CoursesListResponse
 import models.video.CourseComponent
 import ui.auths.Login
 import ui.auths.OrgAuth
+import ui.auths.Registration
 import ui.dashboards.Dashboard
 import ui.groups.Group
 import ui.manages.*
@@ -30,7 +31,7 @@ import ui.utilities.Headers
 import ui.utilities.TabButton
 import ui.videos.Documents
 import ui.videos.Videos
-import java.util.prefs.Preferences
+
 
 class App
 
@@ -56,8 +57,6 @@ fun GlobalContainer() {
 
     var coursesGlobalList : CoursesListResponse? by remember { mutableStateOf(CoursesListResponse())}
 
-    var authState by remember { mutableStateOf(false) }
-
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Image(
             painter = painterResource("image/black_people.webp"),
@@ -73,19 +72,14 @@ fun GlobalContainer() {
                 Route.AuthOrg -> {
                     ContentWrapper(false, navigationState, {}) {
                         OrgAuth { org ->
-                            navigationState = NavHelper(Route.AuthLogin, )
+                            navigationState = NavHelper(Route.AuthLogin)
                         }
                     }
                 }
                 Route.AuthLogin -> {
                     ContentWrapper(false,navigationState, {}) {
-                        Login { loggedIn ->
-                            if(loggedIn) {
-                                navigationState = NavHelper(Route.Dashboard)
-                            } else {
-                                navigationState = NavHelper(Route.AuthLogin)
-                            }
-                            authState = loggedIn
+                        Login { navHelper ->
+                            navigationState = navHelper
                         }
                     }
                 }
@@ -174,6 +168,16 @@ fun GlobalContainer() {
                             navigationState = action
                         }
                     }
+                    //Registration
+                }
+                Route.Register -> {
+                    ContentWrapper(true, navigationState,{
+                        navigationState = it
+                    }) {
+                        Registration(navigationState) {
+                            navigationState = it
+                        }
+                    }
                 }
                 Route.Settings -> {
                     ContentWrapper(true, navigationState,{
@@ -240,6 +244,9 @@ fun ContentWrapper(withNav: Boolean, navigationState: NavHelper, onClick:(NavHel
                     }
                     else if(navigationState.route == Route.VideosList) {
                         Text("Videos", style = MaterialTheme.typography.h6)
+                    }
+                    else if(navigationState.route == Route.Register) {
+                        Text("Register", style = MaterialTheme.typography.h6)
                     }
                     else if(navigationState.route == Route.Settings) {
                         Text("Settings", style = MaterialTheme.typography.h6)
@@ -387,8 +394,13 @@ fun ContentWrapper(withNav: Boolean, navigationState: NavHelper, onClick:(NavHel
                             onClick.invoke(NavHelper(Route.AuthLogin))
                         }
                     }
-                    else {
+                    else if(navigationState.route == Route.Register) {
+
+                        TabButton("AUTH CODE") {
+                            onClick.invoke(NavHelper(Route.AuthOrg))
+                        }
                     }
+                    else { }
                 }
 
             }
@@ -422,6 +434,7 @@ enum class Route(route: String) {
     Organization("Organization"),
     Quiz("Quiz"),
     ViewDocument("UploadDocument"),
+    Register("Register"),
     Settings("Settings"),
     ManageQuizzes("Quizzes"),
     VideosList("CoursesList"),

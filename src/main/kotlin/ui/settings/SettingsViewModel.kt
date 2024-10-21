@@ -3,12 +3,13 @@ package ui.settings
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import models.auth.EmailAndPassComponent
 import models.auth.UserAuthApi
 import models.auth.UserDataModel
 import models.auth.UserResponse
 import java.io.File
 
-class SettingsViewModel {
+open class SettingsViewModel {
 
     var filePath by mutableStateOf<String?>(null)
         private set
@@ -17,17 +18,10 @@ class SettingsViewModel {
         filePath = path
     }
 
-    suspend fun startRegistration(user: UserDataModel, isRegister: Boolean): UserResponse {
+    suspend fun updateUserInfo(user: UserDataModel): UserResponse {
         val userAuthApi = UserAuthApi()
         val file = filePath?.let {path -> File(path)  }
 
-
-        return if(true) {
-            userAuthApi.registerUser(file, user)
-        }
-        else {
-            userAuthApi.updateUser(file, user)
-        }
+        return userAuthApi.updateUser(file, user)
     }
-
 }

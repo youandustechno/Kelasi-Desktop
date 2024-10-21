@@ -71,6 +71,48 @@ class UserAuthApi {
         }
     }
 
+    suspend fun loginWithEmail(credentials: EmailAndPassComponent) : TokenResponse {
+        return try {
+            withContext(Dispatchers.IO) {
+                val token = UserRetrofitClient
+                    .getApiService()
+                    .loginWithEmail(credentials)
+
+                if(token != null){
+                    TokenResponse(token)
+                }
+                else {
+                    TokenResponse(null, TokenError(0,
+                        "Token is null"))
+                }
+            }
+        } catch (exception: Exception) {
+            TokenResponse(null, TokenError(0,
+                exception.message?:"exception"))
+        }
+    }
+
+    suspend fun registerAccessCredentials(credentials: EmailAndPassComponent) : TokenResponse {
+        return try {
+            withContext(Dispatchers.IO) {
+                val token = UserRetrofitClient
+                    .getApiService()
+                    .register(credentials)
+
+                if(token != null){
+                    TokenResponse(token)
+                }
+                else {
+                    TokenResponse(null, TokenError(0,
+                        "Token is null"))
+                }
+            }
+        } catch (exception: Exception) {
+            TokenResponse(null, TokenError(0,
+                exception.message?:"exception"))
+        }
+    }
+
     suspend fun registerUser(file: File?, userData: UserDataModel): UserResponse {
 
         val theFile = if(file != null) {
@@ -81,6 +123,10 @@ class UserAuthApi {
         return try {
             withContext(Dispatchers.IO) {
                 val authCode = StorageHelper().retrieveFromStorage(StorageHelper.AUTH_CODE)
+
+                //Firebase auth
+
+
                 val token =  if(theFile == null){
                     UserRetrofitClient
                         .setInterceptor(authCode!!)
@@ -159,6 +205,28 @@ class UserAuthApi {
         } catch (exception: Exception) {
             UserResponse(null, TokenError(0,
                 exception.message?:"exception"))
+        }
+    }
+
+    suspend fun getUser(key: String): UserResponse  {
+        return try {
+            val authCode = StorageHelper().retrieveFromStorage(StorageHelper.AUTH_CODE)
+            val user =  UserRetrofitClient
+                .setInterceptor(authCode!!)
+                .getApiService()
+                .getUser(key)
+
+            withContext(Dispatchers.IO) {
+                if(user != null){
+                    UserResponse(user)
+                }
+                else {
+                    UserResponse(null, TokenError(0, "User not found"))
+                }
+            }
+
+        }catch (e: Exception) {
+            UserResponse(null)
         }
     }
 }

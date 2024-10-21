@@ -1,4 +1,4 @@
-package ui.settings
+package ui.auths
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -22,11 +22,11 @@ import ui.videos.VideosViewModel
 import java.io.File
 
 @Composable
-fun Settings(navHelper: NavHelper, onClick:((NavHelper) -> Unit)? = null) {
+fun Registration(navHelper: NavHelper, onClick:((NavHelper) -> Unit)? = null) {
 
     val coroutineScope = rememberCoroutineScope()
 
-    val settingsViewModel : SettingsViewModel by remember { mutableStateOf(SettingsViewModel()) }
+    val authViewModel : AuthViewModel by remember { mutableStateOf(AuthViewModel()) }
 
     //PICTURE
     var fileToUpload by remember { mutableStateOf<String?>(null) }
@@ -38,7 +38,6 @@ fun Settings(navHelper: NavHelper, onClick:((NavHelper) -> Unit)? = null) {
     var passwordField by remember { mutableStateOf("") }
     var newPasswordField by remember { mutableStateOf("") }
     var confirmNewPasswordField by remember { mutableStateOf("") }
-    var isRegistration: Boolean by remember { mutableStateOf(false) }
 
     //PERSONAL INFORMATION
     var email by remember { mutableStateOf("") }
@@ -94,7 +93,7 @@ fun Settings(navHelper: NavHelper, onClick:((NavHelper) -> Unit)? = null) {
                                     }
                                     if(!fileToUpload.isNullOrEmpty()) {
                                         fileToUpload?.let {
-                                            settingsViewModel.selectImageFile(it)
+                                            authViewModel.selectImageFile(it)
                                             Spacer(Modifier.width(8.dp))
                                         }
                                     }
@@ -157,12 +156,11 @@ fun Settings(navHelper: NavHelper, onClick:((NavHelper) -> Unit)? = null) {
                                 UserPasswordFields(passwordField) {
                                     passwordField = it
                                 }
-                                if(isRegistration) {
-                                    Spacer(modifier = Modifier.height(16.dp))
-                                    // Card Number Input
-                                    UserNewPasswordFields(newPasswordField) {
-                                        newPasswordField = it
-                                    }
+
+                                Spacer(modifier = Modifier.height(16.dp))
+                                // Card Number Input
+                                UserNewPasswordFields(newPasswordField) {
+                                    newPasswordField = it
                                 }
 
                                 Spacer(modifier = Modifier.height(16.dp))
@@ -199,7 +197,7 @@ fun Settings(navHelper: NavHelper, onClick:((NavHelper) -> Unit)? = null) {
                     )
                     if(validDataMap.containsKey("valid")) {
                         coroutineScope.launch(Dispatchers.IO) {
-                            val userSuccess = settingsViewModel.updateUserInfo(
+                            val userSuccess = authViewModel.startRegistration(
                                 UserDataModel(
                                     firstName = firstname,
                                     lastName = lastname,
