@@ -7,6 +7,6 @@ import retrofit2.http.POST
 
 interface QuizUrls {
 
-    @POST("users/quiz")
+    @POST("quiz/submit")
     suspend fun submitUserQuiz(@Body userQuiz: UserQuizComponent): UserQuizResponse?
 }

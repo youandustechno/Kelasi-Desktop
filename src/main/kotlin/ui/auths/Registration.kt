@@ -15,6 +15,9 @@ import models.auth.UserDataModel
 import models.video.CourseComponent
 import models.video.VideoComponent
 import ui.NavHelper
+import ui.NavKeys.CONFIRM
+import ui.NavKeys.USER_KEY
+import ui.NavKeys.VALID
 import ui.Route
 import ui.utilities.*
 import ui.utilities.FieldsValidation.isValid
@@ -195,7 +198,7 @@ fun Registration(navHelper: NavHelper, onClick:((NavHelper) -> Unit)? = null) {
                         password = passwordField,
                         confirmPassword = confirmNewPasswordField
                     )
-                    if(validDataMap.containsKey("valid")) {
+                    if(validDataMap.containsKey(VALID)) {
                         coroutineScope.launch(Dispatchers.IO) {
                             val userSuccess = authViewModel.startRegistration(
                                 UserDataModel(
@@ -213,7 +216,7 @@ fun Registration(navHelper: NavHelper, onClick:((NavHelper) -> Unit)? = null) {
 
                                 if(userSuccess.user != null) {
                                     val courseMap = mutableMapOf<String, Any>()
-                                    courseMap["user"] = userSuccess.user
+                                    courseMap[USER_KEY] = userSuccess.user
                                     onClick?.invoke(NavHelper(Route.Dashboard, courseMap))
                                 }
                                 else {
@@ -274,11 +277,11 @@ private fun validateEntries(
     }
 
     if(!confirmPassword.isValid() || password != confirmPassword) {
-        map["confirm"] = false
+        map[CONFIRM] = false
     }
 
     if(map.keys.size == 0) {
-        map["valid"] = true
+        map[VALID] = true
     }
 
     return map

@@ -23,7 +23,10 @@ import models.userquiz.UserQuizComponent
 import models.video.CourseComponent
 import models.video.Module
 import models.video.QuizComponent
+import ui.Cache.userCache
 import ui.NavHelper
+import ui.NavKeys.COURSE
+import ui.NavKeys.MODULE
 import ui.utilities.AnswerFields
 import ui.utilities.DocCards
 import ui.utilities.QuestionCards
@@ -46,10 +49,10 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
 
     val quizViewModel = QuizViewModel()
 
-    if (navHelper.dataMap.isNotEmpty() && navHelper.dataMap.containsKey("course")) {
-        course = navHelper.dataMap["course"] as CourseComponent
-        if(navHelper.dataMap.containsKey("module")) {
-            module = navHelper.dataMap["module"] as Module
+    if (navHelper.dataMap.isNotEmpty() && navHelper.dataMap.containsKey(COURSE)) {
+        course = navHelper.dataMap[COURSE] as CourseComponent
+        if(navHelper.dataMap.containsKey(MODULE)) {
+            module = navHelper.dataMap[MODULE] as Module
         }
     }
 
@@ -145,19 +148,22 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
 
                             SubmitQuizButton("START QUIZ") {
                                 coroutineScope.launch(Dispatchers.IO) {
-                                    val response = quizViewModel.submitQuiz(
-                                        UserQuizComponent(
-                                            firstName = "",
-                                            lastName = "",
-                                            grade = 0,
-                                            total = 10,
-                                            moduleName = "",
-                                            topicName = "",
-                                            topicId = "",
-                                            quizId = selectedQuiz!!._id!!,
-                                            hasResponseField = false
+
+                                    val response = userCache?.let { user ->
+                                        quizViewModel.submitQuiz(
+                                            UserQuizComponent(
+                                                firstName = user.firstName,
+                                                lastName = user.lastName,
+                                                grade = 0,
+                                                total = 10,
+                                                moduleName = module?._id ?: module?.name ?: "",
+                                                topicName =  course?.name ?: "",
+                                                topicId = course?._id ?: "",
+                                                quizId = selectedQuiz!!._id!!,
+                                                hasResponseField = false
+                                            )
                                         )
-                                    )
+                                    }
                                     withContext(Dispatchers.Main) {
                                         if(response?.score != null) {
                                             isContinueClick = true
@@ -216,19 +222,22 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                             SubmitQuizButton("SUBMIT QUIZ") {
                                 //quizViewModel.addOrUpdateQuiz()
                                 coroutineScope.launch(Dispatchers.IO) {
-                                    val response = quizViewModel.submitQuiz(
-                                        UserQuizComponent(
-                                            firstName = "",
-                                            lastName = "",
-                                            grade = 0,
-                                            total = 10,
-                                            moduleName = "",
-                                            topicName = "",
-                                            topicId = "",
-                                            quizId = selectedQuiz!!._id!!,
-                                            hasResponseField = false
+                                    val response = userCache?.let { user ->
+                                        quizViewModel.submitQuiz(
+                                            UserQuizComponent(
+                                                firstName = user.firstName,
+                                                lastName = user.lastName,
+                                                grade = 0,
+                                                total = 10,
+                                                moduleName = module?._id ?: module?.name ?: "",
+                                                topicName =  course?.name ?: "",
+                                                topicId = course?._id ?: "",
+                                                quizId = selectedQuiz!!._id!!,
+                                                hasResponseField = false
+                                            )
                                         )
-                                    )
+                                    }
+
                                     withContext(Dispatchers.Main) {
                                         if(response?.score != null) {
                                             //display score

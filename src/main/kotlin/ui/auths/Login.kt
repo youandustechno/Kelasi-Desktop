@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import models.auth.EmailAndPassComponent
 import ui.NavHelper
+import ui.NavKeys.USER_KEY
 import ui.Route
 import ui.utilities.FieldsValidation.isValid
 import ui.utilities.LoginButton
@@ -91,7 +92,7 @@ fun Login(onClick: (NavHelper) -> Unit) {
                         withContext(Dispatchers.Main) {
                             if (result.user != null) {
                                 val map = mutableMapOf<String, Any>()
-                                map["user"] = result.user
+                                map[USER_KEY] = result.user
                                 //Todo persist
                                 onClick.invoke(NavHelper(Route.Dashboard, map))
                             } else {

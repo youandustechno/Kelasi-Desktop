@@ -15,12 +15,13 @@ import androidx.compose.ui.unit.dp
 import helpers.StorageHelper
 import models.CoursesListResponse
 import models.video.CourseComponent
+import ui.NavKeys.COURSE
+import ui.NavKeys.COURSE_ID
 import ui.auths.Login
 import ui.auths.OrgAuth
 import ui.auths.Registration
 import ui.dashboards.Dashboard
 import ui.groups.Group
-import ui.manages.*
 import ui.organizations.CoursesSubscriptionList
 import ui.organizations.Subscriptions
 import ui.organizations.UsersSubscription
@@ -55,7 +56,7 @@ fun GlobalContainer() {
         NavHelper(Route.AuthOrg)
     })}
 
-    var coursesGlobalList : CoursesListResponse? by remember { mutableStateOf(CoursesListResponse())}
+    var coursesGlobalList : CoursesListResponse? by remember { mutableStateOf(CoursesListResponse()) }
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Image(
@@ -77,7 +78,7 @@ fun GlobalContainer() {
                     }
                 }
                 Route.AuthLogin -> {
-                    ContentWrapper(false,navigationState, {}) {
+                    ContentWrapper(false, navigationState, {}) {
                         Login { navHelper ->
                             navigationState = navHelper
                         }
@@ -121,13 +122,6 @@ fun GlobalContainer() {
 //                        }
 //                    }
 //                }
-                Route.ManageVideo -> {
-                    ContentWrapper(true, navigationState, {
-                        navigationState = it
-                    }) {
-                        ManageVideos(navigationState)
-                    }
-                }
                 Route.VideosList -> {
                     ContentWrapper(true, navigationState,{
                         navigationState = it
@@ -275,7 +269,7 @@ fun ContentWrapper(withNav: Boolean, navigationState: NavHelper, onClick:(NavHel
                         }
                     }
                     else if(navigationState.route == Route.ManageVideo) {
-                        courseId = navigationState.dataMap["courseId"].toString()
+                        courseId = navigationState.dataMap[COURSE_ID].toString()
 
                         TabButton("Home") {
                             onClick.invoke(NavHelper(Route.Dashboard))
@@ -283,17 +277,17 @@ fun ContentWrapper(withNav: Boolean, navigationState: NavHelper, onClick:(NavHel
 
                         TabButton("Videos") {
                             val courseMap = mutableMapOf<String, Any>()
-                            courseMap["courseId"] = courseId
+                            courseMap[COURSE_ID] = courseId
                             onClick.invoke(NavHelper(Route.VideosList, courseMap))
                         }
                     }
                     else if(navigationState.route == Route.Quiz) {
 
-                        if(navigationState.dataMap.containsKey("course")) {
-                            course = navigationState.dataMap["course"] as CourseComponent
+                        if(navigationState.dataMap.containsKey(COURSE)) {
+                            course = navigationState.dataMap[COURSE] as CourseComponent
 
-                        } else if(navigationState.dataMap.containsKey("courseId")) {
-                            courseId = navigationState.dataMap["courseId"].toString()
+                        } else if(navigationState.dataMap.containsKey(COURSE_ID)) {
+                            courseId = navigationState.dataMap[COURSE_ID].toString()
                         }
 
                         TabButton("Home") {
@@ -303,18 +297,18 @@ fun ContentWrapper(withNav: Boolean, navigationState: NavHelper, onClick:(NavHel
                         TabButton("Videos") {
                             val courseMap = mutableMapOf<String, Any>()
                             if(course != null) {
-                                courseMap["course"] = course!!
+                                courseMap[COURSE] = course!!
 
                             } else if(courseId.isNotEmpty()) {
-                                courseMap["courseId"] = courseId
+                                courseMap[COURSE_ID] = courseId
                             }
                             onClick.invoke(NavHelper(Route.VideosList, courseMap))
                         }
                     }
                     else if(navigationState.route == Route.ManageQuizzes) {
 
-                        if(navigationState.dataMap.containsKey("course")) {
-                            course = navigationState.dataMap["course"] as CourseComponent
+                        if(navigationState.dataMap.containsKey(COURSE)) {
+                            course = navigationState.dataMap[COURSE] as CourseComponent
 
                         } else if(navigationState.dataMap.containsKey("courseId")) {
                             courseId = navigationState.dataMap["courseId"].toString()
@@ -327,7 +321,7 @@ fun ContentWrapper(withNav: Boolean, navigationState: NavHelper, onClick:(NavHel
                         TabButton("Videos") {
                             val courseMap = mutableMapOf<String, Any>()
                             if(course != null) {
-                                courseMap["course"] = course!!
+                                courseMap[COURSE] = course!!
 
                             } else if(courseId.isNotEmpty()) {
                                 courseMap["courseId"] = courseId
@@ -337,11 +331,11 @@ fun ContentWrapper(withNav: Boolean, navigationState: NavHelper, onClick:(NavHel
                     }
                     else if(navigationState.route == Route.VideosList) {
 
-                        if(navigationState.dataMap.containsKey("course")) {
-                            course = navigationState.dataMap["course"] as CourseComponent
+                        if(navigationState.dataMap.containsKey(COURSE)) {
+                            course = navigationState.dataMap[COURSE] as CourseComponent
 
-                        } else if(navigationState.dataMap.containsKey("courseId")) {
-                            courseId = navigationState.dataMap["courseId"].toString()
+                        } else if(navigationState.dataMap.containsKey(COURSE_ID)) {
+                            courseId = navigationState.dataMap[COURSE_ID].toString()
                         }
 
                         TabButton("Home") {
@@ -363,11 +357,11 @@ fun ContentWrapper(withNav: Boolean, navigationState: NavHelper, onClick:(NavHel
                     }
                     else if(navigationState.route == Route.ViewDocument) {
 
-                        if(navigationState.dataMap.containsKey("course")) {
-                            course = navigationState.dataMap["course"] as CourseComponent
+                        if(navigationState.dataMap.containsKey(COURSE)) {
+                            course = navigationState.dataMap[COURSE] as CourseComponent
 
-                        } else if(navigationState.dataMap.containsKey("courseId")) {
-                            courseId = navigationState.dataMap["courseId"].toString()
+                        } else if(navigationState.dataMap.containsKey(COURSE_ID)) {
+                            courseId = navigationState.dataMap[COURSE_ID].toString()
                         }
 
                         TabButton("Home") {
@@ -377,10 +371,10 @@ fun ContentWrapper(withNav: Boolean, navigationState: NavHelper, onClick:(NavHel
                         TabButton("Videos") {
                             val courseMap = mutableMapOf<String, Any>()
                             if(course != null) {
-                                courseMap["course"] = course!!
+                                courseMap[COURSE] = course!!
 
                             } else if(courseId.isNotEmpty()) {
-                                courseMap["courseId"] = courseId
+                                courseMap[COURSE_ID] = courseId
                             }
                             onClick.invoke(NavHelper(Route.VideosList, courseMap))
                         }

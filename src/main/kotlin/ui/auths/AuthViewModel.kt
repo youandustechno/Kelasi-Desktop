@@ -25,13 +25,6 @@ class AuthViewModel: SettingsViewModel (){
         }
     }
 
-    suspend fun login(phone: String) {
-        val authApi = UserAuthApi()
-        val response = authApi.loginWithPhone(phoneNumber = phone)
-
-        return
-    }
-
     suspend fun startLoginEmail(credentials: EmailAndPassComponent): UserResponse {
         val authApi = UserAuthApi()
         val response = authApi.loginWithEmail(credentials)

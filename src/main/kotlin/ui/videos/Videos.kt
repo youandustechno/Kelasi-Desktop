@@ -26,6 +26,9 @@ import models.video.CourseComponent
 import models.video.Module
 import models.video.VideoComponent
 import ui.NavHelper
+import ui.NavKeys.COURSE
+import ui.NavKeys.COURSE_ID
+import ui.NavKeys.MODULE
 import ui.Route
 import ui.utilities.*
 
@@ -56,20 +59,20 @@ fun Videos(
 
     var isFullSize : Boolean by remember { mutableStateOf(false) }
 
-    if (navhelper.dataMap.isNotEmpty() && navhelper.dataMap.containsKey("course")) {
-        course = navhelper.dataMap.get("course") as CourseComponent
+    if (navhelper.dataMap.isNotEmpty() && navhelper.dataMap.containsKey(COURSE)) {
+        course = navhelper.dataMap.get(COURSE) as CourseComponent
         course?.modules?.forEach { module ->
             videosList.addAll(module.videos)
         }
         //videosList.addAll(course.modules[0].videos)
         state = true
-    } else  if(navhelper.dataMap.containsKey("courseId")) {
+    } else  if(navhelper.dataMap.containsKey(COURSE_ID)) {
 
         LaunchedEffect(Unit) {
             courses(videosViewModel.getCoursesList())
         }
 
-        val id = navhelper.dataMap["courseId"]
+        val id = navhelper.dataMap[COURSE_ID]
         if( coursesGlobalList?.courses?.firstOrNull { it._id == id } != null) {
             course = coursesGlobalList.courses.firstOrNull { it._id == id } as CourseComponent
             videosList.clear()
@@ -305,8 +308,8 @@ fun Videos(
                                             Box(Modifier.align(Alignment.CenterStart)) {
                                                 TabButton("Documentation") {
                                                     val courseMap = mutableMapOf<String, Any>()
-                                                    courseMap["module"] = selectedModule!!
-                                                    courseMap["course"] = course as CourseComponent
+                                                    courseMap[MODULE] = selectedModule!!
+                                                    courseMap[COURSE] = course as CourseComponent
 
                                                     onClick.invoke(NavHelper(Route.ViewDocument, courseMap))
                                                 }
@@ -315,8 +318,8 @@ fun Videos(
                                             Box(Modifier.align(Alignment.CenterEnd)) {
                                                 TabButton("Take a Quiz") {
                                                     val courseMap = mutableMapOf<String, Any>()
-                                                    courseMap["module"] = selectedModule!!
-                                                    courseMap["course"] = course as CourseComponent
+                                                    courseMap[MODULE] = selectedModule!!
+                                                    courseMap[COURSE] = course as CourseComponent
 
                                                     onClick.invoke(NavHelper(Route.Quiz, courseMap))
                                                 }

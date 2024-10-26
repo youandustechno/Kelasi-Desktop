@@ -22,6 +22,8 @@ import models.video.CourseComponent
 import models.video.DocumentComponent
 import models.video.Module
 import ui.NavHelper
+import ui.NavKeys.COURSE
+import ui.NavKeys.MODULE
 import ui.utilities.*
 import java.awt.image.BufferedImage
 
@@ -51,15 +53,15 @@ fun Documents(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
     var error: Boolean? by remember { mutableStateOf(null) }
 
 
-    if (navHelper.dataMap.isNotEmpty() && navHelper.dataMap.containsKey("course")) {
+    if (navHelper.dataMap.isNotEmpty() && navHelper.dataMap.containsKey(COURSE)) {
         // courseMap["module"] = module
         //courseMap["course"] = course as CourseComponent
-        course = navHelper.dataMap["course"] as CourseComponent
+        course = navHelper.dataMap[COURSE] as CourseComponent
         course?._id?.let {
             courseId = it
         }
-        if(module == null && navHelper.dataMap.containsKey("module")) {
-            module = navHelper.dataMap["module"] as Module
+        if(module == null && navHelper.dataMap.containsKey(MODULE)) {
+            module = navHelper.dataMap[MODULE] as Module
             module?._id?.let {
                 moduleId = it
             }

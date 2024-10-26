@@ -3,6 +3,7 @@ package models.userquiz
 
 data class UserQuizComponent (
     var _id: String = "",
+    var userRef: String = "",
     val firstName: String,
     val lastName: String,
     var middleName: String ="",

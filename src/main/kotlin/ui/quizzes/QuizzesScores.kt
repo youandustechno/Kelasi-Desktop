@@ -5,6 +5,8 @@ import androidx.compose.runtime.*
 import models.video.CourseComponent
 import models.video.Module
 import ui.NavHelper
+import ui.NavKeys.COURSE
+import ui.NavKeys.MODULE
 
 @Composable
 fun QuizzesScores(navhelper: NavHelper, onClick: (NavHelper) -> Unit) {
@@ -16,12 +18,12 @@ fun QuizzesScores(navhelper: NavHelper, onClick: (NavHelper) -> Unit) {
 
     //val coroutineScope = rememberCoroutineScope()
 
-    if (navhelper.dataMap.isNotEmpty() && navhelper.dataMap.containsKey("course")) {
+    if (navhelper.dataMap.isNotEmpty() && navhelper.dataMap.containsKey(COURSE)) {
         // courseMap["module"] = module
         //courseMap["course"] = course as CourseComponent
-        course = navhelper.dataMap["course"] as CourseComponent
-        if(navhelper.dataMap.containsKey("module")) {
-            module = navhelper.dataMap["module"] as Module
+        course = navhelper.dataMap[COURSE] as CourseComponent
+        if(navhelper.dataMap.containsKey(MODULE)) {
+            module = navhelper.dataMap[MODULE] as Module
         }
     }
 }

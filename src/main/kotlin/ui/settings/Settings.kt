@@ -14,7 +14,12 @@ import models.CoursesListResponse
 import models.auth.UserDataModel
 import models.video.CourseComponent
 import models.video.VideoComponent
+import ui.Cache
+import ui.Cache.userCache
 import ui.NavHelper
+import ui.NavKeys.CONFIRM
+import ui.NavKeys.USER_KEY
+import ui.NavKeys.VALID
 import ui.Route
 import ui.utilities.*
 import ui.utilities.FieldsValidation.isValid
@@ -41,12 +46,12 @@ fun Settings(navHelper: NavHelper, onClick:((NavHelper) -> Unit)? = null) {
     var isRegistration: Boolean by remember { mutableStateOf(false) }
 
     //PERSONAL INFORMATION
-    var email by remember { mutableStateOf("") }
-    var phone by remember { mutableStateOf("") }
-    var firstname by remember { mutableStateOf("") }
-    var lastname by remember { mutableStateOf("") }
-    var middlename by remember { mutableStateOf("") }
-    var level by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf(userCache?.email?:"") }
+    var phone by remember { mutableStateOf(userCache?.phoneNumber?:"") }
+    var firstname by remember { mutableStateOf(userCache?.firstName?:"") }
+    var lastname by remember { mutableStateOf(userCache?.lastName?:"") }
+    var middlename by remember { mutableStateOf(userCache?.middleName?:"") }
+    var level by remember { mutableStateOf(userCache?.level?:"") }
 
     LazyColumn(Modifier.padding(start = 32.dp, end = 32.dp)) {
         item {
@@ -197,7 +202,7 @@ fun Settings(navHelper: NavHelper, onClick:((NavHelper) -> Unit)? = null) {
                         password = passwordField,
                         confirmPassword = confirmNewPasswordField
                     )
-                    if(validDataMap.containsKey("valid")) {
+                    if(validDataMap.containsKey(VALID)) {
                         coroutineScope.launch(Dispatchers.IO) {
                             val userSuccess = settingsViewModel.updateUserInfo(
                                 UserDataModel(
@@ -215,7 +220,11 @@ fun Settings(navHelper: NavHelper, onClick:((NavHelper) -> Unit)? = null) {
 
                                 if(userSuccess.user != null) {
                                     val courseMap = mutableMapOf<String, Any>()
-                                    courseMap["user"] = userSuccess.user
+                                    //userCache = userSuccess.user
+                                    Cache.updateUser(userSuccess.user)
+                                    userCache?.let {
+                                        courseMap[USER_KEY] = it
+                                    }
                                     onClick?.invoke(NavHelper(Route.Dashboard, courseMap))
                                 }
                                 else {
@@ -276,11 +285,11 @@ private fun validateEntries(
     }
 
     if(!confirmPassword.isValid() || password != confirmPassword) {
-        map["confirm"] = false
+        map[CONFIRM] = false
     }
 
     if(map.keys.size == 0) {
-        map["valid"] = true
+        map[VALID] = true
     }
 
     return map

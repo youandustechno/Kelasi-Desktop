@@ -12,7 +12,7 @@ import ui.dashboards.ViewModel
 
 class QuizViewModel: ViewModel() {
 
-    suspend fun submitQuiz(userQuiz: UserQuizComponent) : UserQuizResponse?{
+    suspend fun submitQuiz(userQuiz: UserQuizComponent) : UserQuizResponse? {
        return UserQuizApi().submitUserQuiz(userQuiz)
     }
 

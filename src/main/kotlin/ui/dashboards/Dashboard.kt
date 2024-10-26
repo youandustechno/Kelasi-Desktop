@@ -17,13 +17,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import models.CoursesListResponse
 import models.auth.UserDataModel
 import models.video.CourseComponent
+import ui.Cache
 import ui.NavHelper
+import ui.NavKeys.COURSE
+import ui.NavKeys.USER_KEY
 import ui.Route
 import ui.utilities.*
 
@@ -41,16 +43,22 @@ fun Dashboard(navigationState: NavHelper,
     //courseMap["user"] = userSuccess.user
     //NavHelper(Route.Dashboard, courseMap)
 
-    if(navigationState.dataMap.containsKey("user")) {
-        user = navigationState.dataMap["user"] as UserDataModel
+    if(navigationState.dataMap.containsKey(USER_KEY)) {
+        user = navigationState.dataMap[USER_KEY] as UserDataModel
+        user?.let {
+            Cache.updateUser(it)
+        }
     }
 
     LaunchedEffect(Unit) {
         if(isCoursesAvailable != true) {
-            coursesList = DashboardViewModel().getCoursesList()
+            if(Cache.courseCache == null ) {
+                coursesList =  DashboardViewModel().getCoursesList()
+            }
             courses(coursesList)
             isCoursesAvailable = true
-            courses = coursesList?.courses?.filter { it.level?.contains( user?.level) == true }
+            courses = coursesList?.courses?.filter { it.level?.contains( Cache.userCache?.level) == true }
+            Cache.courseCache = courses
             isCoursesAvailable = courses?.isNotEmpty() == true || courses != null
         }
     }
@@ -103,7 +111,7 @@ fun Dashboard(navigationState: NavHelper,
                                 Box(Modifier
                                     .clickable {
                                         val map = mutableMapOf<String, Any>()
-                                        map["course"] = course
+                                        map[COURSE] = course
                                         onClick.invoke(NavHelper(Route.VideosList, map))
                                     }.fillMaxSize()) {
                                     Row(Modifier.fillMaxWidth(),
