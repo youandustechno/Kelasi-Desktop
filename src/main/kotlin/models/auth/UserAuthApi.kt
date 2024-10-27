@@ -4,6 +4,7 @@ import helpers.StorageHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import models.BaseValues.BASE_URL
+import models.UserValues
 import models.auth.UserRetrofitClient.getApiService
 import models.auth.UserRetrofitClient.setInterceptor
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -14,6 +15,7 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import ui.Cache
 import java.io.File
 
 
@@ -78,7 +80,7 @@ class UserAuthApi {
                     .getApiService()
                     .loginWithEmail(credentials)
 
-                if(token != null){
+                if(token != null) {
                     TokenResponse(token)
                 }
                 else {
@@ -188,10 +190,28 @@ class UserAuthApi {
                         .updaterUser(userData)
                 }
                 else {
+                    val firstName = userData.firstName.toRequestBody("text/plain".toMediaTypeOrNull())
+                    val lastName = userData.lastName.toRequestBody("text/plain".toMediaTypeOrNull())
+                    val middleName = userData.middleName.toRequestBody("text/plain".toMediaTypeOrNull())
+                    val email = userData.email.toRequestBody("text/plain".toMediaTypeOrNull())
+                    val level = userData.level.toRequestBody("text/plain".toMediaTypeOrNull())
+                    val phoneNumber = userData.phoneNumber.toRequestBody("text/plain".toMediaTypeOrNull())
+                    val isApproved = userData.isApproved.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+
                     UserRetrofitClient
                         .setInterceptor(authCode!!)
                         .getApiService()
-                        .updaterUserWithPic(theFile,userData._id, userData)
+                        .updaterUserWithPic(
+                            userData._id,
+                            file = theFile,
+                            firstName = firstName,
+                            lastName = lastName,
+                            middleName = middleName,
+                            email = email,
+                            level = level,
+                            phoneNumber = phoneNumber,
+                            isApproved =  isApproved
+                        )
                 }
 
                 if(user != null){
@@ -211,13 +231,14 @@ class UserAuthApi {
     suspend fun getUser(key: String): UserResponse  {
         return try {
             val authCode = StorageHelper().retrieveFromStorage(StorageHelper.AUTH_CODE)
-            val user =  UserRetrofitClient
-                .setInterceptor(authCode!!)
-                .getApiService()
-                .getUser(key)
 
             withContext(Dispatchers.IO) {
-                if(user != null){
+                val user =  UserRetrofitClient
+                    .setInterceptor(authCode?: Cache.authCode)
+                    .getApiService()
+                    .getUser(UserValues(key))
+
+                if(user != null) {
                     UserResponse(user)
                 }
                 else {

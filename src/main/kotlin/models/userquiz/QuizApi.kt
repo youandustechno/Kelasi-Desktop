@@ -53,7 +53,7 @@ object QuizRetrofitClient {
 
 class UserQuizApi {
 
-    suspend fun submitUserQuiz(userQuizComponent: UserQuizComponent): UserQuizResponse {
+    suspend fun submitUserQuiz(userQuizComponent: UserScoreData): UserQuizResponse {
 
         return try {
             withContext(Dispatchers.IO) {
@@ -65,7 +65,7 @@ class UserQuizApi {
                     .getApiService()
                     .submitUserQuiz(userQuizComponent)
 
-                UserQuizResponse(score = response?.score)
+                UserQuizResponse(userScores = response)
             }
         } catch (e:Exception) {
             UserQuizResponse(errorComponent = ErrorComponent(0, e.message?:"exception"))

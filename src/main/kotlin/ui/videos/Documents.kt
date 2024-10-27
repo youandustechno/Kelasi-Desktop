@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import helpers.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import models.video.CourseComponent
@@ -23,6 +24,7 @@ import models.video.DocumentComponent
 import models.video.Module
 import ui.NavHelper
 import ui.NavKeys.COURSE
+import ui.NavKeys.EMPTY
 import ui.NavKeys.MODULE
 import ui.utilities.*
 import java.awt.image.BufferedImage
@@ -33,7 +35,7 @@ fun Documents(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
     val coroutineScope = rememberCoroutineScope()
 
     var pdfImages by remember { mutableStateOf<List<BufferedImage>?>(null) }
-    var textToRead by remember { mutableStateOf("") }
+    var textToRead by remember { mutableStateOf(EMPTY) }
     var isMaxSize by remember { mutableStateOf(false) }
     var isReading: VoiceStates by remember { mutableStateOf(VoiceStates.NONE) }
     //var pdfListDocImages  = remember {  mutableListOf<BufferedImage>()>(null) }
@@ -43,13 +45,13 @@ fun Documents(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
     var module : Module? by remember { mutableStateOf(null) }
     var documentToUpload by remember { mutableStateOf<String?>(null) }
     var docComponent: DocumentComponent? by remember { mutableStateOf(null) }
-    var moduleId by remember { mutableStateOf("") }
-    var courseId by remember { mutableStateOf("") }
+    var moduleId by remember { mutableStateOf(EMPTY) }
+    var courseId by remember { mutableStateOf(EMPTY) }
 
     val uploadViewModel = MangeDocViewModel()
 
-    var docTitle : String by remember { mutableStateOf("") }
-    var docDescription : String by remember { mutableStateOf("") }
+    var docTitle : String by remember { mutableStateOf(EMPTY) }
+    var docDescription : String by remember { mutableStateOf(EMPTY) }
     var error: Boolean? by remember { mutableStateOf(null) }
 
 
@@ -80,10 +82,11 @@ fun Documents(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                             coroutineScope.launch(Dispatchers.IO) {
                                 val images = uploadViewModel.getDocumentUrl(document.url)
                                 val downloadedFile = downloadPdfFromUrl(document.url)
-                                var textToBeRead = ""
+                                var textToBeRead = EMPTY
                                 if (downloadedFile != null) {
                                     textToBeRead = extractTextFromPdf(downloadedFile.path)
                                 }
+                                delay(500L)
                                 withContext(Dispatchers.Main) {
                                     if(images != null) {
                                         docComponent = document

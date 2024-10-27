@@ -1,9 +1,10 @@
 package models
 
 import models.group.OrganizationComponent
-import models.userquiz.ScoreData
+import models.userquiz.UserQuizComponent
 import models.video.CourseComponent
 import models.video.VideoComponent
+import ui.NavKeys.EMPTY
 
 //Error Response
 data class ErrorComponent(val errorCode: Int = 0, val errorMessage: String? = null)
@@ -20,6 +21,8 @@ data class CoursesListResponse(val courses:List<CourseComponent>?= null, val err
 
 data class CourseResponse(val courses: CourseComponent?= null, val errorComponent: ErrorComponent? = null)
 
-data class UpdateUrl(val updatedTopicUrl: String = "")
+data class UpdateUrl(val updatedTopicUrl: String = EMPTY)
 
-data class UserQuizResponse(val score: ScoreData?= null, val errorComponent: ErrorComponent? = null)
+data class UserQuizResponse(val userScores: UserQuizComponent?= null, val errorComponent: ErrorComponent? = null)
+
+data class UserValues(val id: String)

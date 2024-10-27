@@ -1,12 +1,14 @@
 package models.userquiz
 
 import models.UserQuizResponse
-import retrofit2.http.Body
-import retrofit2.http.POST
+import retrofit2.http.*
 
 
 interface QuizUrls {
 
-    @POST("quiz/submit")
-    suspend fun submitUserQuiz(@Body userQuiz: UserQuizComponent): UserQuizResponse?
+    @POST("quizzes/first")
+    suspend fun firstUserQuiz(@Body userQuiz: UserScoreData): UserQuizComponent?
+
+    @PUT("quizzes/submit")
+    suspend fun submitUserQuiz(@Body userQuiz: UserScoreData): UserQuizComponent?
 }

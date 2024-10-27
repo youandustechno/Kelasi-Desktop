@@ -5,6 +5,7 @@ import androidx.compose.ui.graphics.toComposeImageBitmap
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.rendering.PDFRenderer
 import org.apache.pdfbox.text.PDFTextStripper
+import ui.NavKeys.EMPTY
 import java.awt.image.BufferedImage
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -83,7 +84,7 @@ fun extractTextFromPdf(pdfFilePath: String): String {
             return pdfStripper.getText(document)
         }
     } catch (e:Exception){
-        return ""
+        return EMPTY
     }
 }
 

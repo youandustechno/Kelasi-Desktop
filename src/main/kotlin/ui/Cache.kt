@@ -3,6 +3,7 @@ package ui
 import models.auth.Score
 import models.auth.UserDataModel
 import models.video.CourseComponent
+import ui.NavKeys.EMPTY
 
 object Cache {
 
@@ -12,27 +13,17 @@ object Cache {
     //current user information
     var userCache : UserDataModel? = null
 
-
-//    var _id: String = "",
-//    var firstName: String,
-//    var lastName: String,
-//    var middleName: String = "",
-//    var level: String = "",
-//    var email: String = "",
-//    var phoneNumber:String = "",
-//    var password: String = "",
-//    var confirmPassword: String = "",
-//    val url: String= "",
-//    var scores: List<Score>? = null,
-//    var isApproved: Boolean? = false
+    var authCode: String = EMPTY
 
     fun updateUser(user: UserDataModel) {
-        userCache?._id = user._id
+        userCache?._id = user._id?:EMPTY
         userCache?.level = user.level
         userCache?.email = user.email
-        userCache?.firstName = user.firstName
-        userCache?.lastName = user.lastName
-        userCache?.middleName = user.middleName
-        userCache?.phoneNumber = user.phoneNumber
+        userCache?.firstName = user.firstName?: EMPTY
+        userCache?.lastName = user.lastName?: EMPTY
+        userCache?.middleName = user.middleName?: EMPTY
+        userCache?.phoneNumber = user.phoneNumber?: EMPTY
+        userCache?.url = user.url?: EMPTY
+        userCache?.urlId = user.urlId?: EMPTY
     }
 }

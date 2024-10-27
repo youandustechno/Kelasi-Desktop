@@ -10,10 +10,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import models.auth.EmailAndPassComponent
+import ui.Cache
 import ui.NavHelper
+import ui.NavKeys.EMPTY
 import ui.NavKeys.USER_KEY
 import ui.Route
 import ui.utilities.FieldsValidation.isValid
@@ -29,9 +32,9 @@ fun Login(onClick: (NavHelper) -> Unit) {
     val authViewModel = AuthViewModel()
     val coroutineScope = rememberCoroutineScope()
 
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var phone by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf(EMPTY) }
+    var password by remember { mutableStateOf(EMPTY) }
+    var phone by remember { mutableStateOf(EMPTY) }
     val loginButton by remember { mutableStateOf("LOGIN") }
     val registerLink by remember { mutableStateOf("REGISTER") }
 
@@ -74,11 +77,13 @@ fun Login(onClick: (NavHelper) -> Unit) {
 
                 coroutineScope.launch(Dispatchers.IO) {
 
-                    if(!phone.isValid()) {
-                        //TODO show error
-                    } else if(!email.isValid()) {
-                        //TODO show error
-                    } else if(phone.isValid() && email.isValid() && password.isValid()) {
+                     if(phone.isValid() && email.isValid() && password.isValid()) {
+                        //TODO show error and say you can not login with email and phone credentials the same time.
+                    }
+                     else if(phone.isValid() && !email.isValid() && password.isValid()) {
+                         //TODO show error and say you can not login with email and phone credentials the same time.
+                     }
+                    else if(!phone.isValid() && !email.isValid()) {
                         //TODO show error and say you can not login with email and phone credentials the same time.
                     }
                     else {
@@ -87,11 +92,13 @@ fun Login(onClick: (NavHelper) -> Unit) {
                         } else {
                             authViewModel.startLoginPhone(phone)
                         }
-                        email = ""
-                        password = ""
+                        email = EMPTY
+                        password = EMPTY
+                         delay(500L)
                         withContext(Dispatchers.Main) {
                             if (result.user != null) {
                                 val map = mutableMapOf<String, Any>()
+                                Cache.userCache = result.user
                                 map[USER_KEY] = result.user
                                 //Todo persist
                                 onClick.invoke(NavHelper(Route.Dashboard, map))

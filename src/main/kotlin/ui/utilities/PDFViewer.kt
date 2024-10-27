@@ -10,6 +10,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 //import androidx.compose.ui.graphics.toComposeImageBitmap
 import helpers.toComposeImageBitmap
+import ui.NavKeys.EMPTY
 import java.awt.image.BufferedImage
 
 @Composable
@@ -21,7 +22,7 @@ fun PDFViewer(pdfImages: List<BufferedImage>) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center) {
         pdfImages.forEachIndexed { index, image ->
-            println(""+index)
+            println(EMPTY+index)
             val bitmap = image.toComposeImageBitmap()
             Column (Modifier
                 .fillMaxWidth()

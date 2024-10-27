@@ -8,6 +8,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import models.CoursesListResponse
@@ -16,6 +17,7 @@ import models.video.CourseComponent
 import models.video.VideoComponent
 import ui.NavHelper
 import ui.NavKeys.CONFIRM
+import ui.NavKeys.EMPTY
 import ui.NavKeys.USER_KEY
 import ui.NavKeys.VALID
 import ui.Route
@@ -34,21 +36,21 @@ fun Registration(navHelper: NavHelper, onClick:((NavHelper) -> Unit)? = null) {
     //PICTURE
     var fileToUpload by remember { mutableStateOf<String?>(null) }
     val imageBitmap by remember { derivedStateOf { fileToUpload?.let { loadImageBitmap(File(it)) } } }
-    var urlImage by remember { mutableStateOf("") }
+    var urlImage by remember { mutableStateOf(EMPTY) }
     // loadImageBitmap(file: File)
 
     //CHANGE PASSWORD
-    var passwordField by remember { mutableStateOf("") }
-    var newPasswordField by remember { mutableStateOf("") }
-    var confirmNewPasswordField by remember { mutableStateOf("") }
+    var passwordField by remember { mutableStateOf(EMPTY) }
+    var newPasswordField by remember { mutableStateOf(EMPTY) }
+    var confirmNewPasswordField by remember { mutableStateOf(EMPTY) }
 
     //PERSONAL INFORMATION
-    var email by remember { mutableStateOf("") }
-    var phone by remember { mutableStateOf("") }
-    var firstname by remember { mutableStateOf("") }
-    var lastname by remember { mutableStateOf("") }
-    var middlename by remember { mutableStateOf("") }
-    var level by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf(EMPTY) }
+    var phone by remember { mutableStateOf(EMPTY) }
+    var firstname by remember { mutableStateOf(EMPTY) }
+    var lastname by remember { mutableStateOf(EMPTY) }
+    var middlename by remember { mutableStateOf(EMPTY) }
+    var level by remember { mutableStateOf(EMPTY) }
 
     LazyColumn(Modifier.padding(start = 32.dp, end = 32.dp)) {
         item {
@@ -212,6 +214,7 @@ fun Registration(navHelper: NavHelper, onClick:((NavHelper) -> Unit)? = null) {
                                     confirmPassword = confirmNewPasswordField
                                 )
                             )
+                            delay(500L)
                             withContext(Dispatchers.Main) {
 
                                 if(userSuccess.user != null) {

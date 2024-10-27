@@ -7,9 +7,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import models.CoursesListResponse
 import models.auth.UserDataModel
 import models.video.CourseComponent
@@ -18,6 +16,14 @@ import ui.Cache
 import ui.Cache.userCache
 import ui.NavHelper
 import ui.NavKeys.CONFIRM
+import ui.NavKeys.EMAIL
+import ui.NavKeys.EMPTY
+import ui.NavKeys.FIRST
+import ui.NavKeys.LAST
+import ui.NavKeys.LEVEL
+import ui.NavKeys.MIDDLE
+import ui.NavKeys.PASSWORD
+import ui.NavKeys.PHONE
 import ui.NavKeys.USER_KEY
 import ui.NavKeys.VALID
 import ui.Route
@@ -36,27 +42,31 @@ fun Settings(navHelper: NavHelper, onClick:((NavHelper) -> Unit)? = null) {
     //PICTURE
     var fileToUpload by remember { mutableStateOf<String?>(null) }
     val imageBitmap by remember { derivedStateOf { fileToUpload?.let { loadImageBitmap(File(it)) } } }
-    var urlImage by remember { mutableStateOf("") }
+    var urlImage by remember { mutableStateOf(userCache?.url?:EMPTY) }
     // loadImageBitmap(file: File)
 
     //CHANGE PASSWORD
-    var passwordField by remember { mutableStateOf("") }
-    var newPasswordField by remember { mutableStateOf("") }
-    var confirmNewPasswordField by remember { mutableStateOf("") }
+    var passwordField by remember { mutableStateOf(EMPTY) }
+    var newPasswordField by remember { mutableStateOf(EMPTY) }
+    var confirmNewPasswordField by remember { mutableStateOf(EMPTY) }
     var isRegistration: Boolean by remember { mutableStateOf(false) }
 
     //PERSONAL INFORMATION
-    var email by remember { mutableStateOf(userCache?.email?:"") }
-    var phone by remember { mutableStateOf(userCache?.phoneNumber?:"") }
-    var firstname by remember { mutableStateOf(userCache?.firstName?:"") }
-    var lastname by remember { mutableStateOf(userCache?.lastName?:"") }
-    var middlename by remember { mutableStateOf(userCache?.middleName?:"") }
-    var level by remember { mutableStateOf(userCache?.level?:"") }
+    var email by remember { mutableStateOf(userCache?.email?:EMPTY) }
+    var phone by remember { mutableStateOf(userCache?.phoneNumber?:EMPTY) }
+    var firstname by remember { mutableStateOf(userCache?.firstName?:EMPTY) }
+    var lastname by remember { mutableStateOf(userCache?.lastName?:EMPTY) }
+    var middlename by remember { mutableStateOf(userCache?.middleName?:EMPTY) }
+    var level by remember { mutableStateOf(userCache?.level?:EMPTY) }
+
+    //UPDATE CHECKER
+    var isInfoUpdated : Boolean by remember { mutableStateOf(false) }
 
     LazyColumn(Modifier.padding(start = 32.dp, end = 32.dp)) {
         item {
-            // TODO Add subscription row to take with a click in subscription screen to select type of subscription.
-            // And also show message if subscription expired.
+            if(isInfoUpdated) {
+
+            }
         }
         item {
             Row(Modifier.fillMaxSize()) {
@@ -80,14 +90,15 @@ fun Settings(navHelper: NavHelper, onClick:((NavHelper) -> Unit)? = null) {
                                     horizontalArrangement = Arrangement.Start,
                                     verticalAlignment = Alignment.CenterVertically) {
                                     Spacer(Modifier.width(10.dp))
-                                    if(urlImage.isValid()) {
 
-                                        UserImageUrl(urlImage)
-
-                                    } else if(imageBitmap != null) {
+                                     if(imageBitmap != null) {
                                         imageBitmap?.let {
                                             UserFileImageBitMap(it)
                                         }
+                                    }
+                                    else if(urlImage.isValid()) {
+                                        UserImageUrl(urlImage)
+
                                     }
                                     else {
                                         ResourceUserImage("image/icon_person.svg") {}
@@ -190,7 +201,7 @@ fun Settings(navHelper: NavHelper, onClick:((NavHelper) -> Unit)? = null) {
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically) {
 
-                ConfirmButton("REGISTER") {
+                ConfirmButton("UPDATE") {
                    // onClick?.invoke(NavHelper(Route.Payments))
                     val validDataMap = validateEntries(
                         firstName = firstname,
@@ -204,28 +215,36 @@ fun Settings(navHelper: NavHelper, onClick:((NavHelper) -> Unit)? = null) {
                     )
                     if(validDataMap.containsKey(VALID)) {
                         coroutineScope.launch(Dispatchers.IO) {
-                            val userSuccess = settingsViewModel.updateUserInfo(
-                                UserDataModel(
-                                    firstName = firstname,
-                                    lastName = lastname,
-                                    middleName = middlename,
-                                    level = level,
-                                    email = email,
-                                    phoneNumber = phone,
-                                    password = passwordField,
-                                    confirmPassword = confirmNewPasswordField
+                            val userSuccess = userCache?.let {
+                                settingsViewModel.updateUserInfo(
+                                    UserDataModel(
+                                        _id = it._id,
+                                        firstName = firstname,
+                                        lastName = lastname,
+                                        middleName = middlename,
+                                        level = level,
+                                        email = email,
+                                        phoneNumber = phone,
+                                        password = passwordField,
+                                        confirmPassword = confirmNewPasswordField
+                                    )
                                 )
-                            )
+                            }
+                            isInfoUpdated = true
+                            delay(2000)
+
                             withContext(Dispatchers.Main) {
 
-                                if(userSuccess.user != null) {
-                                    val courseMap = mutableMapOf<String, Any>()
+                                if(userSuccess?.user != null) {
                                     //userCache = userSuccess.user
                                     Cache.updateUser(userSuccess.user)
+                                    val courseMap = mutableMapOf<String, Any>()
                                     userCache?.let {
                                         courseMap[USER_KEY] = it
                                     }
+                                    isInfoUpdated = false
                                     onClick?.invoke(NavHelper(Route.Dashboard, courseMap))
+
                                 }
                                 else {
                                     //Display error to inform the user failed.
@@ -237,6 +256,10 @@ fun Settings(navHelper: NavHelper, onClick:((NavHelper) -> Unit)? = null) {
                     } else {
                         //Handle validation
                     }
+                }
+                if(isInfoUpdated) {
+                    Spacer(Modifier.width(8.dp))
+                    ResourceImage50by50("image/icon_check.svg")
                 }
             }
         }
@@ -257,31 +280,31 @@ private fun validateEntries(
     val map = mutableMapOf<String, Boolean>()
 
     if(!firstName.isValid()) {
-        map["first"] = false
+        map[FIRST] = false
     }
 
     if(!lastName.isValid()) {
-        map["last"] = false
+        map[LAST] = false
     }
 
     if(!middleName.isValid()) {
-        map["middle"] = false
+        map[MIDDLE] = false
     }
 
     if(!level.isValid()) {
-        map["middle"] = false
+        map[LEVEL] = false
     }
 
     if(!email.isValid()) {
-        map["email"] = false
+        map[EMAIL] = false
     }
 
     if(!phoneNumber.isValid()) {
-        map["phone"] = false
+        map[PHONE] = false
     }
 
     if(!password.isValid()) {
-        map["password"] = false
+        map[PASSWORD] = false
     }
 
     if(!confirmPassword.isValid() || password != confirmPassword) {

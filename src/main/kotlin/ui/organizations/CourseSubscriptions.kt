@@ -14,13 +14,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import ui.NavHelper
+import ui.NavKeys.EMPTY
 
 @Composable
 fun CoursesSubscriptionList(onClick:((NavHelper) -> Unit)? = null, onPayClick: (() -> Unit)? = null) {
-    var name by remember { mutableStateOf("") }
-    var cardNumber by remember { mutableStateOf("") }
-    var expirationDate by remember { mutableStateOf("") }
-    var cvv by remember { mutableStateOf("") }
+    var name by remember { mutableStateOf(EMPTY) }
+    var cardNumber by remember { mutableStateOf(EMPTY) }
+    var expirationDate by remember { mutableStateOf(EMPTY) }
+    var cvv by remember { mutableStateOf(EMPTY) }
 
     Column(
         modifier = Modifier.padding(16.dp)

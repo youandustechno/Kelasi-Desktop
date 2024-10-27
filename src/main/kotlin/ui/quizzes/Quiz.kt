@@ -17,20 +17,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import helpers.startCountDown
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import models.userquiz.UserQuizComponent
+import models.userquiz.ScoreInfo
+import models.userquiz.UserScoreData
 import models.video.CourseComponent
 import models.video.Module
 import models.video.QuizComponent
 import ui.Cache.userCache
 import ui.NavHelper
 import ui.NavKeys.COURSE
+import ui.NavKeys.EMPTY
 import ui.NavKeys.MODULE
-import ui.utilities.AnswerFields
-import ui.utilities.DocCards
-import ui.utilities.QuestionCards
-import ui.utilities.SubmitQuizButton
+import ui.NavKeys.USER_KEY
+import ui.Route
+import ui.utilities.*
 
 
 @Composable
@@ -74,7 +76,7 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
 
                         DocCards({
                             totalMinutes = 0
-                            countDownText = ""
+                            countDownText = EMPTY
                             selectedQuiz = interro
                         }) {
                             if(interro._id != null) {
@@ -109,7 +111,7 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                     horizontalAlignment = Alignment.Start,
                     verticalArrangement = Arrangement.Center){
 
-                    Text(countDownText?:"" ,
+                    Text(countDownText?:EMPTY ,
                         modifier = Modifier.padding(start = 10.dp),
                         style = MaterialTheme.typography.caption)
                 }
@@ -151,22 +153,30 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
 
                                     val response = userCache?.let { user ->
                                         quizViewModel.submitQuiz(
-                                            UserQuizComponent(
-                                                firstName = user.firstName,
-                                                lastName = user.lastName,
-                                                grade = 0,
-                                                total = 10,
-                                                moduleName = module?._id ?: module?.name ?: "",
-                                                topicName =  course?.name ?: "",
-                                                topicId = course?._id ?: "",
-                                                quizId = selectedQuiz!!._id!!,
-                                                hasResponseField = false
+                                            UserScoreData(
+                                                userRef = user._id,
+                                                scoreInfo = ScoreInfo(
+                                                    quizRef = selectedQuiz?._id!!,
+                                                    score = 0.toString(),
+                                                    total = 10.toString(),
+                                                    module = module?._id ?: module?.name!!,
+                                                    topicRef = course?._id?:course?.name!!,
+                                                    topicName =  course?.name ?: EMPTY,
+                                                    created = Others.getCurrentDate(),
+                                                    response = emptyList(),
+                                                    pending = true,
+                                                    hasResponseField = false // Todo change this
+                                                )
                                             )
                                         )
                                     }
+                                    delay(500L)
                                     withContext(Dispatchers.Main) {
-                                        if(response?.score != null) {
+                                        if(response?.userScores != null) {
                                             isContinueClick = true
+                                        }
+                                        else {
+                                            isContinueClick = null
                                         }
                                     }
                                 }
@@ -178,32 +188,35 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                 LazyColumn(horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center) {
 
-                    items(selectedQuiz!!.problems!!) { problem ->
-                        var answerEntry by remember { mutableStateOf("") }
+                    itemsIndexed(selectedQuiz!!.problems!!) { index, problem ->
+                        var answerEntry by remember { mutableStateOf(EMPTY) }
 
                         Column(Modifier
                             .fillMaxWidth()
                             .wrapContentHeight()
                             .padding(start = 40.dp, end = 40.dp, top = 10.dp)) {
                             QuestionCards {
-                                Text("${problem.positon}. ${problem.question}", style = MaterialTheme.typography.body2)
+                                Text("${index + 1}. ${problem.question}", style = MaterialTheme.typography.body2)
                                 Spacer(Modifier.height(10.dp))
-                                problem.assertions?.forEachIndexed { index, option ->
-                                    Row(Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.Start,
-                                        verticalAlignment = Alignment.CenterVertically) {
-                                        RadioButton(
-                                            selected = selectedOptions[problem.question] == index,
-                                            onClick = {
-                                                selectedOptions = selectedOptions.toMutableMap().apply {
-                                                    put(problem.question, index)
+                                if(!problem.assertions.isNullOrEmpty()) {
+                                    problem.assertions?.forEachIndexed { index, option ->
+                                        Row(Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.Start,
+                                            verticalAlignment = Alignment.CenterVertically) {
+                                            RadioButton(
+                                                selected = selectedOptions[problem.question] == index,
+                                                onClick = {
+                                                    selectedOptions = selectedOptions.toMutableMap().apply {
+                                                        put(problem.question, index)
+                                                    }
                                                 }
-                                            }
-                                        )
-                                        Spacer(Modifier.width(5.dp))
-                                        Text(option,  style = MaterialTheme.typography.body2)
+                                            )
+                                            Spacer(Modifier.width(5.dp))
+                                            Text(option,  style = MaterialTheme.typography.body2)
+                                        }
                                     }
-                                }?: kotlin.run {
+                                }
+                                else {
                                     AnswerFields(answerEntry) {
                                         answerEntry = it
                                     }
@@ -223,27 +236,32 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                                 //quizViewModel.addOrUpdateQuiz()
                                 coroutineScope.launch(Dispatchers.IO) {
                                     val response = userCache?.let { user ->
+
                                         quizViewModel.submitQuiz(
-                                            UserQuizComponent(
-                                                firstName = user.firstName,
-                                                lastName = user.lastName,
-                                                grade = 0,
-                                                total = 10,
-                                                moduleName = module?._id ?: module?.name ?: "",
-                                                topicName =  course?.name ?: "",
-                                                topicId = course?._id ?: "",
-                                                quizId = selectedQuiz!!._id!!,
-                                                hasResponseField = false
+                                            UserScoreData(
+                                                userRef = user._id,
+                                                scoreInfo = ScoreInfo(
+                                                    quizRef = selectedQuiz?._id!!,
+                                                    score = 0.toString(), //todo change this
+                                                    total = 10.toString(),
+                                                    module = module?._id ?: module?.name!!,
+                                                    topicRef = course?._id?:course?.name!!,
+                                                    topicName =  course?.name ?: "",
+                                                    created = Others.getCurrentDate(),
+                                                    response = emptyList(),
+                                                    pending = true,
+                                                    hasResponseField = false // Todo change this
+                                                )
                                             )
                                         )
                                     }
-
+                                    delay(500L)
                                     withContext(Dispatchers.Main) {
-                                        if(response?.score != null) {
+                                        if(response?.userScores != null) {
                                             //display score
                                             isContinueClick = false
                                         } else {
-
+                                           isContinueClick = null
                                         }
                                     }
                                 }
@@ -275,7 +293,15 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                             .sizeIn(150.dp, 70.dp, 300.dp, 90.dp)
                             .padding(20.dp)) {
                             SubmitQuizButton("CLOSE") {
-
+                                val map = mutableMapOf<String, Any>()
+                                 userCache?.let {
+                                     map[USER_KEY] = it
+                                }
+                                 course?.let {
+                                     map[COURSE] = it
+                                }
+                                //Todo persist
+                                onClick.invoke(NavHelper(Route.VideosList, map))
                             }
                         }
                     }

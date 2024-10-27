@@ -17,6 +17,7 @@ import models.CoursesListResponse
 import models.video.CourseComponent
 import ui.NavKeys.COURSE
 import ui.NavKeys.COURSE_ID
+import ui.NavKeys.EMPTY
 import ui.auths.Login
 import ui.auths.OrgAuth
 import ui.auths.Registration
@@ -39,7 +40,7 @@ class App
 @Composable
 fun GlobalContainer() {
 
-    var groupCode by remember { mutableStateOf("") }
+    var groupCode by remember { mutableStateOf(EMPTY) }
     //val prefs = Preferences.userNodeForPackage(App::class.java)
 
     LaunchedEffect(Unit) {
@@ -126,8 +127,7 @@ fun GlobalContainer() {
                     ContentWrapper(true, navigationState,{
                         navigationState = it
                     }) {
-                        Videos (coursesGlobalList,
-                            navigationState, { courses ->
+                        Videos (coursesGlobalList, navigationState, { courses ->
                                 coursesGlobalList = courses
                             }) { videos->
                             navigationState = videos
@@ -200,7 +200,7 @@ fun GlobalContainer() {
 @Composable
 fun ContentWrapper(withNav: Boolean, navigationState: NavHelper, onClick:(NavHelper) -> Unit, content: @Composable () () -> Unit) {
 
-    var courseId by remember { mutableStateOf("") }
+    var courseId by remember { mutableStateOf(EMPTY) }
     var course : CourseComponent? by remember { mutableStateOf(null) }
 
     if(withNav) {
@@ -249,7 +249,7 @@ fun ContentWrapper(withNav: Boolean, navigationState: NavHelper, onClick:(NavHel
                         Text("Module Documents", style = MaterialTheme.typography.h6)
                     }
                     else {
-                        Text("", style = MaterialTheme.typography.h6)
+                        Text(EMPTY, style = MaterialTheme.typography.h6)
                     }
                 }
 
@@ -339,7 +339,14 @@ fun ContentWrapper(withNav: Boolean, navigationState: NavHelper, onClick:(NavHel
                         }
 
                         TabButton("Home") {
-                            onClick.invoke(NavHelper(Route.Dashboard))
+                            val courseMap = mutableMapOf<String, Any>()
+                            if(course != null) {
+                                courseMap[COURSE] = course!!
+
+                            } else if(courseId.isNotEmpty()) {
+                                courseMap["courseId"] = courseId
+                            }
+                            onClick.invoke(NavHelper(Route.Dashboard, courseMap))
                         }
 
                         TabButton("Logout") {

@@ -17,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import models.CoursesListResponse
@@ -25,6 +26,7 @@ import models.video.CourseComponent
 import ui.Cache
 import ui.NavHelper
 import ui.NavKeys.COURSE
+import ui.NavKeys.EMPTY
 import ui.NavKeys.USER_KEY
 import ui.Route
 import ui.utilities.*
@@ -54,11 +56,14 @@ fun Dashboard(navigationState: NavHelper,
         if(isCoursesAvailable != true) {
             if(Cache.courseCache == null ) {
                 coursesList =  DashboardViewModel().getCoursesList()
+                courses(coursesList)
+                //courses = coursesList?.courses?.filter { it.level?.contains( user?.level) == true }
+                courses = coursesList?.courses //courses
+                Cache.courseCache = coursesList?.courses //courses
+            } else {
+                courses = Cache.courseCache
             }
-            courses(coursesList)
-            isCoursesAvailable = true
-            courses = coursesList?.courses?.filter { it.level?.contains( Cache.userCache?.level) == true }
-            Cache.courseCache = courses
+            isCoursesAvailable = if(courses?.isNotEmpty() == true) true else false
             isCoursesAvailable = courses?.isNotEmpty() == true || courses != null
         }
     }
@@ -76,6 +81,7 @@ fun Dashboard(navigationState: NavHelper,
                 ResourceImageDashboard("image/black_people.webp")  {
                      coroutineScope.launch(Dispatchers.IO) {
                         val classes = DashboardViewModel().getCoursesList()
+                         delay(500L)
                          withContext(Dispatchers.Main) {
                              coursesList = classes
                              courses(classes )
@@ -112,6 +118,9 @@ fun Dashboard(navigationState: NavHelper,
                                     .clickable {
                                         val map = mutableMapOf<String, Any>()
                                         map[COURSE] = course
+                                        Cache.userCache?: user?.let{
+                                            map[USER_KEY] = it
+                                        }
                                         onClick.invoke(NavHelper(Route.VideosList, map))
                                     }.fillMaxSize()) {
                                     Row(Modifier.fillMaxWidth(),
@@ -120,7 +129,7 @@ fun Dashboard(navigationState: NavHelper,
                                         Column(Modifier
                                             .padding(start = 5.dp, end = 5.dp, top = 3.dp, bottom = 1.dp)) {
                                             ResourceImageDashboard("image/black_people.webp")
-                                            Text(text = ""+course.name, style = MaterialTheme.typography.caption
+                                            Text(text = EMPTY+course.name, style = MaterialTheme.typography.caption
                                                 .copy(
                                                     fontSize = 14.sp,
                                                     fontWeight = FontWeight(200),
@@ -129,7 +138,7 @@ fun Dashboard(navigationState: NavHelper,
                                                 )
                                             )
                                             Spacer(Modifier.height(2.dp))
-                                            Text(text = ""+course.description, style = MaterialTheme.typography.caption
+                                            Text(text = EMPTY+course.description, style = MaterialTheme.typography.caption
                                                 .copy(fontSize = 12.sp, lineHeight = 15.sp))
                                         }
                                     }

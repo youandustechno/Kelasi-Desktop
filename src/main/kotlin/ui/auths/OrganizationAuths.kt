@@ -13,9 +13,11 @@ import androidx.compose.ui.unit.dp
 import helpers.StorageHelper
 import helpers.StorageHelper.Companion.AUTH_CODE
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ui.NavHelper
+import ui.NavKeys.EMPTY
 import ui.Route
 import ui.utilities.ErrorCard
 import ui.utilities.FieldsValidation.isValid
@@ -35,7 +37,7 @@ fun OrgAuth(orgFound:(NavHelper) -> Unit) {
         .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center) {
-        var text by remember { mutableStateOf("") }
+        var text by remember { mutableStateOf(EMPTY) }
         var buttonText by remember { mutableStateOf("Verify") }
 
         Column (Modifier
@@ -57,6 +59,7 @@ fun OrgAuth(orgFound:(NavHelper) -> Unit) {
                 coroutineScope.launch(Dispatchers.IO) {
                     if(text.isValid()) {
                       val result =  authViewModel.verifyAuthCode(text)
+                        delay(500L)
                         withContext(Dispatchers.Main) {
                             if(result.org != null) {
                                 //prefs.put("group", result.org!!.tenantCode)

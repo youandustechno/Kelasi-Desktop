@@ -28,6 +28,7 @@ import models.video.VideoComponent
 import ui.NavHelper
 import ui.NavKeys.COURSE
 import ui.NavKeys.COURSE_ID
+import ui.NavKeys.EMPTY
 import ui.NavKeys.MODULE
 import ui.Route
 import ui.utilities.*
@@ -105,8 +106,8 @@ fun Videos(
 
                      Box(Modifier.wrapContentSize()
                          .align(Alignment.Center)) {
-                        Text(""+if(course != null) course?.name?.toUpperCase(Locale.current)
-                        else "",
+                        Text(EMPTY+if(course != null) course?.name?.toUpperCase(Locale.current)
+                        else EMPTY,
                             style = MaterialTheme.typography.h5)
                     }
 

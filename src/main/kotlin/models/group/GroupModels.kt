@@ -1,26 +1,27 @@
 package models.group
 
 import com.google.gson.annotations.SerializedName
+import ui.NavKeys.EMPTY
 
 data class OrganizationComponent(
     var _id: String? = null,
-    var cloudinaryId: String = "",
+    var cloudinaryId: String = EMPTY,
     @SerializedName("tenantId")
-    var tenantCode: String ="",
-    var name: String = "",
-    var url: String ="",
+    var tenantCode: String = EMPTY,
+    var name: String = EMPTY,
+    var url: String = EMPTY,
     var users: List<Users> = listOf(),
-    var description: String =""
+    var description: String = EMPTY
 )
 
 data class Users(
-    val firstName: String = "",
-    val lastName: String = "",
-    val middleName: String = "",
-    val phone: String = "",
-    val picture:String ="",
-    val group: String = "",
-    val type: String = "",
-    var tenantCode: String = "",
+    val firstName: String = EMPTY,
+    val lastName: String = EMPTY,
+    val middleName: String = EMPTY,
+    val phone: String = EMPTY,
+    val picture:String = EMPTY,
+    val group: String = EMPTY,
+    val type: String = EMPTY,
+    var tenantCode: String = EMPTY,
     val isAdmin: Boolean = false
 )
