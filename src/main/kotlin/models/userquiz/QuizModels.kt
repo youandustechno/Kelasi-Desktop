@@ -27,13 +27,17 @@ data class ScoreInfo (
     var topicName: String,
     var created: String,
     var topicRef: String,
-    var response: List<String>? = null,
+    var response: Map<String, String>? = null,
     var hasResponseField: Boolean = false,
     var pending: Boolean? = null
 )
 
 data class UserScoreData(
     var userRef: String,
+    val firstName: String,
+    val lastName: String,
+    var middleName: String = EMPTY,
+    var level: String,
     val scoreInfo: ScoreInfo
 )
 

@@ -3,7 +3,6 @@ package ui.quizzes
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.RadioButton
@@ -48,6 +47,11 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
     var countDownText: String?  by remember {  mutableStateOf(null) }
     var selectedOptions by remember { mutableStateOf<Map<String, Int>>(emptyMap()) }
     var isContinueClick : Boolean? by remember { mutableStateOf(null) }
+    var quizState : QuizState by remember { mutableStateOf(QuizState.INITIAL) }
+
+    var score by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
+
+    val responsesMap: MutableMap<String, String> by remember { mutableStateOf(mutableMapOf()) }
 
     val quizViewModel = QuizViewModel()
 
@@ -58,7 +62,7 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
         }
     }
 
-    if(totalMinutes != 0 && isContinueClick == true) {
+    if(totalMinutes != 0 && quizState == QuizState.START) {
         LaunchedEffect(totalMinutes) {
             startCountDown(totalMinutes) { remainingTime  ->
                 countDownText = remainingTime
@@ -70,13 +74,15 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
         Column(Modifier.fillMaxWidth()
             .wrapContentHeight()
         ) {
-            if(module != null && isContinueClick != true) {
+            if(module != null && (quizState == QuizState.INITIAL || quizState == QuizState.SUBMIT)) {
+                //Displays Quizzes list horizontally
                 LazyRow {
                     itemsIndexed(module!!.quiz) { index, interro ->
 
                         DocCards({
                             totalMinutes = 0
                             countDownText = EMPTY
+                            quizState = QuizState.CONTINUE
                             selectedQuiz = interro
                         }) {
                             if(interro._id != null) {
@@ -122,7 +128,7 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
         if(selectedQuiz != null) {
             Spacer(Modifier.height(10.dp))
             //Questions
-            if(isContinueClick == null) {
+            if(quizState == QuizState.CONTINUE) {
                 Column(Modifier.fillMaxWidth()
                     .wrapContentHeight(),
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -155,6 +161,10 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                                         quizViewModel.submitQuiz(
                                             UserScoreData(
                                                 userRef = user._id,
+                                                firstName = user.firstName,
+                                                lastName = user.lastName,
+                                                middleName = user.middleName,
+                                                level = user.level,
                                                 scoreInfo = ScoreInfo(
                                                     quizRef = selectedQuiz?._id!!,
                                                     score = 0.toString(),
@@ -163,7 +173,7 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                                                     topicRef = course?._id?:course?.name!!,
                                                     topicName =  course?.name ?: EMPTY,
                                                     created = Others.getCurrentDate(),
-                                                    response = emptyList(),
+                                                    response = responsesMap,
                                                     pending = true,
                                                     hasResponseField = false // Todo change this
                                                 )
@@ -174,9 +184,11 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                                     withContext(Dispatchers.Main) {
                                         if(response?.userScores != null) {
                                             isContinueClick = true
+                                            quizState = QuizState.START
                                         }
                                         else {
                                             isContinueClick = null
+                                            quizState = QuizState.START
                                         }
                                     }
                                 }
@@ -184,11 +196,14 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                         }
                     }
                 }
-            } else  if(isContinueClick == true){
+            }
+
+            if(quizState == QuizState.START) {
+
                 LazyColumn(horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center) {
 
-                    itemsIndexed(selectedQuiz!!.problems!!) { index, problem ->
+                    itemsIndexed(selectedQuiz!!.problems!!) { outerIndex, problem ->
                         var answerEntry by remember { mutableStateOf(EMPTY) }
 
                         Column(Modifier
@@ -196,7 +211,7 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                             .wrapContentHeight()
                             .padding(start = 40.dp, end = 40.dp, top = 10.dp)) {
                             QuestionCards {
-                                Text("${index + 1}. ${problem.question}", style = MaterialTheme.typography.body2)
+                                Text("${outerIndex + 1}. ${problem.question}", style = MaterialTheme.typography.body2)
                                 Spacer(Modifier.height(10.dp))
                                 if(!problem.assertions.isNullOrEmpty()) {
                                     problem.assertions?.forEachIndexed { index, option ->
@@ -209,15 +224,18 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                                                     selectedOptions = selectedOptions.toMutableMap().apply {
                                                         put(problem.question, index)
                                                     }
+                                                    responsesMap[problem.question] = option
                                                 }
                                             )
                                             Spacer(Modifier.width(5.dp))
                                             Text(option,  style = MaterialTheme.typography.body2)
                                         }
                                     }
+
                                 }
                                 else {
                                     AnswerField(answerEntry) {
+                                        responsesMap[problem.question] = it
                                         answerEntry = it
                                     }
                                 }
@@ -233,22 +251,26 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                             .padding(20.dp)) {
 
                             SubmitQuizButton("SUBMIT QUIZ") {
-                                //quizViewModel.addOrUpdateQuiz()
+                                score = quizViewModel.validateAnswer(responsesMap, selectedQuiz!!.problems)
                                 coroutineScope.launch(Dispatchers.IO) {
                                     val response = userCache?.let { user ->
 
                                         quizViewModel.submitQuiz(
                                             UserScoreData(
                                                 userRef = user._id,
+                                                firstName = user.firstName,
+                                                lastName = user.lastName,
+                                                middleName = user.middleName,
+                                                level = user.level,
                                                 scoreInfo = ScoreInfo(
                                                     quizRef = selectedQuiz?._id!!,
-                                                    score = 0.toString(), //todo change this
-                                                    total = 10.toString(),
+                                                    score = score.keys.first().toString(),
+                                                    total = score.values.first().toString(),
                                                     module = module?._id ?: module?.name!!,
                                                     topicRef = course?._id?:course?.name!!,
                                                     topicName =  course?.name ?: "",
                                                     created = Others.getCurrentDate(),
-                                                    response = emptyList(),
+                                                    response = responsesMap,
                                                     pending = true,
                                                     hasResponseField = false // Todo change this
                                                 )
@@ -259,9 +281,9 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                                     withContext(Dispatchers.Main) {
                                         if(response?.userScores != null) {
                                             //display score
-                                            isContinueClick = false
+                                            quizState = QuizState.SUBMIT
                                         } else {
-                                           isContinueClick = null
+                                            quizState = QuizState.SUBMIT
                                         }
                                     }
                                 }
@@ -269,39 +291,61 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                         }
                     }
                 }
-            } else {
+            }
+
+            if(quizState == QuizState.SUBMIT) {
+
                 Column(Modifier.fillMaxWidth()
                     .wrapContentHeight(),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Top) {
                     Spacer(Modifier.height(10.dp))
-                    Column(Modifier.width(450.dp)
-                        .height(300.dp),
+                    LazyColumn(Modifier.width(450.dp)
+                        .wrapContentHeight(),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center) {
 
-                        Text("Your score is * some score * over *some total*",
-                            style = MaterialTheme.typography.caption.copy(
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight(200),
-                                fontFamily = FontFamily.Serif,
-                                lineHeight = 24.sp
-                            ))
+                        item {
+                            Text("Your score is  ${score.keys.first()} over ${score.values.first()} ",
+                                style = MaterialTheme.typography.caption.copy(
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight(200),
+                                    fontFamily = FontFamily.Serif,
+                                    lineHeight = 24.sp
+                                ))
+                            Spacer(Modifier.height(10.dp))
+                        }
 
-                        Spacer(Modifier.height(20.dp))
-                        Row(Modifier
-                            .sizeIn(150.dp, 70.dp, 300.dp, 90.dp)
-                            .padding(20.dp)) {
-                            SubmitQuizButton("CLOSE") {
-                                val map = mutableMapOf<String, Any>()
-                                 userCache?.let {
-                                     map[USER_KEY] = it
+                        itemsIndexed(selectedQuiz!!.problems!!) {index, item ->
+                            Text("Question : ${item.question} \n" +
+                                    "Your answer :  ${responsesMap[item.question]} \n " +
+                                    "Correct answer :  ${item.answer} ",
+                                style = MaterialTheme.typography.caption.copy(
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight(200),
+                                    fontFamily = FontFamily.Serif,
+                                    lineHeight = 24.sp
+                                ))
+                            Spacer(Modifier.height(10.dp))
+                        }
+
+                        item {
+                            Spacer(Modifier.height(20.dp))
+                            Row(Modifier
+                                .sizeIn(150.dp, 70.dp, 300.dp, 90.dp)
+                                .padding(20.dp)) {
+                                SubmitQuizButton("CLOSE") {
+                                    val map = mutableMapOf<String, Any>()
+                                    userCache?.let {
+                                        map[USER_KEY] = it
+                                    }
+                                    course?.let {
+                                        map[COURSE] = it
+                                    }
+                                    quizState = QuizState.INITIAL
+                                    //Todo persist
+                                    onClick.invoke(NavHelper(Route.VideosList, map))
                                 }
-                                 course?.let {
-                                     map[COURSE] = it
-                                }
-                                //Todo persist
-                                onClick.invoke(NavHelper(Route.VideosList, map))
                             }
                         }
                     }
@@ -310,3 +354,5 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
         }
     }
 }
+
+enum class QuizState { INITIAL, SUBMIT, CONTINUE, DISPLAY, START, NONE}
