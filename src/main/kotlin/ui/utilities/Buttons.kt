@@ -1,12 +1,14 @@
 package ui.utilities
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -40,6 +42,19 @@ fun TabButton(value: String, click: () -> Unit) {
 
             Text(value, style =  MaterialTheme.typography.caption)
         }
+    }
+}
+
+@Composable
+fun LinkButton(value: String, click: () -> Unit) {
+    Box(modifier = Modifier.width(150.dp)
+                .defaultMinSize(minWidth = 50.dp, minHeight = 10.dp )
+                .background(Color(0XFF668011), shape = RoundedCornerShape(10.dp))
+                .padding(5.dp)
+        .clickable {
+            click()
+        }) {
+            Text(value, color =Color.White, style =  MaterialTheme.typography.caption, modifier = Modifier.align(Alignment.Center))
     }
 }
 

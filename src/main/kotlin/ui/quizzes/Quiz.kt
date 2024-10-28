@@ -58,7 +58,7 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
         }
     }
 
-    if(totalMinutes != 0) {
+    if(totalMinutes != 0 && isContinueClick == true) {
         LaunchedEffect(totalMinutes) {
             startCountDown(totalMinutes) { remainingTime  ->
                 countDownText = remainingTime
@@ -70,7 +70,7 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
         Column(Modifier.fillMaxWidth()
             .wrapContentHeight()
         ) {
-            if(module != null) {
+            if(module != null && isContinueClick != true) {
                 LazyRow {
                     itemsIndexed(module!!.quiz) { index, interro ->
 
@@ -217,7 +217,7 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                                     }
                                 }
                                 else {
-                                    AnswerFields(answerEntry) {
+                                    AnswerField(answerEntry) {
                                         answerEntry = it
                                     }
                                 }

@@ -13,6 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
@@ -37,6 +39,41 @@ fun OrgaAuthText(phoneNumber: String, onChange: (String) -> Unit) {
 fun AnswerFields(question: String, onChange: (String) -> Unit) {
     Spacer(Modifier.height(20.dp))
     DataQuestionFields(question, "Answer", onChange)
+}
+
+
+@Composable
+fun AnswerField(value: String, onChange: (String) -> Unit) {
+    Spacer(Modifier.height(20.dp))
+    Box(modifier = Modifier
+        .fillMaxWidth()
+        .padding(16.dp)) {
+        TextField(value,
+            onValueChange = { onChange(it)},
+            modifier = Modifier
+                .defaultMinSize(minHeight = 100.dp)
+                .fillMaxWidth(),
+            colors = TextFieldDefaults.textFieldColors(
+                textColor = Color.Black,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                unfocusedLabelColor = Color.Black,
+                focusedLabelColor = Color.Transparent,
+                disabledTextColor = Color.Black,
+                disabledIndicatorColor = Color.Transparent,
+                errorLeadingIconColor = MaterialTheme.colors.error,
+                errorCursorColor = MaterialTheme.colors.error
+            ),
+            shape = RoundedCornerShape(8.dp),
+            textStyle = TextStyle(
+                fontSize = 15.sp,
+                fontFamily = FontFamily.SansSerif,
+                letterSpacing = 1.4.sp,
+                fontWeight = FontWeight.Light,
+                lineHeight = 28.sp),
+        )
+
+    }
 }
 
 @Composable
