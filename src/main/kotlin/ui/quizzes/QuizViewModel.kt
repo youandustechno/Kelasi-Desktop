@@ -9,6 +9,7 @@ import models.userquiz.UserQuizApi
 import models.userquiz.UserScoreData
 import models.video.*
 import ui.dashboards.ViewModel
+import ui.utilities.ScoreWrapper
 
 class QuizViewModel: ViewModel() {
 
@@ -18,11 +19,11 @@ class QuizViewModel: ViewModel() {
 
     fun validateAnswer(
         responsesList: MutableMap<String, String>,
-        questions: List<Question>?): Map<String, String> {
+        questions: List<Question>?): ScoreWrapper {
         var count = 0
         var total = 0
+        var max = 0
 
-        var map = mutableMapOf<String, String>()
         questions?.forEach {
             if(responsesList[it.question] == it.answer && it.assertions?.size != 0) {
                 count ++
@@ -31,10 +32,12 @@ class QuizViewModel: ViewModel() {
             if(it.assertions?.size != 0) {
                 total ++
             }
+            max++
         }
-        map[count.toString()] =  total.toString()
 
-        return map
+        return ScoreWrapper(temp = count.toDouble(),
+            tempTotal = total.toDouble(),
+            total = max.toDouble())
     }
 
     var course by mutableStateOf<CourseResponse?>(null)

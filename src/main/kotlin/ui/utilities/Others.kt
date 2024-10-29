@@ -14,4 +14,10 @@ object Others {
 
         return current
     }
+
+    fun formatNumber(number: Double): Number {
+        return if(number%1.0 == 0.0) number.toInt() else number
+    }
 }
+
+data class ScoreWrapper(var temp: Double = 0.0, var tempTotal: Double= 0.0, var total: Double = 0.0)

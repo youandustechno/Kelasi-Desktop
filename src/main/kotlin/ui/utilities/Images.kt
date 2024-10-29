@@ -269,6 +269,24 @@ fun ResourceImage50by50(imagePath: String, onClick:(() ->Unit)? = null) {
 }
 
 @Composable
+fun ResourceImage30by30(imagePath: String, onClick:(() ->Unit)? = null) {
+    //""
+    Image(
+        painter = painterResource(imagePath),
+        contentDescription = "people",
+        contentScale = ContentScale.FillBounds,
+        modifier = Modifier
+            .width(30.dp)
+            .height(30.dp)
+            .padding(5.dp)
+            .clickable {
+                onClick?.invoke()
+                //fileToUpload = showFileChooser()
+            }
+    )
+}
+
+@Composable
 fun ResourceImageDashboard(imagePath: String, onClick:(() ->Unit)? = null) {
     //""
     Image(

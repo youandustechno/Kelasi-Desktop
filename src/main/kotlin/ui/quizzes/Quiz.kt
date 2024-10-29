@@ -10,6 +10,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -29,9 +30,8 @@ import ui.NavHelper
 import ui.NavKeys.COURSE
 import ui.NavKeys.EMPTY
 import ui.NavKeys.MODULE
-import ui.NavKeys.USER_KEY
-import ui.Route
 import ui.utilities.*
+import ui.utilities.Others.formatNumber
 
 
 @Composable
@@ -49,7 +49,7 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
     var isContinueClick : Boolean? by remember { mutableStateOf(null) }
     var quizState : QuizState by remember { mutableStateOf(QuizState.INITIAL) }
 
-    var score by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
+    var score by remember { mutableStateOf(ScoreWrapper()) }
 
     val responsesMap: MutableMap<String, String> by remember { mutableStateOf(mutableMapOf()) }
 
@@ -105,7 +105,8 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                 Spacer(Modifier.height(10.dp))
             }
 
-            if(selectedQuiz != null && selectedQuiz!!.time > 0 && totalMinutes == 0) {
+            if(selectedQuiz != null && selectedQuiz!!.time > 0
+                && totalMinutes == 0 && quizState == QuizState.START) {
                 totalMinutes = selectedQuiz!!.time
             }
 
@@ -264,8 +265,8 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                                                 level = user.level,
                                                 scoreInfo = ScoreInfo(
                                                     quizRef = selectedQuiz?._id!!,
-                                                    score = score.keys.first().toString(),
-                                                    total = score.values.first().toString(),
+                                                    score = score.temp.toString(),
+                                                    total = score.tempTotal.toString(),
                                                     module = module?._id ?: module?.name!!,
                                                     topicRef = course?._id?:course?.name!!,
                                                     topicName =  course?.name ?: "",
@@ -304,9 +305,14 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                         .wrapContentHeight(),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center) {
-
                         item {
-                            Text("Your score is  ${score.keys.first()} over ${score.values.first()} ",
+                            val scoreText = if(score.tempTotal == score.total) {
+                                "You scored  ${ formatNumber((score.temp) * 10) } out of ${score.tempTotal.toInt() * 10}"
+                            } else{
+                                "You have  ${formatNumber((score.temp) * 10)  } correct answers. \n" +
+                                        "The instructor has to grade the no graded part question to see the final score."
+                            }
+                            Text(scoreText,
                                 style = MaterialTheme.typography.caption.copy(
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight(200),
@@ -317,16 +323,55 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                         }
 
                         itemsIndexed(selectedQuiz!!.problems!!) {index, item ->
-                            Text("Question : ${item.question} \n" +
-                                    "Your answer :  ${responsesMap[item.question]} \n " +
-                                    "Correct answer :  ${item.answer} ",
-                                style = MaterialTheme.typography.caption.copy(
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight(200),
-                                    fontFamily = FontFamily.Serif,
-                                    lineHeight = 24.sp
-                                ))
-                            Spacer(Modifier.height(10.dp))
+                            Column(Modifier.fillMaxWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally) {
+                                QuestionCards {
+                                    Text("Question: ${item.question}",
+                                        style = MaterialTheme.typography.caption.copy(
+                                            fontSize = 14.sp,
+                                            fontWeight = FontWeight(200),
+                                            fontFamily = FontFamily.Serif,
+                                            lineHeight = 24.sp
+                                        ))
+                                    Spacer(Modifier.height(10.dp))
+                                    Text("Your answer:  ${responsesMap[item.question]}",
+                                        style = MaterialTheme.typography.caption.copy(
+                                            fontSize = 14.sp,
+                                            fontWeight = FontWeight(200),
+                                            fontFamily = FontFamily.Serif,
+                                            lineHeight = 24.sp
+                                        ))
+                                    Spacer(Modifier.height(10.dp))
+                                    Row(Modifier.fillMaxWidth().padding(end = 5.dp),
+                                        horizontalArrangement = Arrangement.SpaceBetween) {
+                                        Text("Correct answer:  ${item.answer}",
+                                            style = MaterialTheme.typography.caption.copy(
+                                                fontSize = 14.sp,
+                                                fontWeight = FontWeight(200),
+                                                fontFamily = FontFamily.Serif,
+                                                lineHeight = 24.sp
+                                            ))
+                                        if(item.answer.equals(responsesMap[item.question], true)
+                                            && item.assertions?.isEmpty() != true ) {
+                                            ResourceImage30by30("image/icon_check.svg")
+                                        }
+                                        else if( item.assertions?.isNullOrEmpty() == true ) {
+                                            Text("No graded yet",
+                                                color = Color(0XFF338dff),
+                                                style = MaterialTheme.typography.caption.copy(
+                                                    fontSize = 14.sp,
+                                                    fontWeight = FontWeight(200),
+                                                    fontFamily = FontFamily.Serif,
+                                                    lineHeight = 24.sp
+                                                ))
+                                        }
+                                        else {
+                                            ResourceImage30by30("image/icon_clear.svg")
+                                        }
+                                    }
+                                }
+                            }
+                            Spacer(Modifier.height(20.dp))
                         }
 
                         item {
@@ -335,16 +380,18 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                                 .sizeIn(150.dp, 70.dp, 300.dp, 90.dp)
                                 .padding(20.dp)) {
                                 SubmitQuizButton("CLOSE") {
-                                    val map = mutableMapOf<String, Any>()
-                                    userCache?.let {
-                                        map[USER_KEY] = it
-                                    }
-                                    course?.let {
-                                        map[COURSE] = it
-                                    }
                                     quizState = QuizState.INITIAL
-                                    //Todo persist
-                                    onClick.invoke(NavHelper(Route.VideosList, map))
+
+//                                    val map = mutableMapOf<String, Any>()
+//                                    userCache?.let {
+//                                        map[USER_KEY] = it
+//                                    }
+//                                    course?.let {
+//                                        map[COURSE] = it
+//                                    }
+//                                    quizState = QuizState.INITIAL
+//                                    //Todo persist
+//                                    onClick.invoke(NavHelper(Route.VideosList, map))
                                 }
                             }
                         }
