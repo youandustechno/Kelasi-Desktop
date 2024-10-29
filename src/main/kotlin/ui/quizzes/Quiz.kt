@@ -110,17 +110,20 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                 totalMinutes = selectedQuiz!!.time
             }
 
-            Box(Modifier.fillMaxWidth()){
-                Column(modifier = Modifier
-                    .wrapContentHeight()
-                    .width(300.dp)
-                    .align(Alignment.CenterEnd),
-                    horizontalAlignment = Alignment.Start,
-                    verticalArrangement = Arrangement.Center){
+            //DIsplay timer
+            if(quizState == QuizState.START) {
+                Box(Modifier.fillMaxWidth()){
+                    Column(modifier = Modifier
+                        .wrapContentHeight()
+                        .width(300.dp)
+                        .align(Alignment.CenterEnd),
+                        horizontalAlignment = Alignment.Start,
+                        verticalArrangement = Arrangement.Center){
 
-                    Text(countDownText?:EMPTY ,
-                        modifier = Modifier.padding(start = 10.dp),
-                        style = MaterialTheme.typography.caption)
+                        Text(countDownText?:EMPTY ,
+                            modifier = Modifier.padding(start = 10.dp),
+                            style = MaterialTheme.typography.caption.copy(fontSize = 14.sp))
+                    }
                 }
             }
         }
@@ -309,7 +312,7 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                             val scoreText = if(score.tempTotal == score.total) {
                                 "You scored  ${ formatNumber((score.temp) * 10) } out of ${score.tempTotal.toInt() * 10}"
                             } else{
-                                "You have  ${formatNumber((score.temp) * 10)  } correct answers. \n" +
+                                "You have  ${formatNumber((score.temp))  } correct answers. \n" +
                                         "The instructor has to grade the no graded part question to see the final score."
                             }
                             Text(scoreText,

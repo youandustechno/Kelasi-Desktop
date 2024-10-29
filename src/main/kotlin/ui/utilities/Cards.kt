@@ -86,6 +86,21 @@ fun CourseSubscriptionCard(content: @Composable() () -> Unit) {
 }
 
 @Composable
+fun ModuleCard(content: @Composable() () -> Unit) {
+    Column(Modifier
+        .width(300.dp)
+        .height(120.dp)
+        .padding(start = 2.dp, end = 2.dp)) {
+        Cards {
+            Column(Modifier
+                .padding(5.dp)){
+                content()
+            }
+        }
+    }
+}
+
+@Composable
 fun CourseCard(content: @Composable() () -> Unit) {
     Column(Modifier
         .width(350.dp)
@@ -98,7 +113,6 @@ fun CourseCard(content: @Composable() () -> Unit) {
             }
         }
     }
-
 }
 
 @Composable

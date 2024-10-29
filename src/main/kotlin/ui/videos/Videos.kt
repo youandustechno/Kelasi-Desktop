@@ -153,34 +153,37 @@ fun Videos(
                                 .wrapContentWidth()
                                 .padding(start = 10.dp, end = 10.dp, top = 5.dp))
                             {
-                                Row(
-                                    Modifier
-                                        .sizeIn(minWidth = 100.dp, minHeight = 120.dp, maxWidth = 120.dp, maxHeight = 150.dp)
-                                        .then(if(index == selectedModuleIndex ) Modifier
-                                            .background(Color.White, shape = RoundedCornerShape(5.dp))
-                                            .border(1.dp, Color.DarkGray,shape = RoundedCornerShape(5.dp))
-                                        else Modifier
-                                            .background(Color.LightGray, shape = RoundedCornerShape(5.dp)))
-                                        .clickable {
-                                            selectedModule = module
-                                            selectedModuleIndex = index
-                                            playerState = VideoState.STOP
-                                            CoroutineScope(Dispatchers.Main).launch {
-                                                delay(1000)
-                                                playerState = VideoState.NONE
+                                ModuleCard {
+                                    Row(
+                                        Modifier
+                                            //.sizeIn(minWidth = 100.dp, minHeight = 120.dp, maxWidth = 120.dp, maxHeight = 150.dp)
+                                            .then(if(index == selectedModuleIndex ) Modifier
+                                                .background(Color.White, shape = RoundedCornerShape(5.dp))
+                                                .border(1.dp, Color.DarkGray,shape = RoundedCornerShape(5.dp))
+                                            else Modifier
+                                                .background(Color.LightGray, shape = RoundedCornerShape(5.dp)))
+                                            .clickable {
+                                                selectedModule = module
+                                                selectedModuleIndex = index
+                                                playerState = VideoState.STOP
+                                                CoroutineScope(Dispatchers.Main).launch {
+                                                    delay(1000)
+                                                    playerState = VideoState.NONE
+                                                }
                                             }
-                                        }
-                                        .padding(start = 10.dp, top= 5.dp, bottom = 5.dp, end = 10.dp),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(module.name, style = MaterialTheme.typography.caption
-                                        .copy(
-                                            fontSize = 16.sp,
-                                            fontWeight = FontWeight(200),
-                                            fontFamily = FontFamily.Serif,
-                                            lineHeight = 24.sp
-                                        ))
+                                            .padding(start = 10.dp, top= 5.dp, bottom = 5.dp, end = 10.dp)
+                                            .fillMaxSize(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(module.name, style = MaterialTheme.typography.caption
+                                            .copy(
+                                                fontSize = 16.sp,
+                                                fontWeight = FontWeight(200),
+                                                fontFamily = FontFamily.Serif,
+                                                lineHeight = 24.sp
+                                            ))
+                                    }
                                 }
                             }
                         }
@@ -217,6 +220,13 @@ fun Videos(
                         }
                     }
                     Spacer(Modifier.height(10.dp))
+                } else {
+                    Row {
+                        Box(Modifier.fillMaxWidth()
+                            .heightIn(50.dp, 70.dp)) {
+                            Spacer(Modifier.width(8.dp))
+                        }
+                    }
                 }
             }
 
