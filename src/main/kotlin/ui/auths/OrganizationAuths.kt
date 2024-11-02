@@ -38,7 +38,7 @@ fun OrgAuth(orgFound:(NavHelper) -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center) {
         var text by remember { mutableStateOf(EMPTY) }
-        var buttonText by remember { mutableStateOf("Verify") }
+        var buttonText by remember { mutableStateOf("VERIFY") }
 
         Column (Modifier
             .width(350.dp)

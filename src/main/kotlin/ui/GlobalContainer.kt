@@ -391,13 +391,13 @@ fun ContentWrapper(withNav: Boolean, navigationState: NavHelper, onClick:(NavHel
                             onClick.invoke(NavHelper(Route.Dashboard))
                         }
 
-                        TabButton("LOGOUT") {
+                        TabButton("Logout") {
                             onClick.invoke(NavHelper(Route.AuthLogin))
                         }
                     }
                     else if(navigationState.route == Route.Register) {
 
-                        TabButton("AUTH CODE") {
+                        TabButton("Auth Code") {
                             onClick.invoke(NavHelper(Route.AuthOrg))
                         }
                     }

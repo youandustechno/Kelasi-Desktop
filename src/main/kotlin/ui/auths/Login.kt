@@ -1,29 +1,31 @@
 package ui.auths
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import models.auth.EmailAndPassComponent
+import models.video.CourseComponent
 import ui.Cache
 import ui.NavHelper
+import ui.NavKeys.COURSE
 import ui.NavKeys.EMPTY
+import ui.NavKeys.MODULE
 import ui.NavKeys.USER_KEY
 import ui.Route
+import ui.utilities.*
 import ui.utilities.FieldsValidation.isValid
-import ui.utilities.LoginButton
-import ui.utilities.PhoneText
-import ui.utilities.UserEmailFields
-import ui.utilities.UserPasswordFields
 
 
 @Composable
@@ -36,7 +38,8 @@ fun Login(onClick: (NavHelper) -> Unit) {
     var password by remember { mutableStateOf(EMPTY) }
     var phone by remember { mutableStateOf(EMPTY) }
     val loginButton by remember { mutableStateOf("LOGIN") }
-    val registerLink by remember { mutableStateOf("REGISTER") }
+    var loginMode by remember { mutableStateOf("Phone") }
+    var isPhoneAuth by remember { mutableStateOf(false) }
 
     Column(Modifier
         .fillMaxSize(),
@@ -44,34 +47,60 @@ fun Login(onClick: (NavHelper) -> Unit) {
         verticalArrangement = Arrangement.Center) {
 
         Column (Modifier
-            .width(350.dp)
+            .width(400.dp)
             .wrapContentHeight()
             .background(Color.White, shape = RoundedCornerShape(10.dp))
-            .padding(5.dp),
+            .padding(10.dp),
             horizontalAlignment = Alignment.CenterHorizontally) {
             Box(Modifier
                 .fillMaxWidth()
+                .defaultMinSize(minHeight = 200.dp)
                 .padding(start = 4.dp, end = 4.dp)) {
 
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    PhoneText(phone) {
-                        phone = it
+                    Spacer(Modifier.height(10.dp))
+                    Row(Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End,
+                        verticalAlignment = Alignment.CenterVertically) {
+                        loginMode = if(isPhoneAuth)  "Email" else "Phone"
+                        Text(loginMode, style = MaterialTheme.typography.caption,
+                            color = Color(0XFF3b1b49))
+                        Spacer(Modifier.width(8.dp))
+                        Switch(
+                            isPhoneAuth,
+                            onCheckedChange = { isPhoneAuth = it },
+                            colors = SwitchDefaults.colors(
+                                checkedThumbColor = Color(0XFF4A3125),
+                                uncheckedThumbColor = Color(0XFF4A3125),
+                                checkedTrackColor = Color(0XFF4A3125),
+                                uncheckedTrackColor = Color(0XFFc5aca0)
+                            )
+                        )
                     }
+                    Spacer(Modifier.height(10.dp))
+                    if(isPhoneAuth) {
+                        PhoneText(phone) {
+                            phone = it
+                        }
 
-                    Spacer(Modifier.height(10.dp))
-                    Text("OR")
-                    Spacer(Modifier.height(10.dp))
+                        if(true) {
+                            Spacer(Modifier.height(10.dp))
+                            PinView { pinCode ->
+                                println("Entered PIN: $pinCode")
+                            }
+                        }
 
-                    UserEmailFields(email) {
-                        email = it
-                    }
-                    Spacer(Modifier.height(10.dp))
-                    UserPasswordFields(password) {
-                        password = it
+                    } else {
+                        UserEmailFields(email) {
+                            email = it
+                        }
+                        Spacer(Modifier.height(10.dp))
+                        UserPasswordFields(password) {
+                            password = it
+                        }
                     }
                 }
             }
-
             Spacer(Modifier.height(20.dp))
             LoginButton(loginButton) {
 
@@ -109,13 +138,30 @@ fun Login(onClick: (NavHelper) -> Unit) {
                     }
                 }
             }
-            Spacer(Modifier.height(10.dp))
-            Text("DON'T HAVE CREDENTIALS?")
-            Spacer(Modifier.height(10.dp))
 
-            LoginButton(registerLink) {
-                onClick.invoke(NavHelper(Route.Register))
+            Spacer(Modifier.height(20.dp))
+            Row(Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically) {
+
+                Row(Modifier.wrapContentWidth()) {
+                    LinkButton("Register", color = Color(0XFFc5aca0)) {
+                        onClick.invoke(NavHelper(Route.Register))
+                    }
+                    Spacer(Modifier.width(8.dp))
+                    LinkButton("Help Login") {
+
+                    }
+                }
             }
+            Spacer(Modifier.height(20.dp))
+
+
+//            LoginButton(registerLink) {
+//                onClick.invoke(NavHelper(Route.Register))
+//            }
         }
     }
 }

@@ -46,15 +46,19 @@ fun TabButton(value: String, click: () -> Unit) {
 }
 
 @Composable
-fun LinkButton(value: String, click: () -> Unit) {
-    Box(modifier = Modifier.width(150.dp)
-                .defaultMinSize(minWidth = 50.dp, minHeight = 10.dp )
-                .background(Color(0XFF668011), shape = RoundedCornerShape(10.dp))
-                .padding(5.dp)
+fun LinkButton(value: String, color: Color = Color(0XFF4A3125), click: () -> Unit) {
+    Box(modifier = Modifier
+                .wrapContentWidth()
+                .defaultMinSize(minWidth = 30.dp, minHeight = 10.dp )
+                .background(color, shape = RoundedCornerShape(10.dp))
         .clickable {
             click()
         }) {
-            Text(value, color =Color.White, style =  MaterialTheme.typography.caption, modifier = Modifier.align(Alignment.Center))
+            Text(value, color =Color.White,
+                style =  MaterialTheme.typography.caption,
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .padding(start = 9.dp, end = 9.dp, top = 5.dp, bottom = 5.dp))
     }
 }
 

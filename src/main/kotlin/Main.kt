@@ -27,6 +27,7 @@ fun main() = application {
     Window(onCloseRequest = ::exitApplication, title = "MATEYA") {
        // App()
         //LoginPreview()
+        window.minimumSize = java.awt.Dimension(800, 600)
         AppTheme {
             GlobalContainer()
         }

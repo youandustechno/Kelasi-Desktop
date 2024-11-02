@@ -87,7 +87,9 @@ fun VideoPlayerImpl(
     }
 
     DisposableEffect(Unit) { onDispose(mediaPlayer::release) }
-    Row(Modifier.height(330.dp)){
+    Row(Modifier
+        .fillMaxWidth()
+        .height(330.dp)){
         SwingPanel(
             factory = factory,
             background = Color.Transparent,
