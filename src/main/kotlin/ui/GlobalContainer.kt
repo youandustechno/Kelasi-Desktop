@@ -18,6 +18,7 @@ import models.video.CourseComponent
 import ui.NavKeys.COURSE
 import ui.NavKeys.COURSE_ID
 import ui.NavKeys.EMPTY
+import ui.auths.HelpLogin
 import ui.auths.Login
 import ui.auths.OrgAuth
 import ui.auths.Registration
@@ -81,6 +82,13 @@ fun GlobalContainer() {
                 Route.AuthLogin -> {
                     ContentWrapper(false, navigationState, {}) {
                         Login { navHelper ->
+                            navigationState = navHelper
+                        }
+                    }
+                }
+                Route.HelpLogin -> {
+                    ContentWrapper(false, navigationState, {}) {
+                        HelpLogin { navHelper ->
                             navigationState = navHelper
                         }
                     }
@@ -431,6 +439,7 @@ data class NavHelper(val route: Route, val dataMap: MutableMap<String, Any> = mu
 
 enum class Route(route: String) {
     AuthLogin("Login"),
+    HelpLogin("HelpLogin"),
     AuthOrg ("Org"),
     Organization("Organization"),
     Quiz("Quiz"),

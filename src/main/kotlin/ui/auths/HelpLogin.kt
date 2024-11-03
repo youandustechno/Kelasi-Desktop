@@ -27,11 +27,8 @@ fun HelpLogin(onClick: (NavHelper) -> Unit) {
     val coroutineScope = rememberCoroutineScope()
 
     var email by remember { mutableStateOf(EMPTY) }
-    var password by remember { mutableStateOf(EMPTY) }
     var phone by remember { mutableStateOf(EMPTY) }
-    var userCode by remember { mutableStateOf(EMPTY) }
-    var loginButton by remember { mutableStateOf("CONFIRM") }
-    var isPhoneAuth by remember { mutableStateOf(false) }
+    var loginButton by remember { mutableStateOf("VALIDATE") }
     var isUserFound by remember { mutableStateOf(false) }
 
     var firstname by remember { mutableStateOf(userCache?.firstName?:EMPTY) }
@@ -58,9 +55,17 @@ fun HelpLogin(onClick: (NavHelper) -> Unit) {
                 .padding(start = 4.dp, end = 4.dp)) {
 
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Row {
-                        ResourceUserImage("image/icon_arrow_back.svg") {
-                            onClick?.invoke(NavHelper(Route.AuthLogin))
+                    Box (Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .padding(5.dp)){
+                        Box(Modifier
+                            .wrapContentSize()
+                            .align(Alignment.CenterEnd)) {
+
+                            ResourceImageController30by30("image/icon_arrow_back.svg") {
+                                onClick.invoke(NavHelper(Route.AuthLogin))
+                            }
                         }
                     }
                     Spacer(Modifier.height(10.dp))
@@ -110,6 +115,7 @@ fun HelpLogin(onClick: (NavHelper) -> Unit) {
                         delay(500L)
                         withContext(Dispatchers.Main) {
                             if (result.user != null) {
+                                email = result.user.email
                                 isUserFound = true
                             } else {
                                 //Todo show error for authentication failure

@@ -178,7 +178,7 @@ fun Login(onClick: (NavHelper) -> Unit) {
                     }
                     Spacer(Modifier.width(8.dp))
                     LinkButton("Help Login") {
-
+                        onClick.invoke(NavHelper(Route.HelpLogin))
                     }
                 }
             }
