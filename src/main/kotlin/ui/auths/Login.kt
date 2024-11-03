@@ -1,7 +1,6 @@
 package ui.auths
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -9,19 +8,15 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import models.auth.EmailAndPassComponent
-import models.video.CourseComponent
-import ui.Cache
+import ui.Cache.userCache
 import ui.NavHelper
-import ui.NavKeys.COURSE
 import ui.NavKeys.EMPTY
-import ui.NavKeys.MODULE
 import ui.NavKeys.USER_KEY
 import ui.Route
 import ui.utilities.*
@@ -37,9 +32,11 @@ fun Login(onClick: (NavHelper) -> Unit) {
     var email by remember { mutableStateOf(EMPTY) }
     var password by remember { mutableStateOf(EMPTY) }
     var phone by remember { mutableStateOf(EMPTY) }
-    val loginButton by remember { mutableStateOf("LOGIN") }
+    var userCode by remember { mutableStateOf(EMPTY) }
+    var loginButton by remember { mutableStateOf("LOGIN") }
     var loginMode by remember { mutableStateOf("Phone") }
     var isPhoneAuth by remember { mutableStateOf(false) }
+    var isTokenValid by remember { mutableStateOf(false) }
 
     Column(Modifier
         .fillMaxSize(),
@@ -47,7 +44,7 @@ fun Login(onClick: (NavHelper) -> Unit) {
         verticalArrangement = Arrangement.Center) {
 
         Column (Modifier
-            .width(400.dp)
+            .width(500.dp)
             .wrapContentHeight()
             .background(Color.White, shape = RoundedCornerShape(10.dp))
             .padding(10.dp),
@@ -78,19 +75,20 @@ fun Login(onClick: (NavHelper) -> Unit) {
                         )
                     }
                     Spacer(Modifier.height(10.dp))
-                    if(isPhoneAuth) {
-                        PhoneText(phone) {
+                    if(isPhoneAuth && !isTokenValid) {
+                        UserPhoneFields(phone) {
                             phone = it
                         }
 
-                        if(true) {
-                            Spacer(Modifier.height(10.dp))
-                            PinView { pinCode ->
-                                println("Entered PIN: $pinCode")
-                            }
-                        }
+                    } else if(isTokenValid) {
+                        loginButton = "VALIDATE"
 
-                    } else {
+                        PinView { pinCode ->
+                            userCode = pinCode
+                            println("Entered PIN: $pinCode")
+                        }
+                    }
+                    else {
                         UserEmailFields(email) {
                             email = it
                         }
@@ -104,39 +102,67 @@ fun Login(onClick: (NavHelper) -> Unit) {
             Spacer(Modifier.height(20.dp))
             LoginButton(loginButton) {
 
-                coroutineScope.launch(Dispatchers.IO) {
+                if(loginButton.equals("VALIDATE", true)) {
 
-                     if(phone.isValid() && email.isValid() && password.isValid()) {
-                        //TODO show error and say you can not login with email and phone credentials the same time.
-                    }
-                     else if(phone.isValid() && !email.isValid() && password.isValid()) {
-                         //TODO show error and say you can not login with email and phone credentials the same time.
-                     }
-                    else if(!phone.isValid() && !email.isValid()) {
-                        //TODO show error and say you can not login with email and phone credentials the same time.
-                    }
-                    else {
-                        val result = if(email.isValid() && password.isValid()) {
-                            authViewModel.startLoginEmail(EmailAndPassComponent(email, password))
-                        } else {
-                            authViewModel.startLoginPhone(phone)
+                    if(isTokenValid) {
+                        coroutineScope.launch(Dispatchers.IO) {
+                            val result  = authViewModel.getAuthenticatedUser(email.ifEmpty { phone })
+                            delay(500L)
+                            withContext(Dispatchers.Main) {
+                                if (result.user != null) {
+                                    val map = mutableMapOf<String, Any>()
+                                    val isVerified = authViewModel.isTokenStillValid(result.user, userCode)
+                                    if(isVerified) {
+
+                                        userCode = EMPTY
+                                        password = EMPTY
+                                        email = EMPTY
+                                        phone = EMPTY
+                                        userCache = result.user
+                                        map[USER_KEY] = result.user
+                                        //Todo persist
+                                        onClick.invoke(NavHelper(Route.Dashboard, map))
+                                    } else {
+                                        //Todo show error for authentication failure
+                                    }
+                                } else {
+                                    //Todo show error for authentication failure
+                                }
+                            }
                         }
-                        email = EMPTY
-                        password = EMPTY
-                         delay(500L)
-                        withContext(Dispatchers.Main) {
-                            if (result.user != null) {
-                                val map = mutableMapOf<String, Any>()
-                                Cache.userCache = result.user
-                                map[USER_KEY] = result.user
-                                //Todo persist
-                                onClick.invoke(NavHelper(Route.Dashboard, map))
+                    }
+                } else {
+
+                    coroutineScope.launch(Dispatchers.IO) {
+
+                        if(phone.isValid() && email.isValid() && password.isValid()) {
+                            //TODO show error and say you can not login with email and phone credentials the same time.
+                        }
+                        else if(phone.isValid() && !email.isValid() && password.isValid()) {
+                            //TODO show error and say you can not login with email and phone credentials the same time.
+                        }
+                        else if(!phone.isValid() && !email.isValid()) {
+                            //TODO show error and say you can not login with email and phone credentials the same time.
+                        }
+                        else {
+                            val result = if(email.isValid() && password.isValid()) {
+                                authViewModel.startLoginEmail(EmailAndPassComponent(email, password))
                             } else {
-                                //Todo show error for authentication failure
+                                authViewModel.startLoginPhone(phone)
+                            }
+                            delay(500L)
+                            withContext(Dispatchers.Main) {
+                                if (result.token != null) {
+                                    AuthViewModel.currentToken = result.token.token
+                                    isTokenValid = true
+                                } else {
+                                    //Todo show error for authentication failure
+                                }
                             }
                         }
                     }
                 }
+
             }
 
             Spacer(Modifier.height(20.dp))
@@ -157,7 +183,6 @@ fun Login(onClick: (NavHelper) -> Unit) {
                 }
             }
             Spacer(Modifier.height(20.dp))
-
 
 //            LoginButton(registerLink) {
 //                onClick.invoke(NavHelper(Route.Register))

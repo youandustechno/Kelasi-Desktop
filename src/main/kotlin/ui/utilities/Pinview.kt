@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 
 
 @Composable
-fun PinView(pinLength: Int = 6, onPinEntered: (String) -> Unit) {
+fun PinView(pinLength: Int = 8, onPinEntered: (String) -> Unit) {
     var pinValues = remember { mutableStateListOf(*Array(pinLength){""}) }
     val focusRequesters = remember { List(pinLength) { FocusRequester() } }
     val focusManager = LocalFocusManager.current
@@ -53,7 +53,7 @@ fun PinView(pinLength: Int = 6, onPinEntered: (String) -> Unit) {
                     .typography
                     .caption,
                 modifier = Modifier
-                    .width(60.dp)
+                    .width(50.dp)
                     .padding(horizontal = 4.dp)
                     .focusRequester(focusRequesters[index])
                     .onKeyEvent { keyEvent ->

@@ -42,6 +42,8 @@ dependencies {
 
     implementation("com.optimaize.languagedetector:language-detector:0.6")
     implementation("com.google.guava:guava:31.1-jre")
+    // jwt token
+    implementation("com.auth0:java-jwt:4.2.1")
 
     //implementation("com.google.cloud:google-cloud-texttospeech:2.37.0")
     implementation("javazoom:jlayer:1.0.1")

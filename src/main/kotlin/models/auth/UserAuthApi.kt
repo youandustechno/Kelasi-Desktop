@@ -59,8 +59,10 @@ class UserAuthApi {
                     .getApiService()
                     .loginWithPhone(PhoneComponent(phoneNumber))
 
-                if(token != null){
-                    TokenResponse(token)
+                if(token != null) {
+                    val code: String = token.headers()["Authorization"]?.replace("Bearer", "")?:""
+
+                    TokenResponse(TokenComponent(code))
                 }
                 else {
                     TokenResponse(null, TokenError(0,
@@ -81,7 +83,8 @@ class UserAuthApi {
                     .loginWithEmail(credentials)
 
                 if(token != null) {
-                    TokenResponse(token)
+                    val code: String = token.headers()["Authorization"]?.replace("Bearer", "")?:""
+                    TokenResponse(TokenComponent(code))
                 }
                 else {
                     TokenResponse(null, TokenError(0,
@@ -237,6 +240,29 @@ class UserAuthApi {
                     .setInterceptor(authCode?: Cache.authCode)
                     .getApiService()
                     .getUser(UserValues(key))
+
+                if(user != null) {
+                    UserResponse(user)
+                }
+                else {
+                    UserResponse(null, TokenError(0, "User not found"))
+                }
+            }
+
+        }catch (e: Exception) {
+            UserResponse(null)
+        }
+    }
+
+    suspend fun recoverUserCredentials(userCredentials: UserCredentials): UserResponse  {
+        return try {
+            val authCode = StorageHelper().retrieveFromStorage(StorageHelper.AUTH_CODE)
+
+            withContext(Dispatchers.IO) {
+                val user =  UserRetrofitClient
+                    .setInterceptor(authCode?: Cache.authCode)
+                    .getApiService()
+                    .recoverUser(userCredentials)
 
                 if(user != null) {
                     UserResponse(user)

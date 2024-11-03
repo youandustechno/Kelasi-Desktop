@@ -1,13 +1,28 @@
 package ui.auths
 
+import com.auth0.jwt.JWT
+import com.auth0.jwt.algorithms.Algorithm
 import models.AuthCodeResponse
+import models.BaseValues
 import models.auth.*
 import models.group.GroupApi
+import okhttp3.Credentials
 import ui.settings.SettingsViewModel
+import ui.utilities.Others.isTokenExpired
+import ui.utilities.Others.timeStampToLocalDateTime
 import java.io.File
+import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.*
+import kotlin.time.Duration.Companion.hours
 
 
-class AuthViewModel: SettingsViewModel (){
+class AuthViewModel: SettingsViewModel () {
+
+    companion object {
+        var currentToken: String? = null
+    }
 
     suspend fun verifyAuthCode(text: String): AuthCodeResponse {
         val groupApi = GroupApi()
@@ -15,24 +30,34 @@ class AuthViewModel: SettingsViewModel (){
         return groupApi.verifyTenant(text)
     }
 
-    suspend fun startLoginPhone(phone: String): UserResponse {
+    suspend fun startLoginPhone(phone: String): TokenResponse {
         val authApi = UserAuthApi()
         val response = authApi.loginWithPhone(phoneNumber = phone)
         return if(response.token != null) {
-            authApi.getUser(phone)
+            response
         } else {
-            UserResponse(error = TokenError(error = "Login failure"))
+            TokenResponse (error = TokenError(error = "Login failure"))
         }
     }
 
-    suspend fun startLoginEmail(credentials: EmailAndPassComponent): UserResponse {
+    suspend fun startLoginEmail(credentials: EmailAndPassComponent): TokenResponse  {
         val authApi = UserAuthApi()
         val response = authApi.loginWithEmail(credentials)
         return if(response.token != null) {
-            authApi.getUser(credentials.email)
+            response
         } else {
-            UserResponse(error = TokenError(error = "Login failure"))
+            TokenResponse (error = TokenError(error = "Login failure"))
         }
+    }
+
+    suspend fun recoverUser(credential: UserCredentials) : UserResponse {
+        val authApi = UserAuthApi()
+        return authApi.recoverUserCredentials(credential)
+    }
+
+    suspend fun getAuthenticatedUser(credential: String) : UserResponse {
+        val authApi = UserAuthApi()
+        return authApi.getUser(credential)
     }
 
     suspend fun startRegistration(user: UserDataModel): UserResponse {
@@ -49,6 +74,46 @@ class AuthViewModel: SettingsViewModel (){
             }
         } else {
             UserResponse(error = TokenError(error = "Authentication failure"))
+        }
+    }
+
+    fun isTokenStillValid(userCredential: UserDataModel?, userCode: String): Boolean  {
+
+        return try {
+            val secret = BaseValues.KEY
+            val algorithm = Algorithm.HMAC256(secret)
+            val verifier = JWT.require(algorithm).build()
+            val decodeJWT = verifier.verify(currentToken?.trim())
+
+            val username = decodeJWT.getClaim("username").asString()
+            val verificationCode = decodeJWT.getClaim("verificationCode").asString()
+            val exp = decodeJWT.expiresAt.time
+            val date = timeStampToLocalDateTime(Date(exp).time)
+
+            println("Username: $username, Verification Code: $verificationCode")
+
+
+            if(isTokenExpired(currentTime = LocalDateTime.now(), tokenDate = date)) {
+               currentToken = null
+               false
+            }
+            else if(userCode != verificationCode) {
+                currentToken = null
+                false
+            }
+            else if(userCredential?.email == username && userCredential?.phoneNumber != username) {
+                 true
+             }
+             else if(userCredential?.email != username && userCredential?.phoneNumber == username) {
+                 true
+             }
+            else {
+                 currentToken = null
+                false
+            }
+
+        }catch (exc: Exception) {
+            false
         }
     }
 }

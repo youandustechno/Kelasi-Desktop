@@ -3,6 +3,7 @@ package models.auth
 import models.UserValues
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import retrofit2.Response
 import retrofit2.http.*
 
 interface UserAuthUrls {
@@ -13,12 +14,12 @@ interface UserAuthUrls {
     @POST("/auths/phone")
     suspend fun loginWithPhone(
         @Body phoneNumber: PhoneComponent
-    ): TokenComponent?
+    ): Response<TokenComponent>?
 
     @POST("/auths/email")
     suspend fun loginWithEmail(
         @Body credentials: EmailAndPassComponent
-    ): TokenComponent?
+    ): Response<TokenComponent>?
 
     @POST("/auths/register")
     suspend fun register(
@@ -65,4 +66,7 @@ interface UserAuthUrls {
 
     @POST("users/get")
     suspend fun getUser(@Body userValues: UserValues) : UserDataModel?
+
+    @POST("users/recover")
+    suspend fun recoverUser(@Body userValues: UserCredentials) : UserDataModel?
 }
