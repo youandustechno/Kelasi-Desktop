@@ -5,6 +5,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import models.BaseValues.BASE_URL
 import models.ErrorComponent
+import models.QuizzesResponse
 import models.UserQuizResponse
 import models.userquiz.QuizRetrofitClient.getApiService
 import models.userquiz.QuizRetrofitClient.setInterceptor
@@ -69,6 +70,26 @@ class UserQuizApi {
             }
         } catch (e:Exception) {
             UserQuizResponse(errorComponent = ErrorComponent(0, e.message?:"exception"))
+        }
+
+    }
+
+    suspend fun getUserScores(userQuizComponent: UserScoreRequest): QuizzesResponse {
+
+        return try {
+            withContext(Dispatchers.IO) {
+
+                val authCode = StorageHelper().retrieveFromStorage(StorageHelper.AUTH_CODE)
+
+                val response = QuizRetrofitClient
+                    .setInterceptor(authCode!!)
+                    .getApiService()
+                    .getUserTopicScores(userQuizComponent)
+
+                QuizzesResponse(cours = response)
+            }
+        } catch (e:Exception) {
+            QuizzesResponse(errorComponent = ErrorComponent(0, e.message?:"exception"))
         }
 
     }

@@ -15,16 +15,21 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.times
 import helpers.startCountDown
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import models.QuizScore
+import models.userquiz.Answer
 import models.userquiz.ScoreInfo
 import models.userquiz.UserScoreData
+import models.userquiz.UserScoreRequest
 import models.video.CourseComponent
 import models.video.Module
 import models.video.QuizComponent
+import ui.Cache
 import ui.Cache.userCache
 import ui.NavHelper
 import ui.NavKeys.COURSE
@@ -47,17 +52,36 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
     var countDownText: String?  by remember {  mutableStateOf(null) }
     var selectedOptions by remember { mutableStateOf<Map<String, Int>>(emptyMap()) }
     var isContinueClick : Boolean? by remember { mutableStateOf(null) }
-    var quizState : QuizState by remember { mutableStateOf(QuizState.INITIAL) }
+    var quizState : QuizState by remember { mutableStateOf(QuizState.NONE) }
+
+    val quizScores: MutableList<QuizScore>? by remember { mutableStateOf(mutableListOf()) }
 
     var score by remember { mutableStateOf(ScoreWrapper()) }
 
-    val responsesMap: MutableMap<String, String> by remember { mutableStateOf(mutableMapOf()) }
+    var quizFinalScore: QuizScore? by remember { mutableStateOf(null) }
+
+    var answers: MutableList<Answer> by remember { mutableStateOf(mutableListOf()) }
 
     val quizViewModel = QuizViewModel()
 
     if (navHelper.dataMap.isNotEmpty() && navHelper.dataMap.containsKey(COURSE)) {
         course = navHelper.dataMap[COURSE] as CourseComponent
         if(navHelper.dataMap.containsKey(MODULE)) {
+            LaunchedEffect(Unit) {
+                val courses = quizViewModel.getCourseScores(
+                    UserScoreRequest(
+                         userRef = userCache?._id.toString(),
+                         topicId = course?._id.toString(),
+                        topicName = course?.name.toString()
+                    )
+                )
+
+                quizScores?.clear()
+                courses?.cours?.scores?.let {
+                    quizScores?.addAll(it)
+                }
+                quizState = QuizState.INITIAL
+            }
             module = navHelper.dataMap[MODULE] as Module
         }
     }
@@ -70,20 +94,29 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
         }
     }
 
-    Column (Modifier.fillMaxSize()){
+    Column (Modifier.fillMaxSize()) {
         Column(Modifier.fillMaxWidth()
             .wrapContentHeight()
         ) {
-            if(module != null && (quizState == QuizState.INITIAL || quizState == QuizState.SUBMIT)) {
+            if(module != null && (quizState == QuizState.INITIAL || quizState == QuizState.SUBMIT || quizState == QuizState.DISPLAY)) {
                 //Displays Quizzes list horizontally
                 LazyRow {
                     itemsIndexed(module!!.quiz) { index, interro ->
-
+                        val found = quizScores?.find { it.quizRef == interro._id }
                         DocCards({
-                            totalMinutes = 0
-                            countDownText = EMPTY
-                            quizState = QuizState.CONTINUE
-                            selectedQuiz = interro
+                            if(!found?.score.isNullOrEmpty()) {
+                                totalMinutes = 0
+                                countDownText = EMPTY
+                                quizState = QuizState.DISPLAY
+                                quizFinalScore = found
+
+                            } else {
+                                totalMinutes = 0
+                                countDownText = EMPTY
+                                quizState = QuizState.CONTINUE
+                                selectedQuiz = interro
+                            }
+
                         }) {
                             if(interro._id != null) {
                                 Spacer(Modifier.height(5.dp))
@@ -97,6 +130,15 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                                 Spacer(Modifier.height(2.dp))
                                 Text(text = interro.title, style = MaterialTheme.typography.caption
                                     .copy(fontSize = 12.sp, lineHeight = 15.sp))
+
+                                if(!found?.score.isNullOrEmpty()) {
+
+                                    Text(text = found?.score.toString()+ " / "+ found?.total.toString(),
+                                        style = MaterialTheme.typography.caption
+                                        .copy(fontSize = 12.sp, lineHeight = 15.sp))
+                                    Spacer(Modifier.height(2.dp))
+                                }
+
                             }
                         }
                         Spacer(Modifier.width(8.dp))
@@ -108,9 +150,12 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
             if(selectedQuiz != null && selectedQuiz!!.time > 0
                 && totalMinutes == 0 && quizState == QuizState.START) {
                 totalMinutes = selectedQuiz!!.time
+                selectedQuiz!!.problems?.forEach {
+                    answers.add(Answer(it.question, "", rightAnswer = it.answer))
+                }
             }
 
-            //DIsplay timer
+            //Display timer
             if(quizState == QuizState.START) {
                 Box(Modifier.fillMaxWidth()){
                     Column(modifier = Modifier
@@ -160,7 +205,7 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
 
                             SubmitQuizButton("START QUIZ") {
                                 coroutineScope.launch(Dispatchers.IO) {
-
+                                    score = quizViewModel.validateAnswer(answers)
                                     val response = userCache?.let { user ->
                                         quizViewModel.submitQuiz(
                                             UserScoreData(
@@ -171,13 +216,13 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                                                 level = user.level,
                                                 scoreInfo = ScoreInfo(
                                                     quizRef = selectedQuiz?._id!!,
-                                                    score = 0.toString(),
-                                                    total = 10.toString(),
+                                                    score = formatNumber((score.temp) * 10).toString(),
+                                                    total = (score.total.toInt() * 10).toString(),
                                                     module = module?._id ?: module?.name!!,
                                                     topicRef = course?._id?:course?.name!!,
                                                     topicName =  course?.name ?: EMPTY,
                                                     created = Others.getCurrentDate(),
-                                                    response = responsesMap,
+                                                    responses = answers,
                                                     pending = true,
                                                     hasResponseField = false // Todo change this
                                                 )
@@ -202,7 +247,7 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                 }
             }
 
-            if(quizState == QuizState.START) {
+            else if(quizState == QuizState.START) {
 
                 LazyColumn(horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center) {
@@ -228,7 +273,18 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                                                     selectedOptions = selectedOptions.toMutableMap().apply {
                                                         put(problem.question, index)
                                                     }
-                                                    responsesMap[problem.question] = option
+
+                                                    answers.find { it.question == problem.question }?.let {
+                                                        it.answer = option
+                                                        it.isAssertion = true
+                                                    }
+//                                                    answers[outerIndex - 1] = Answer(
+//                                                        question = problem.question,
+//                                                        answer = option,
+//                                                        rightAnswer = problem.answer,
+//                                                        isAssertion = true
+//                                                    )
+                                                    //questions[problem.question] = option
                                                 }
                                             )
                                             Spacer(Modifier.width(5.dp))
@@ -238,9 +294,19 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
 
                                 }
                                 else {
-                                    AnswerField(answerEntry) {
-                                        responsesMap[problem.question] = it
-                                        answerEntry = it
+                                    AnswerField(answerEntry) { entry ->
+
+                                        answers.find { it.question == problem.question }?.let {
+                                            it.answer = entry
+                                            it.isAssertion = true
+                                        }
+//                                        answers[outerIndex -1] = Answer(
+//                                            question = problem.question,
+//                                            answer = it,
+//                                            rightAnswer = problem.answer,
+//                                            isAssertion = false
+//                                        )
+                                        answerEntry = entry
                                     }
                                 }
                             }
@@ -255,7 +321,7 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                             .padding(20.dp)) {
 
                             SubmitQuizButton("SUBMIT QUIZ") {
-                                score = quizViewModel.validateAnswer(responsesMap, selectedQuiz!!.problems)
+                                score = quizViewModel.validateAnswer(answers)
                                 coroutineScope.launch(Dispatchers.IO) {
                                     val response = userCache?.let { user ->
 
@@ -268,13 +334,13 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                                                 level = user.level,
                                                 scoreInfo = ScoreInfo(
                                                     quizRef = selectedQuiz?._id!!,
-                                                    score = score.temp.toString(),
-                                                    total = score.tempTotal.toString(),
+                                                    score = formatNumber((score.temp) * 10).toString(),
+                                                    total = (score.total.toInt() * 10).toString(),
                                                     module = module?._id ?: module?.name!!,
                                                     topicRef = course?._id?:course?.name!!,
                                                     topicName =  course?.name ?: "",
                                                     created = Others.getCurrentDate(),
-                                                    response = responsesMap,
+                                                    responses = answers,
                                                     pending = true,
                                                     hasResponseField = false // Todo change this
                                                 )
@@ -297,7 +363,7 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                 }
             }
 
-            if(quizState == QuizState.SUBMIT) {
+            else if(quizState == QuizState.SUBMIT) {
 
                 Column(Modifier.fillMaxWidth()
                     .wrapContentHeight(),
@@ -337,7 +403,8 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                                             lineHeight = 24.sp
                                         ))
                                     Spacer(Modifier.height(10.dp))
-                                    Text("Your answer:  ${responsesMap[item.question]}",
+                                    val currentAnswer = answers.find { it.question == item.question }
+                                    Text("Your answer:  ${ currentAnswer?.answer}",
                                         style = MaterialTheme.typography.caption.copy(
                                             fontSize = 14.sp,
                                             fontWeight = FontWeight(200),
@@ -354,7 +421,7 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                                                 fontFamily = FontFamily.Serif,
                                                 lineHeight = 24.sp
                                             ))
-                                        if(item.answer.equals(responsesMap[item.question], true)
+                                        if(item.answer.equals(currentAnswer?.answer, true)
                                             && item.assertions?.isEmpty() != true ) {
                                             ResourceImage30by30("image/icon_check.svg")
                                         }
@@ -397,6 +464,34 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
 //                                    onClick.invoke(NavHelper(Route.VideosList, map))
                                 }
                             }
+                        }
+                    }
+                }
+            }
+        }
+        else if(quizState == QuizState.DISPLAY) {
+
+            Column(Modifier.fillMaxWidth()
+                .wrapContentHeight(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center) {
+                Spacer(Modifier.height(10.dp))
+                LazyColumn(Modifier.fillMaxWidth()
+                    .fillMaxHeight(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center) {
+                    item {
+                        Column {
+                            Text("${quizFinalScore?.module}",
+                                style = MaterialTheme.typography.caption.copy(
+                                    fontSize = 18.sp,
+                                    color = Color.Blue,
+                                    fontWeight = FontWeight(200),
+                                    fontFamily = FontFamily.Serif,
+                                    lineHeight = 24.sp
+                                ))
+                            Spacer(Modifier.height(20.dp))
+                            Text("${quizFinalScore?.score} / ${quizFinalScore?.total}")
                         }
                     }
                 }

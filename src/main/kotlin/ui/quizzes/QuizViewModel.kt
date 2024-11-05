@@ -4,9 +4,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import models.CourseResponse
+import models.QuizzesResponse
 import models.UserQuizResponse
+import models.userquiz.Answer
 import models.userquiz.UserQuizApi
 import models.userquiz.UserScoreData
+import models.userquiz.UserScoreRequest
 import models.video.*
 import ui.dashboards.ViewModel
 import ui.utilities.ScoreWrapper
@@ -17,22 +20,24 @@ class QuizViewModel: ViewModel() {
        return UserQuizApi().submitUserQuiz(userQuiz)
     }
 
-    fun validateAnswer(
-        responsesList: MutableMap<String, String>,
-        questions: List<Question>?): ScoreWrapper {
+    suspend fun getCourseScores(userQuiz: UserScoreRequest) : QuizzesResponse? {
+        return UserQuizApi().getUserScores(userQuiz)
+    }
+
+    fun validateAnswer(responsesList: MutableList<Answer>): ScoreWrapper {
         var count = 0
         var total = 0
         var max = 0
 
-        questions?.forEach {
-            if(responsesList[it.question] == it.answer && it.assertions?.size != 0) {
+        responsesList.forEach {
+            if(it.answer == it.rightAnswer) {
                 count ++
             }
 
-            if(it.assertions?.size != 0) {
-                total ++
+            if(it.isAssertion) {
+                total++
             }
-            max++
+            max ++
         }
 
         return ScoreWrapper(temp = count.toDouble(),

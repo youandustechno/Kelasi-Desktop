@@ -61,7 +61,6 @@ class UserAuthApi {
 
                 if(token != null) {
                     val code: String = token.headers()["Authorization"]?.replace("Bearer", "")?:""
-
                     TokenResponse(TokenComponent(code))
                 }
                 else {
@@ -84,11 +83,14 @@ class UserAuthApi {
 
                 if(token != null) {
                     val code: String = token.headers()["Authorization"]?.replace("Bearer", "")?:""
-                    TokenResponse(TokenComponent(code))
+                    if (code.isNotEmpty()) {
+                        TokenResponse(TokenComponent(code))
+                    } else {
+                        TokenResponse(null, TokenError(0, "Token is null"))
+                    }
                 }
                 else {
-                    TokenResponse(null, TokenError(0,
-                        "Token is null"))
+                    TokenResponse(null, TokenError(0, "Token is null"))
                 }
             }
         } catch (exception: Exception) {

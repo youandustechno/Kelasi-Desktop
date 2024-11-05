@@ -211,7 +211,7 @@ fun Videos(
 
                                     Spacer(Modifier.width(8.dp))
 
-                                    LinkButton("Take a Quiz") {
+                                    LinkButton("Quizzes") {
                                         val courseMap = mutableMapOf<String, Any>()
                                         courseMap[MODULE] = selectedModule!!
                                         courseMap[COURSE] = course as CourseComponent

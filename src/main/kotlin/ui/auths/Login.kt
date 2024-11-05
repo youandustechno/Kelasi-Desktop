@@ -55,6 +55,20 @@ fun Login(onClick: (NavHelper) -> Unit) {
                 .padding(start = 4.dp, end = 4.dp)) {
 
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Box (Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .padding(5.dp)){
+                        Box(Modifier
+                            .wrapContentSize()
+                            .align(Alignment.CenterEnd)) {
+
+                            ResourceImageController30by30("image/icon_arrow_back.svg") {
+                                //todo remove auth code and clear everything
+                                onClick.invoke(NavHelper(Route.AuthOrg))
+                            }
+                        }
+                    }
                     Spacer(Modifier.height(10.dp))
                     Row(Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.End,

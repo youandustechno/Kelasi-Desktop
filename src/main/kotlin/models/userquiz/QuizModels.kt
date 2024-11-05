@@ -19,6 +19,13 @@ data class UserQuizComponent (
     var hasResponseField: Boolean = false
 )
 
+data class Answer(
+    var question: String,
+    var answer: String,
+    var rightAnswer: String,
+    var isAssertion: Boolean = false
+)
+
 data class ScoreInfo (
     var quizRef: String,
     var score: String,
@@ -27,7 +34,7 @@ data class ScoreInfo (
     var topicName: String,
     var created: String,
     var topicRef: String,
-    var response: Map<String, String>? = null,
+    var responses: List<Answer>? = null,
     var hasResponseField: Boolean = false,
     var pending: Boolean? = null
 )
@@ -37,7 +44,13 @@ data class UserScoreData(
     val firstName: String,
     val lastName: String,
     var middleName: String = EMPTY,
-    var level: String,
-    val scoreInfo: ScoreInfo
+    var level: String = EMPTY,
+    val scoreInfo: ScoreInfo?
+)
+
+data class UserScoreRequest(
+    var userRef: String,
+    val topicId: String,
+    val topicName: String
 )
 
