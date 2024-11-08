@@ -6,7 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Modifier
@@ -43,7 +43,7 @@ fun QuestionCards(content: @Composable() () -> Unit) {
         Column(Modifier
             .widthIn(300.dp, 600.dp)
             .wrapContentHeight()
-            .padding(3.dp)) {
+            .padding(start = 8.dp, end = 8.dp, top = 3.dp, bottom = 3.dp)) {
             content()
         }
     }
@@ -62,11 +62,15 @@ fun SubscriptionCards(content: @Composable() () -> Unit) {
 }
 
 @Composable
-fun DocCards(click: () -> kotlin.Unit, content: @Composable() () -> Unit) {
+fun DocCards(click: () -> Unit, isClick: Boolean = false, content: @Composable() () -> Unit) {
+    val isClicked: Boolean by remember{ mutableStateOf(isClick) }
+
     CardsWrapHeightWithPadding (click = click ){
         Column(Modifier
             .width(200.dp)
             .wrapContentHeight()
+//            .then(if(isClicked) Modifier.background(Color.LightGray)
+//             else Modifier)
             .defaultMinSize(minWidth = 150.dp, minHeight = 120.dp)) {
             content()
         }

@@ -65,7 +65,13 @@ fun Login(onClick: (NavHelper) -> Unit) {
 
                             ResourceImageController30by30("image/icon_arrow_back.svg") {
                                 //todo remove auth code and clear everything
-                                onClick.invoke(NavHelper(Route.AuthOrg))
+
+                                if(isTokenValid) {
+                                   isTokenValid = false
+
+                                } else {
+                                    onClick.invoke(NavHelper(Route.AuthOrg))
+                                }
                             }
                         }
                     }
@@ -74,19 +80,21 @@ fun Login(onClick: (NavHelper) -> Unit) {
                         horizontalArrangement = Arrangement.End,
                         verticalAlignment = Alignment.CenterVertically) {
                         loginMode = if(isPhoneAuth)  "Email" else "Phone"
-                        Text(loginMode, style = MaterialTheme.typography.caption,
-                            color = Color(0XFF3b1b49))
-                        Spacer(Modifier.width(8.dp))
-                        Switch(
-                            isPhoneAuth,
-                            onCheckedChange = { isPhoneAuth = it },
-                            colors = SwitchDefaults.colors(
-                                checkedThumbColor = Color(0XFF4A3125),
-                                uncheckedThumbColor = Color(0XFF4A3125),
-                                checkedTrackColor = Color(0XFF4A3125),
-                                uncheckedTrackColor = Color(0XFFc5aca0)
+                        if(!isTokenValid) {
+                            Text(loginMode, style = MaterialTheme.typography.caption,
+                                color = Color(0XFF3b1b49))
+                            Spacer(Modifier.width(8.dp))
+                            Switch(
+                                isPhoneAuth,
+                                onCheckedChange = { isPhoneAuth = it },
+                                colors = SwitchDefaults.colors(
+                                    checkedThumbColor = Color(0XFF4A3125),
+                                    uncheckedThumbColor = Color(0XFF4A3125),
+                                    checkedTrackColor = Color(0XFF4A3125),
+                                    uncheckedTrackColor = Color(0XFFc5aca0)
+                                )
                             )
-                        )
+                        }
                     }
                     Spacer(Modifier.height(10.dp))
                     if(isPhoneAuth && !isTokenValid) {

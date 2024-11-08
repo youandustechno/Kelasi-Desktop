@@ -3,6 +3,7 @@ package ui.quizzes
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.RadioButton
@@ -15,7 +16,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.unit.times
 import helpers.startCountDown
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -58,7 +58,7 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
 
     var score by remember { mutableStateOf(ScoreWrapper()) }
 
-    var quizFinalScore: QuizScore? by remember { mutableStateOf(null) }
+    var quizFinalScore: QuizFinalScore? by remember { mutableStateOf(null) }
 
     var answers: MutableList<Answer> by remember { mutableStateOf(mutableListOf()) }
 
@@ -108,7 +108,8 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                                 totalMinutes = 0
                                 countDownText = EMPTY
                                 quizState = QuizState.DISPLAY
-                                quizFinalScore = found
+                                quizFinalScore = QuizFinalScore((index + 1).toString(), found)
+                                selectedQuiz = null
 
                             } else {
                                 totalMinutes = 0
@@ -117,7 +118,8 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                                 selectedQuiz = interro
                             }
 
-                        }) {
+                        }, selectedQuiz != null || quizState == QuizState.DISPLAY ) {
+
                             if(interro._id != null) {
                                 Spacer(Modifier.height(5.dp))
                                 Text("Quiz Number ${index + 1}",
@@ -132,8 +134,7 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                                     .copy(fontSize = 12.sp, lineHeight = 15.sp))
 
                                 if(!found?.score.isNullOrEmpty()) {
-
-                                    Text(text = found?.score.toString()+ " / "+ found?.total.toString(),
+                                    Text(text = "Already taken",
                                         style = MaterialTheme.typography.caption
                                         .copy(fontSize = 12.sp, lineHeight = 15.sp))
                                     Spacer(Modifier.height(2.dp))
@@ -187,6 +188,14 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                         .height(300.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center) {
+
+                        Row (Modifier.fillMaxWidth()
+                            .padding(end = 20.dp, bottom = 50.dp),
+                            horizontalArrangement = Arrangement.End) {
+                            ResourceImage30by30("image/icon_close.svg")  {
+                                quizState = QuizState.INITIAL
+                            }
+                        }
 
                         Text("Before you start this quiz. Make sure you have stable internet connection " +
                                 "and once you click on continue, you can not go off this screen or close it before you submit it." +
@@ -475,29 +484,106 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                 .wrapContentHeight(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center) {
-                Spacer(Modifier.height(10.dp))
-                LazyColumn(Modifier.fillMaxWidth()
+                Spacer(Modifier.height(20.dp))
+                LazyColumn(Modifier.widthIn(450.dp, 650.dp)
                     .fillMaxHeight(),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center) {
+                    verticalArrangement = Arrangement.Top) {
                     item {
                         Column {
-                            Text("${quizFinalScore?.module}",
+                            Text("Quiz Number ${quizFinalScore?.index}",
                                 style = MaterialTheme.typography.caption.copy(
                                     fontSize = 18.sp,
-                                    color = Color.Blue,
+                                    color = Color.Black,
                                     fontWeight = FontWeight(200),
                                     fontFamily = FontFamily.Serif,
                                     lineHeight = 24.sp
                                 ))
                             Spacer(Modifier.height(20.dp))
-                            Text("${quizFinalScore?.score} / ${quizFinalScore?.total}")
+                            Text("You scored ${quizFinalScore?.quiz?.score} out of  ${quizFinalScore?.quiz?.total}",
+                                style = MaterialTheme.typography.caption.copy(
+                                    fontSize = 18.sp,
+                                    color = Color.Blue,
+                                    fontWeight = FontWeight(200),
+                                    fontFamily = FontFamily.Serif,
+                                    lineHeight = 20.sp
+                                ))
+                            Spacer(Modifier.height(20.dp))
+                        }
+                    }
+
+                    if(!quizFinalScore?.quiz?.responses.isNullOrEmpty() && quizFinalScore?.quiz?.pending.toBoolean()) {
+
+                        items(quizFinalScore?.quiz?.responses!!) { item ->
+
+                            Column(Modifier
+                                .fillMaxWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally) {
+                                QuestionCards {
+                                    Text("Question: ${item.question}",
+                                        style = MaterialTheme.typography.caption.copy(
+                                            fontSize = 14.sp,
+                                            fontWeight = FontWeight(200),
+                                            fontFamily = FontFamily.Serif,
+                                            lineHeight = 24.sp
+                                        ))
+                                    Spacer(Modifier.height(10.dp))
+                                    val currentAnswer = answers.find { it.question == item.question }
+                                    Text("Your answer:  ${ item.answer}",
+                                        style = MaterialTheme.typography.caption.copy(
+                                            fontSize = 14.sp,
+                                            fontWeight = FontWeight(200),
+                                            fontFamily = FontFamily.Serif,
+                                            lineHeight = 24.sp
+                                        ))
+                                    Spacer(Modifier.height(10.dp))
+                                    Row(Modifier.fillMaxWidth().padding(0.dp),
+                                        horizontalArrangement = Arrangement.SpaceBetween) {
+                                        Text("Correct answer:  ${item.rightAnswer}",
+                                            style = MaterialTheme.typography.caption.copy(
+                                                fontSize = 14.sp,
+                                                fontWeight = FontWeight(200),
+                                                fontFamily = FontFamily.Serif,
+                                                lineHeight = 24.sp
+                                            ))
+                                        if(item.answer.equals(item.rightAnswer, true)) {
+                                            ResourceImage30by30("image/icon_check.svg")
+                                        }
+                                        else {
+                                            ResourceImage30by30("image/icon_clear.svg")
+                                        }
+                                    }
+                                }
+                            }
+                            Spacer(Modifier.height(20.dp))
+
                         }
                     }
                 }
+            }
+        }
+        else {
+            val welcomeText = "Welcome the assessments and Quizzes section." +
+                    " \nHere is where you can take a quiz and also see the result for a quiz taken." +
+                    "\nSelect the quiz you want to take or see the score in the above selection."
+
+            Column(Modifier.fillMaxWidth()
+                .heightIn(300.dp, 450.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center) {
+
+                Text(welcomeText,
+                    style = MaterialTheme.typography.caption.copy(
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight(200),
+                        fontFamily = FontFamily.Serif,
+                        lineHeight = 24.sp
+                    ))
             }
         }
     }
 }
 
 enum class QuizState { INITIAL, SUBMIT, CONTINUE, DISPLAY, START, NONE}
+
+data class QuizFinalScore(var index: String, var  quiz: QuizScore?)

@@ -53,7 +53,7 @@ fun PinView(pinLength: Int = 8, onPinEntered: (String) -> Unit) {
                     .typography
                     .caption,
                 modifier = Modifier
-                    .width(50.dp)
+                    .width(55.dp)
                     .padding(horizontal = 4.dp)
                     .focusRequester(focusRequesters[index])
                     .onKeyEvent { keyEvent ->
