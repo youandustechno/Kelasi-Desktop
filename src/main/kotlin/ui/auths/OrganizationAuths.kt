@@ -9,7 +9,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import helpers.StorageHelper
 import helpers.StorageHelper.Companion.AUTH_CODE
 import kotlinx.coroutines.Dispatchers
@@ -37,56 +40,95 @@ fun OrgAuth(orgFound:(NavHelper) -> Unit) {
         .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center) {
+
         var text by remember { mutableStateOf(EMPTY) }
-        var buttonText by remember { mutableStateOf("VERIFY") }
+        val buttonText by remember { mutableStateOf("VERIFY") }
 
         Column (Modifier
-            .width(350.dp)
-            .wrapContentHeight()
+            .width(500.dp)
+            .height(400.dp)
             .background(Color.White, shape = RoundedCornerShape(10.dp))
-            .padding(5.dp)) {
+            .padding(10.dp),
+            horizontalAlignment = Alignment.CenterHorizontally) {
 
-            Box(Modifier
-                .fillMaxWidth()
-                .padding(start = 4.dp, end = 4.dp)) {
-                OrgaAuthText(text) {
-                    text = it
-                }
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .heightIn(40.dp, 60.dp)
+            ) {
+                Text("INSTITUTION",
+                    style = MaterialTheme.typography.caption.copy(
+                        fontSize = 18.sp,
+                        color = Color.Black,
+                        fontWeight = FontWeight.Light,
+                        fontFamily = FontFamily.Serif,
+                        lineHeight = 24.sp
+                    ),
+                    modifier = Modifier.align(Alignment.Center)
+                )
             }
-            
-            LoginButton(buttonText) {
-                //Make http call
-                coroutineScope.launch(Dispatchers.IO) {
-                    if(text.isValid()) {
-                      val result =  authViewModel.verifyAuthCode(text)
-                        delay(500L)
-                        withContext(Dispatchers.Main) {
-                            if(result.org != null) {
-                                //prefs.put("group", result.org!!.tenantCode)
-                                result.org?.tenantCode?.let {
-                                    //PreferenceHelper().saveAuthCode(it)
-                                    StorageHelper().saveInStorage(AUTH_CODE, it)
+
+            Column (Modifier
+                .fillMaxWidth()
+                .weight(1f, true),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center) {
+
+                Box(Modifier
+                    .widthIn(300.dp, 400.dp)
+                    .padding(start = 4.dp, end = 4.dp)) {
+
+                    OrgaAuthText(text) {
+                        text = it
+                    }
+                }
+
+                Spacer(Modifier.height(20.dp))
+
+                Box(Modifier
+                    .widthIn(300.dp, 400.dp)
+                    .padding(start = 4.dp, end = 4.dp)) {
+
+                    LoginButton(buttonText) {
+                        //Make http call
+                        coroutineScope.launch(Dispatchers.IO) {
+                            if(text.isValid()) {
+                                val result =  authViewModel.verifyAuthCode(text)
+                                delay(500L)
+                                withContext(Dispatchers.Main) {
+                                    if(result.org != null) {
+                                        //prefs.put("group", result.org!!.tenantCode)
+                                        result.org?.tenantCode?.let {
+                                            //PreferenceHelper().saveAuthCode(it)
+                                            StorageHelper().saveInStorage(AUTH_CODE, it)
+                                        }
+                                        orgFound.invoke(NavHelper(Route.AuthLogin))
+                                    } else {
+                                        isFailure = true
+                                        failureMessage = result.error?.errorMessage
+                                    }
                                 }
-                                orgFound.invoke(NavHelper(Route.AuthLogin))
-                            } else {
-                                isFailure = true
-                                failureMessage = result.error?.errorMessage
                             }
                         }
                     }
-                }
-            }
-        }
 
-        if(isFailure == true) {
-            Spacer(Modifier.height(30.dp))
-            Column(Modifier.sizeIn(150.dp, 100.dp, 400.dp, 150.dp)){
-                ErrorCard {
-                    Text("$failureMessage",
-                        style = MaterialTheme.typography
-                            .button
-                            .copy(color = Color.DarkGray))
+                    Spacer(Modifier.height(10.dp))
                 }
+
+                if(isFailure == true) {
+                    Spacer(Modifier.height(10.dp))
+                    Column(Modifier
+                        .sizeIn(150.dp, 100.dp, 400.dp, 150.dp)
+                        .widthIn(300.dp, 400.dp)){
+                        ErrorCard {
+                            Text("$failureMessage",
+                                style = MaterialTheme.typography
+                                    .button
+                                    .copy(color = Color.DarkGray))
+                        }
+                    }
+                }
+                Spacer(Modifier.height(30.dp))
             }
         }
     }

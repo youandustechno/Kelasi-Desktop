@@ -1,9 +1,6 @@
 package ui.videos
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -21,6 +18,7 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -266,9 +264,9 @@ fun Videos(
                                             lineHeight = 22.sp
                                         ))
                                 }
-
+                                val scrollState = rememberScrollState()
                                 //Video card
-                                Column(
+                                Box(
                                     Modifier
                                         .then(if (isFullSize) Modifier
                                             .widthIn(650.dp, 1000.dp)
@@ -276,8 +274,13 @@ fun Videos(
                                         else Modifier
                                             .widthIn(500.dp, 750.dp)
                                             .heightIn(300.dp, 400.dp))
+                                        .verticalScroll(scrollState)
                                         .padding(10.dp)
                                 ) {
+                                    Box(Modifier.background(Color.Transparent)
+                                        .zIndex(2f)
+                                        .fillMaxSize()) {}
+
                                     if(selectedVideo != null) {
                                         VideoPlayerCards(
                                             selectedVideo !!.apply {
@@ -347,6 +350,7 @@ fun Videos(
                                                     .then(if(index == selectedVideoIndex ) Modifier.background(Color.DarkGray)
                                                     else Modifier.background(Color.LightGray))
                                                     .fillMaxSize()
+                                                    .padding(top = 3.dp, start = 3.dp)
                                                     .clickable {
                                                         selectedVideo = video
                                                         playerState = VideoState.STOP
@@ -361,15 +365,28 @@ fun Videos(
                                                     ResourceImageDashboard("image/image_java.png") {
                                                         selectedVideo = video
                                                         playerState = VideoState.STOP
+                                                        selectedVideoIndex = index
                                                         isInitial = false
+                                                        CoroutineScope(Dispatchers.Main).launch {
+                                                            delay(1000)
+                                                            playerState = VideoState.START
+                                                        }
                                                     }
-                                                    Text(text = "  ${video.title}", style = MaterialTheme.typography.caption
-                                                        .copy(
-                                                            fontSize = 14.sp,
-                                                            fontWeight = FontWeight(200),
-                                                            fontFamily = FontFamily.Serif,
-                                                            lineHeight = 24.sp
-                                                        ))
+
+                                                    if(video.title.isNotEmpty()) {
+                                                        Box(Modifier
+                                                            .wrapContentSize()
+                                                            .background(Color.White, shape = RoundedCornerShape(2.dp))
+                                                            .padding(3.dp)){
+                                                            Text(text = "  ${video.title}", style = MaterialTheme.typography.caption
+                                                                .copy(
+                                                                    fontSize = 14.sp,
+                                                                    fontWeight = FontWeight(200),
+                                                                    fontFamily = FontFamily.Serif,
+                                                                    lineHeight = 24.sp
+                                                                ))
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }

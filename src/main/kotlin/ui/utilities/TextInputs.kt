@@ -32,7 +32,7 @@ fun PhoneText(phoneNumber: String, onChange: (String) -> Unit) {
 @Composable
 fun OrgaAuthText(phoneNumber: String, onChange: (String) -> Unit) {
     var text by remember { mutableStateOf(TextFieldValue(phoneNumber)) }
-    AuthTextFieldWithIcons(text.text, Icons.Default.Edit, "Auth Code", onChange)
+    AuthTextFieldWithIcons(text.text, Icons.Default.Edit, "Code", onChange)
 }
 
 @Composable

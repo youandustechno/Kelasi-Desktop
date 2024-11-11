@@ -1,5 +1,6 @@
 package ui.utilities
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Slider
 import androidx.compose.runtime.*
@@ -85,7 +86,6 @@ fun VideoPlayerImpl(
         }
         else -> {}
     }
-
     DisposableEffect(Unit) { onDispose(mediaPlayer::release) }
     Row(Modifier
         .fillMaxWidth()

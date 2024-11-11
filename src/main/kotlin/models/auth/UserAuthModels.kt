@@ -11,7 +11,7 @@ data class EmailAndPassComponent(var email: String = EMPTY, val password: String
 
 data class TokenResponse(val token: TokenComponent? = null, val error: TokenError? = null)
 
-data class UserCredentials(var firstName: String, var lastName: String, var middleName: String, var phoneNumber: String)
+data class UserCredentials(var firstName: String, var lastName: String, var phoneNumber: String)
 
 data class TokenError(val code: Int = 0, val error: String = EMPTY)
 

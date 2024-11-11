@@ -4,8 +4,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
@@ -13,7 +11,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.KeyboardType
@@ -22,7 +19,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun PinView(pinLength: Int = 8, onPinEntered: (String) -> Unit) {
-    var pinValues = remember { mutableStateListOf(*Array(pinLength){""}) }
+    val pinValues = remember { mutableStateListOf(*Array(pinLength){""}) }
     val focusRequesters = remember { List(pinLength) { FocusRequester() } }
     val focusManager = LocalFocusManager.current
 
@@ -57,22 +54,31 @@ fun PinView(pinLength: Int = 8, onPinEntered: (String) -> Unit) {
                     .padding(horizontal = 4.dp)
                     .focusRequester(focusRequesters[index])
                     .onKeyEvent { keyEvent ->
-                        if(keyEvent.type == KeyEventType.KeyDown && keyEvent.key == Key.Tab) {
-                            if(index < pinLength - 1) {
-                                focusRequesters[index + 1].requestFocus()
-                            } else {
-                                focusManager.clearFocus()
+                        if(keyEvent.type == KeyEventType.KeyDown) {
+                            when(keyEvent.key) {
+                                Key.Backspace, Key.Delete -> {
+                                    if(pinValues[index].isEmpty() && index > 0) {
+                                        focusRequesters[index - 1].requestFocus()
+                                        pinValues[index - 1] = ""
+                                    }
+                                    true
+                                }
+                                Key.Tab -> {
+
+                                    if(index < pinLength - 1) {
+                                        focusRequesters[index + 1].requestFocus()
+                                    } else {
+                                        focusManager.clearFocus()
+                                    }
+                                    true
+                                }
+                                else -> false
                             }
-                            true
+
                         } else {
                             false
                         }
                     },
-//                colors = TextFieldDefaults.textFieldColors(
-//                    backgroundColor = Color.Transparent,
-//                    focusedIndicatorColor = Color.Transparent,
-//                    unfocusedIndicatorColor = Color.Transparent
-//                )
             )
         }
     }

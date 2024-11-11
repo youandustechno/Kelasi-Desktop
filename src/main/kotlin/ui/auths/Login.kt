@@ -8,7 +8,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -32,6 +35,11 @@ fun Login(onClick: (NavHelper) -> Unit) {
     var email by remember { mutableStateOf(EMPTY) }
     var password by remember { mutableStateOf(EMPTY) }
     var phone by remember { mutableStateOf(EMPTY) }
+
+    var emailSave by remember { mutableStateOf(EMPTY) }
+    var passwordSave by remember { mutableStateOf(EMPTY) }
+    var phoneSave by remember { mutableStateOf(EMPTY) }
+
     var userCode by remember { mutableStateOf(EMPTY) }
     var loginButton by remember { mutableStateOf("LOGIN") }
     var loginMode by remember { mutableStateOf("Phone") }
@@ -45,7 +53,7 @@ fun Login(onClick: (NavHelper) -> Unit) {
 
         Column (Modifier
             .width(500.dp)
-            .wrapContentHeight()
+            .height(400.dp)
             .background(Color.White, shape = RoundedCornerShape(10.dp))
             .padding(10.dp),
             horizontalAlignment = Alignment.CenterHorizontally) {
@@ -58,7 +66,30 @@ fun Login(onClick: (NavHelper) -> Unit) {
                     Box (Modifier
                         .fillMaxWidth()
                         .wrapContentHeight()
-                        .padding(5.dp)){
+                        .padding(5.dp)) {
+
+                        val titleText = if (isTokenValid) {
+                            "VERIFICATION CODE"
+                        } else {
+                            "LOGIN"
+                        }
+
+                        Box(
+                            Modifier
+                                .wrapContentSize()
+                                .align(Alignment.Center)
+                        ) {
+                            Text(titleText,
+                                style = MaterialTheme.typography.caption.copy(
+                                    fontSize = 18.sp,
+                                    color = Color.Black,
+                                    fontWeight = FontWeight.Light,
+                                    fontFamily = FontFamily.Serif,
+                                    lineHeight = 24.sp
+                                ))
+                        }
+
+
                         Box(Modifier
                             .wrapContentSize()
                             .align(Alignment.CenterEnd)) {
@@ -98,8 +129,12 @@ fun Login(onClick: (NavHelper) -> Unit) {
                     }
                     Spacer(Modifier.height(10.dp))
                     if(isPhoneAuth && !isTokenValid) {
-                        UserPhoneFields(phone) {
-                            phone = it
+                        Box(Modifier
+                            .widthIn(300.dp, 400.dp)) {
+
+                            UserPhoneFields(phone) {
+                                phone = it
+                            }
                         }
 
                     } else if(isTokenValid) {
@@ -111,83 +146,98 @@ fun Login(onClick: (NavHelper) -> Unit) {
                         }
                     }
                     else {
-                        UserEmailFields(email) {
-                            email = it
+                        Column(Modifier
+                            .widthIn(300.dp, 400.dp)
+                            .wrapContentHeight()) {
+
+                            UserEmailFields(email) {
+                                email = it
+                            }
+                            Spacer(Modifier.height(10.dp))
+                            UserPasswordFields(password) {
+                                password = it
+                            }
                         }
-                        Spacer(Modifier.height(10.dp))
-                        UserPasswordFields(password) {
-                            password = it
-                        }
+
                     }
                 }
             }
             Spacer(Modifier.height(20.dp))
-            LoginButton(loginButton) {
+            Column(Modifier
+                .widthIn(300.dp, 400.dp)) {
+                LoginButton(loginButton) {
 
-                if(loginButton.equals("VALIDATE", true)) {
+                    if(loginButton.equals("VALIDATE", true)) {
 
-                    if(isTokenValid) {
-                        coroutineScope.launch(Dispatchers.IO) {
-                            val result  = authViewModel.getAuthenticatedUser(email.ifEmpty { phone })
-                            delay(500L)
-                            withContext(Dispatchers.Main) {
-                                if (result.user != null) {
-                                    val map = mutableMapOf<String, Any>()
-                                    val isVerified = authViewModel.isTokenStillValid(result.user, userCode)
-                                    if(isVerified) {
+                        if(isTokenValid) {
+                            coroutineScope.launch(Dispatchers.IO) {
+                                val result  = authViewModel.getAuthenticatedUser(email.ifEmpty { phone })
+                                delay(500L)
+                                withContext(Dispatchers.Main) {
+                                    if (result.user != null) {
+                                        val map = mutableMapOf<String, Any>()
+                                        val isVerified = authViewModel.isTokenStillValid(result.user, userCode)
+                                        if(isVerified) {
 
-                                        userCode = EMPTY
-                                        password = EMPTY
-                                        email = EMPTY
-                                        phone = EMPTY
-                                        userCache = result.user
-                                        map[USER_KEY] = result.user
-                                        //Todo persist
-                                        onClick.invoke(NavHelper(Route.Dashboard, map))
+                                            userCode = EMPTY
+                                            passwordSave = EMPTY
+                                            emailSave = EMPTY
+                                            phoneSave = EMPTY
+                                            userCache = result.user
+                                            map[USER_KEY] = result.user
+                                            //Todo persist
+                                            onClick.invoke(NavHelper(Route.Dashboard, map))
+                                        } else {
+                                            //Todo show error for authentication failure
+                                        }
                                     } else {
                                         //Todo show error for authentication failure
                                     }
+                                }
+                            }
+                        }
+                    } else {
+
+                        coroutineScope.launch(Dispatchers.IO) {
+
+                            if(phone.isValid() && email.isValid() && password.isValid()) {
+                                //TODO show error and say you can not login with email and phone credentials the same time.
+                            }
+                            else if(phone.isValid() && !email.isValid() && password.isValid()) {
+                                //TODO show error and say you can not login with email and phone credentials the same time.
+                            }
+                            else if(!phone.isValid() && !email.isValid()) {
+                                //TODO show error and say you can not login with email and phone credentials the same time.
+                            }
+                            else {
+                                val result = if(email.isValid() && password.isValid()) {
+                                    authViewModel.startLoginEmail(EmailAndPassComponent(email, password))
                                 } else {
-                                    //Todo show error for authentication failure
+                                    authViewModel.startLoginPhone(phone)
+                                }
+                                delay(500L)
+                                withContext(Dispatchers.Main) {
+                                    if (result.token != null) {
+                                        AuthViewModel.currentToken = result.token.token
+                                        passwordSave = password
+                                        emailSave = email
+                                        phoneSave = phone
+                                        password = EMPTY
+                                        email = EMPTY
+                                        phone = EMPTY
+                                        isTokenValid = true
+                                    } else {
+                                        //Todo show error for authentication failure
+                                    }
                                 }
                             }
                         }
                     }
-                } else {
 
-                    coroutineScope.launch(Dispatchers.IO) {
-
-                        if(phone.isValid() && email.isValid() && password.isValid()) {
-                            //TODO show error and say you can not login with email and phone credentials the same time.
-                        }
-                        else if(phone.isValid() && !email.isValid() && password.isValid()) {
-                            //TODO show error and say you can not login with email and phone credentials the same time.
-                        }
-                        else if(!phone.isValid() && !email.isValid()) {
-                            //TODO show error and say you can not login with email and phone credentials the same time.
-                        }
-                        else {
-                            val result = if(email.isValid() && password.isValid()) {
-                                authViewModel.startLoginEmail(EmailAndPassComponent(email, password))
-                            } else {
-                                authViewModel.startLoginPhone(phone)
-                            }
-                            delay(500L)
-                            withContext(Dispatchers.Main) {
-                                if (result.token != null) {
-                                    AuthViewModel.currentToken = result.token.token
-                                    isTokenValid = true
-                                } else {
-                                    //Todo show error for authentication failure
-                                }
-                            }
-                        }
-                    }
                 }
 
+                Spacer(Modifier.height(20.dp))
             }
-
-            Spacer(Modifier.height(20.dp))
             Row(Modifier
                 .fillMaxWidth()
                 .padding(end = 10.dp),
@@ -205,10 +255,6 @@ fun Login(onClick: (NavHelper) -> Unit) {
                 }
             }
             Spacer(Modifier.height(20.dp))
-
-//            LoginButton(registerLink) {
-//                onClick.invoke(NavHelper(Route.Register))
-//            }
         }
     }
 }

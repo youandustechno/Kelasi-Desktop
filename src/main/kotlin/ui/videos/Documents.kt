@@ -13,7 +13,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import helpers.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -191,7 +194,24 @@ fun Documents(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                                 Text("No file found", style = MaterialTheme.typography.caption)
                             }
                         } else {
-                            Column {  }
+                            val welcomeText = "Welcome Documentation Page ." +
+                                    " \nHere is where you can see you instructor course documentation" +
+                                    "\nTo view a content, please select above."
+
+                            Column(Modifier.fillMaxWidth()
+                                .heightIn(300.dp, 450.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center) {
+
+                                Text(welcomeText,
+                                    style = MaterialTheme.typography.caption.copy(
+                                        fontSize = 18.sp,
+                                        color = Color.Black,
+                                        fontWeight = FontWeight.Light,
+                                        fontFamily = FontFamily.Serif,
+                                        lineHeight = 24.sp
+                                    ))
+                            }
                         }
                     }
                 }

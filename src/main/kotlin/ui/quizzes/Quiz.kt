@@ -28,8 +28,7 @@ import models.userquiz.UserScoreData
 import models.userquiz.UserScoreRequest
 import models.video.CourseComponent
 import models.video.Module
-import models.video.QuizComponent
-import ui.Cache
+import models.video.QuizComponent 
 import ui.Cache.userCache
 import ui.NavHelper
 import ui.NavKeys.COURSE
@@ -201,8 +200,9 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                                 "and once you click on continue, you can not go off this screen or close it before you submit it." +
                                 "Failing to do so, you will get the lowest mark for this quiz",
                             style = MaterialTheme.typography.caption.copy(
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight(200),
+                                fontSize = 18.sp,
+                                color = Color.Black,
+                                fontWeight = FontWeight.Light,
                                 fontFamily = FontFamily.Serif,
                                 lineHeight = 24.sp
                             ))
@@ -392,8 +392,9 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                             }
                             Text(scoreText,
                                 style = MaterialTheme.typography.caption.copy(
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight(200),
+                                    fontSize = 18.sp,
+                                    color = Color.Black,
+                                    fontWeight = FontWeight.Light,
                                     fontFamily = FontFamily.Serif,
                                     lineHeight = 24.sp
                                 ))
@@ -574,8 +575,9 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
 
                 Text(welcomeText,
                     style = MaterialTheme.typography.caption.copy(
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight(200),
+                        fontSize = 18.sp,
+                        color = Color.Black,
+                        fontWeight = FontWeight.Light,
                         fontFamily = FontFamily.Serif,
                         lineHeight = 24.sp
                     ))
