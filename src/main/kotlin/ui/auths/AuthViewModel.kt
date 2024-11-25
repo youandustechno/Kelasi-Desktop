@@ -2,6 +2,7 @@ package ui.auths
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
+import helpers.StorageHelper
 import models.AuthCodeResponse
 import models.BaseValues
 import models.auth.*
@@ -83,7 +84,8 @@ class AuthViewModel: SettingsViewModel () {
             val secret = BaseValues.KEY
             val algorithm = Algorithm.HMAC256(secret)
             val verifier = JWT.require(algorithm).build()
-            val decodeJWT = verifier.verify(currentToken?.trim())
+            val tokenCode = StorageHelper().retrieveFromStorage(StorageHelper.TOKEN_CODE)
+            val decodeJWT = verifier.verify(currentToken?.trim()?:tokenCode?.trim())
 
             val username = decodeJWT.getClaim("username").asString()
             val verificationCode = decodeJWT.getClaim("verificationCode").asString()

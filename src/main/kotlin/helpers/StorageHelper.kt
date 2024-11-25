@@ -12,6 +12,7 @@ class StorageHelper {
 
     companion object {
         val AUTH_CODE = "authCode"
+        val TOKEN_CODE = "tokenCode"
     }
 
     init {

@@ -12,6 +12,9 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import helpers.StorageHelper
+import helpers.StorageHelper.Companion.AUTH_CODE
+import helpers.StorageHelper.Companion.TOKEN_CODE
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -98,7 +101,8 @@ fun Login(onClick: (NavHelper) -> Unit) {
                                 //todo remove auth code and clear everything
 
                                 if(isTokenValid) {
-                                   isTokenValid = false
+                                    loginButton = "LOGIN"
+                                    isTokenValid = false
 
                                 } else {
                                     onClick.invoke(NavHelper(Route.AuthOrg))
@@ -171,7 +175,16 @@ fun Login(onClick: (NavHelper) -> Unit) {
 
                         if(isTokenValid) {
                             coroutineScope.launch(Dispatchers.IO) {
-                                val result  = authViewModel.getAuthenticatedUser(email.ifEmpty { phone })
+                                val credential: String = email.ifEmpty {
+                                    phone.ifEmpty {
+                                        phoneSave.ifEmpty {
+                                            emailSave
+                                        }
+                                    }
+                                }
+
+                                val result  = authViewModel
+                                    .getAuthenticatedUser(credential)
                                 delay(500L)
                                 withContext(Dispatchers.Main) {
                                     if (result.user != null) {
@@ -218,7 +231,7 @@ fun Login(onClick: (NavHelper) -> Unit) {
                                 delay(500L)
                                 withContext(Dispatchers.Main) {
                                     if (result.token != null) {
-                                        AuthViewModel.currentToken = result.token.token
+                                        StorageHelper().saveInStorage(TOKEN_CODE, result.token.token)
                                         passwordSave = password
                                         emailSave = email
                                         phoneSave = phone

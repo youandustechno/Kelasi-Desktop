@@ -1,9 +1,11 @@
 package ui
 
+import models.BaseValues
 import java.text.SimpleDateFormat
 import java.util.logging.SimpleFormatter
 
 object NavKeys {
+
     const val USER_KEY = "user"
     const val COURSE = "course"
     const val COURSE_ID = "courseId"
@@ -19,4 +21,7 @@ object NavKeys {
     const val PASSWORD= "password"
     const val EMPTY =""
 
+    fun clearAllBeforeLogout() {
+        BaseValues.KEY = ""
+    }
 }

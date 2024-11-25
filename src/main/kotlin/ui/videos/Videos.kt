@@ -104,6 +104,10 @@ fun Videos(
                 selectedVideo = course!!.modules[0].videos[0]
             }
         }
+
+        if(course?.modules?.size == 1) {
+            selectedModule = course!!.modules[0]
+        }
     }
 
     if (state) {
@@ -189,43 +193,42 @@ fun Videos(
                             }
                         }
                     }
+                }
+                Spacer(Modifier.height(10.dp))
 
-                    Spacer(Modifier.height(10.dp))
+                if(selectedModule?.quiz?.isNotEmpty() == true) {
+                    Row {
+                        Box(Modifier.fillMaxWidth()
+                            .heightIn(50.dp, 70.dp)) {
 
-                    if(selectedModule?.quiz?.isNotEmpty() == true) {
-                        Row {
-                            Box(Modifier.fillMaxWidth()
-                                .heightIn(50.dp, 70.dp)) {
+                            Row(Modifier.align(Alignment.CenterEnd)) {
 
-                                Row(Modifier.align(Alignment.CenterEnd)) {
+                                LinkButton("Documentation", color = Color(0XFFc5aca0)) {
+                                    val courseMap = mutableMapOf<String, Any>()
+                                    courseMap[MODULE] = selectedModule!!
+                                    courseMap[COURSE] = course as CourseComponent
 
-                                    LinkButton("Documentation", color = Color(0XFFc5aca0)) {
-                                        val courseMap = mutableMapOf<String, Any>()
-                                        courseMap[MODULE] = selectedModule!!
-                                        courseMap[COURSE] = course as CourseComponent
+                                    onClick.invoke(NavHelper(Route.ViewDocument, courseMap))
+                                }
 
-                                        onClick.invoke(NavHelper(Route.ViewDocument, courseMap))
-                                    }
+                                Spacer(Modifier.width(8.dp))
 
-                                    Spacer(Modifier.width(8.dp))
+                                LinkButton("Quizzes") {
+                                    val courseMap = mutableMapOf<String, Any>()
+                                    courseMap[MODULE] = selectedModule!!
+                                    courseMap[COURSE] = course as CourseComponent
 
-                                    LinkButton("Quizzes") {
-                                        val courseMap = mutableMapOf<String, Any>()
-                                        courseMap[MODULE] = selectedModule!!
-                                        courseMap[COURSE] = course as CourseComponent
-
-                                        onClick.invoke(NavHelper(Route.Quiz, courseMap))
-                                    }
+                                    onClick.invoke(NavHelper(Route.Quiz, courseMap))
                                 }
                             }
                         }
-                        Spacer(Modifier.height(10.dp))
-                    } else {
-                        Row {
-                            Box(Modifier.fillMaxWidth()
-                                .heightIn(50.dp, 70.dp)) {
-                                Spacer(Modifier.width(8.dp))
-                            }
+                    }
+                    Spacer(Modifier.height(10.dp))
+                } else {
+                    Row {
+                        Box(Modifier.fillMaxWidth()
+                            .heightIn(50.dp, 70.dp)) {
+                            Spacer(Modifier.width(8.dp))
                         }
                     }
                 }

@@ -367,6 +367,7 @@ fun ContentWrapper(withNav: Boolean, navigationState: NavHelper, onClick:(NavHel
                         }
 
                         TabButton("Logout") {
+
                             onClick.invoke(NavHelper(Route.AuthLogin))
                         }
                     }
@@ -454,4 +455,3 @@ enum class Route(route: String) {
     ManageVideo("ManageVideo"),
     Dashboard("ManageVideo")
 }
-
