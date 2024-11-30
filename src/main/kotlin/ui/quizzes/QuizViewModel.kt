@@ -30,7 +30,7 @@ class QuizViewModel: ViewModel() {
         var max = 0
 
         responsesList.forEach {
-            if(it.answer == it.rightAnswer) {
+            if(it.answer == it.rightAnswer || it.isValidAnswer) {
                 count ++
             }
 

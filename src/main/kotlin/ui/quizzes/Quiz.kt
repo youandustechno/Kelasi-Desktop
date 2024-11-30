@@ -147,7 +147,7 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                 Spacer(Modifier.height(10.dp))
             }
 
-            if(selectedQuiz != null && selectedQuiz!!.time > 0
+            if(selectedQuiz != null && selectedQuiz!!.time >= 0
                 && totalMinutes == 0 && quizState == QuizState.START) {
                 totalMinutes = selectedQuiz!!.time
                 selectedQuiz!!.problems?.forEach {
@@ -307,14 +307,7 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
 
                                         answers.find { it.question == problem.question }?.let {
                                             it.answer = entry
-                                            it.isAssertion = true
                                         }
-//                                        answers[outerIndex -1] = Answer(
-//                                            question = problem.question,
-//                                            answer = it,
-//                                            rightAnswer = problem.answer,
-//                                            isAssertion = false
-//                                        )
                                         answerEntry = entry
                                     }
                                 }
@@ -435,7 +428,7 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                                             && item.assertions?.isEmpty() != true ) {
                                             ResourceImage30by30("image/icon_check.svg")
                                         }
-                                        else if( item.assertions?.isNullOrEmpty() == true ) {
+                                        else if( item.assertions?.isNullOrEmpty() == true) {
                                             Text("No graded yet",
                                                 color = Color(0XFF338dff),
                                                 style = MaterialTheme.typography.caption.copy(
@@ -513,7 +506,7 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                         }
                     }
 
-                    if(!quizFinalScore?.quiz?.responses.isNullOrEmpty() && quizFinalScore?.quiz?.pending.toBoolean()) {
+                    if(!quizFinalScore?.quiz?.responses.isNullOrEmpty()) {
 
                         items(quizFinalScore?.quiz?.responses!!) { item ->
 
@@ -529,7 +522,8 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                                             lineHeight = 24.sp
                                         ))
                                     Spacer(Modifier.height(10.dp))
-                                    val currentAnswer = answers.find { it.question == item.question }
+//                                    var ans = answers.find { it.question == item.question }
+//                                    val currentAnswer: Answer by remember { mutableStateOf(ans) }
                                     Text("Your answer:  ${ item.answer}",
                                         style = MaterialTheme.typography.caption.copy(
                                             fontSize = 14.sp,
@@ -547,7 +541,26 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                                                 fontFamily = FontFamily.Serif,
                                                 lineHeight = 24.sp
                                             ))
-                                        if(item.answer.equals(item.rightAnswer, true)) {
+
+                                        if(!item.isAssertion && quizFinalScore?.quiz?.pending.toBoolean()) {
+                                            Text("No graded yet",
+                                                color = Color(0XFF338dff),
+                                                style = MaterialTheme.typography.caption.copy(
+                                                    fontSize = 14.sp,
+                                                    fontWeight = FontWeight(200),
+                                                    fontFamily = FontFamily.Serif,
+                                                    lineHeight = 24.sp
+                                                ))
+                                        }
+                                        else if(!item.isAssertion && !quizFinalScore?.quiz?.pending.toBoolean()) {
+
+                                            if(item.isValidAnswer) {
+                                                ResourceImage30by30("image/icon_check.svg")
+                                            } else {
+                                                ResourceImage30by30("image/icon_clear.svg")
+                                            }
+
+                                        } else  if(item.answer.equals(item.rightAnswer, true)) {
                                             ResourceImage30by30("image/icon_check.svg")
                                         }
                                         else {

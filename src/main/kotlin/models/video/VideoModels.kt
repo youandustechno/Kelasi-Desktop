@@ -45,12 +45,13 @@ data class QuizComponent(
     var title: String = EMPTY,
     var modulename: String = EMPTY,
     var problems: List<Question>? = null,
-    var time: Int = 0
+    var time: Int = -1
 )
 
 data class Question(
     var question: String = EMPTY,
     var answer: String = EMPTY,
+    var isAssertion: Boolean,
     var assertions: List<String>? = null,
     var positon: Int = 0
 )

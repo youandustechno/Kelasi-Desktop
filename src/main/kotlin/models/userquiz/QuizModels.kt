@@ -23,7 +23,8 @@ data class Answer(
     var question: String,
     var answer: String,
     var rightAnswer: String,
-    var isAssertion: Boolean = false
+    var isAssertion: Boolean = false,
+    var isValidAnswer: Boolean = false
 )
 
 data class ScoreInfo (
