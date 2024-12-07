@@ -1,6 +1,7 @@
 package models
 
 import com.google.gson.annotations.SerializedName
+import models.group.AuthResponseComponent
 import models.group.OrganizationComponent
 import models.userquiz.Answer
 import models.userquiz.UserQuizComponent
@@ -11,7 +12,7 @@ import ui.NavKeys.EMPTY
 //Error Response
 data class ErrorComponent(val errorCode: Int = 0, val errorMessage: String? = null)
 
-data class AuthCodeResponse(var org: OrganizationComponent?= null, var error: ErrorComponent?= null)
+data class AuthCodeResponse(var auth: AuthResponseComponent?= null, var error: ErrorComponent?= null)
 
 //Single Video Response
 data class UpLoadVideoResponse(val uploaded: VideoComponent? = null, val errorComponent: ErrorComponent? = null)

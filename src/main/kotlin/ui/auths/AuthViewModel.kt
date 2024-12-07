@@ -7,16 +7,18 @@ import models.AuthCodeResponse
 import models.BaseValues
 import models.auth.*
 import models.group.GroupApi
-import okhttp3.Credentials
+import ui.LocalizedStrings
+import ui.LocalizedStrings.AUTHENTICATION_FAILURE
+import ui.LocalizedStrings.LOGIN_FAILURE
+import ui.LocalizedStrings.USERNAME
+import ui.LocalizedStrings.VERIFICATION_CODE_KEY
+import ui.NavKeys
 import ui.settings.SettingsViewModel
 import ui.utilities.Others.isTokenExpired
 import ui.utilities.Others.timeStampToLocalDateTime
 import java.io.File
-import java.text.SimpleDateFormat
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import java.util.*
-import kotlin.time.Duration.Companion.hours
 
 
 class AuthViewModel: SettingsViewModel () {
@@ -37,7 +39,7 @@ class AuthViewModel: SettingsViewModel () {
         return if(response.token != null) {
             response
         } else {
-            TokenResponse (error = TokenError(error = "Login failure"))
+            TokenResponse (error = TokenError(error = LocalizedStrings.get(LOGIN_FAILURE)))
         }
     }
 
@@ -47,7 +49,7 @@ class AuthViewModel: SettingsViewModel () {
         return if(response.token != null) {
             response
         } else {
-            TokenResponse (error = TokenError(error = "Login failure"))
+            TokenResponse (error = TokenError(error = LocalizedStrings.get(LOGIN_FAILURE)))
         }
     }
 
@@ -71,10 +73,10 @@ class AuthViewModel: SettingsViewModel () {
                 val file = filePath?.let {path -> File(path)  }
                 userAuthApi.registerUser(file, user)
             } else {
-                UserResponse(error = TokenError(error = "Authentication failure"))
+                UserResponse(error = TokenError(error = LocalizedStrings.get(AUTHENTICATION_FAILURE)))
             }
         } else {
-            UserResponse(error = TokenError(error = "Authentication failure"))
+            UserResponse(error = TokenError(error = LocalizedStrings.get(AUTHENTICATION_FAILURE)))
         }
     }
 
@@ -87,12 +89,15 @@ class AuthViewModel: SettingsViewModel () {
             val tokenCode = StorageHelper().retrieveFromStorage(StorageHelper.TOKEN_CODE)
             val decodeJWT = verifier.verify(currentToken?.trim()?:tokenCode?.trim())
 
-            val username = decodeJWT.getClaim("username").asString()
-            val verificationCode = decodeJWT.getClaim("verificationCode").asString()
+            val username = decodeJWT.getClaim(NavKeys.USERNAME).asString()
+            val verificationCode = decodeJWT.getClaim(NavKeys.VERIFICATION_CODE).asString()
             val exp = decodeJWT.expiresAt.time
             val date = timeStampToLocalDateTime(Date(exp).time)
 
-            println("Username: $username, Verification Code: $verificationCode")
+            println("${LocalizedStrings.get(USERNAME)
+                .replaceFirstChar { 
+                    if (it.isLowerCase()) it.titlecase(Locale.ENGLISH) else it.toString() }
+            }: $username, ${LocalizedStrings.get(VERIFICATION_CODE_KEY)}: $verificationCode")
 
 
             if(isTokenExpired(currentTime = LocalDateTime.now(), tokenDate = date)) {

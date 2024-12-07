@@ -30,6 +30,18 @@ import models.video.CourseComponent
 import models.video.Module
 import models.video.QuizComponent 
 import ui.Cache.userCache
+import ui.LocalizedStrings
+import ui.LocalizedStrings.ALREADY_TAKEN
+import ui.LocalizedStrings.BEFORE_YOU_TAKE
+import ui.LocalizedStrings.CLOSE
+import ui.LocalizedStrings.CORRECT_ANSWER
+import ui.LocalizedStrings.NO_GRADED_YET
+import ui.LocalizedStrings.QUESTION
+import ui.LocalizedStrings.QUIZ_NUMBER
+import ui.LocalizedStrings.START_QUIZ
+import ui.LocalizedStrings.SUBMIT_QUIZ
+import ui.LocalizedStrings.WELCOME_TO_ASSESSMENT
+import ui.LocalizedStrings.YOUR_ANSWER
 import ui.NavHelper
 import ui.NavKeys.COURSE
 import ui.NavKeys.EMPTY
@@ -121,7 +133,7 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
 
                             if(interro._id != null) {
                                 Spacer(Modifier.height(5.dp))
-                                Text("Quiz Number ${index + 1}",
+                                Text("${LocalizedStrings.get(QUIZ_NUMBER)} ${index + 1}",
                                     style = MaterialTheme.typography.caption.copy(
                                         fontSize = 16.sp,
                                         fontWeight = FontWeight(200),
@@ -133,7 +145,7 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                                     .copy(fontSize = 12.sp, lineHeight = 15.sp))
 
                                 if(!found?.score.isNullOrEmpty()) {
-                                    Text(text = "Already taken",
+                                    Text(text = LocalizedStrings.get(ALREADY_TAKEN),
                                         style = MaterialTheme.typography.caption
                                         .copy(fontSize = 12.sp, lineHeight = 15.sp))
                                     Spacer(Modifier.height(2.dp))
@@ -196,9 +208,7 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                             }
                         }
 
-                        Text("Before you start this quiz. Make sure you have stable internet connection " +
-                                "and once you click on continue, you can not go off this screen or close it before you submit it." +
-                                "Failing to do so, you will get the lowest mark for this quiz",
+                        Text(LocalizedStrings.get(BEFORE_YOU_TAKE),
                             style = MaterialTheme.typography.caption.copy(
                                 fontSize = 18.sp,
                                 color = Color.Black,
@@ -212,7 +222,7 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                             .sizeIn(150.dp, 70.dp, 300.dp, 90.dp)
                             .padding(20.dp)) {
 
-                            SubmitQuizButton("START QUIZ") {
+                            SubmitQuizButton(LocalizedStrings.get(START_QUIZ)) {
                                 coroutineScope.launch(Dispatchers.IO) {
                                     score = quizViewModel.validateAnswer(answers)
                                     val response = userCache?.let { user ->
@@ -322,7 +332,7 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                             .sizeIn(150.dp, 70.dp, 300.dp, 90.dp)
                             .padding(20.dp)) {
 
-                            SubmitQuizButton("SUBMIT QUIZ") {
+                            SubmitQuizButton(LocalizedStrings.get(SUBMIT_QUIZ)) {
                                 score = quizViewModel.validateAnswer(answers)
                                 coroutineScope.launch(Dispatchers.IO) {
                                     val response = userCache?.let { user ->
@@ -398,7 +408,7 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                             Column(Modifier.fillMaxWidth(),
                                 horizontalAlignment = Alignment.CenterHorizontally) {
                                 QuestionCards {
-                                    Text("Question: ${item.question}",
+                                    Text("${LocalizedStrings.get(QUESTION)}: ${item.question}",
                                         style = MaterialTheme.typography.caption.copy(
                                             fontSize = 14.sp,
                                             fontWeight = FontWeight(200),
@@ -407,7 +417,7 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                                         ))
                                     Spacer(Modifier.height(10.dp))
                                     val currentAnswer = answers.find { it.question == item.question }
-                                    Text("Your answer:  ${ currentAnswer?.answer}",
+                                    Text("${LocalizedStrings.get(YOUR_ANSWER)}:  ${ currentAnswer?.answer}",
                                         style = MaterialTheme.typography.caption.copy(
                                             fontSize = 14.sp,
                                             fontWeight = FontWeight(200),
@@ -417,7 +427,7 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                                     Spacer(Modifier.height(10.dp))
                                     Row(Modifier.fillMaxWidth().padding(end = 5.dp),
                                         horizontalArrangement = Arrangement.SpaceBetween) {
-                                        Text("Correct answer:  ${item.answer}",
+                                        Text("${LocalizedStrings.get(YOUR_ANSWER)}:  ${item.answer}",
                                             style = MaterialTheme.typography.caption.copy(
                                                 fontSize = 14.sp,
                                                 fontWeight = FontWeight(200),
@@ -452,19 +462,8 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                             Row(Modifier
                                 .sizeIn(150.dp, 70.dp, 300.dp, 90.dp)
                                 .padding(20.dp)) {
-                                SubmitQuizButton("CLOSE") {
+                                SubmitQuizButton(LocalizedStrings.get(CLOSE)) {
                                     quizState = QuizState.INITIAL
-
-//                                    val map = mutableMapOf<String, Any>()
-//                                    userCache?.let {
-//                                        map[USER_KEY] = it
-//                                    }
-//                                    course?.let {
-//                                        map[COURSE] = it
-//                                    }
-//                                    quizState = QuizState.INITIAL
-//                                    //Todo persist
-//                                    onClick.invoke(NavHelper(Route.VideosList, map))
                                 }
                             }
                         }
@@ -485,7 +484,7 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                     verticalArrangement = Arrangement.Top) {
                     item {
                         Column {
-                            Text("Quiz Number ${quizFinalScore?.index}",
+                            Text("${LocalizedStrings.get(QUIZ_NUMBER)} ${quizFinalScore?.index}",
                                 style = MaterialTheme.typography.caption.copy(
                                     fontSize = 18.sp,
                                     color = Color.Black,
@@ -514,7 +513,7 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                                 .fillMaxWidth(),
                                 horizontalAlignment = Alignment.CenterHorizontally) {
                                 QuestionCards {
-                                    Text("Question: ${item.question}",
+                                    Text("${LocalizedStrings.get(QUESTION)}: ${item.question}",
                                         style = MaterialTheme.typography.caption.copy(
                                             fontSize = 14.sp,
                                             fontWeight = FontWeight(200),
@@ -524,7 +523,7 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                                     Spacer(Modifier.height(10.dp))
 //                                    var ans = answers.find { it.question == item.question }
 //                                    val currentAnswer: Answer by remember { mutableStateOf(ans) }
-                                    Text("Your answer:  ${ item.answer}",
+                                    Text("${LocalizedStrings.get(YOUR_ANSWER)}:  ${ item.answer}",
                                         style = MaterialTheme.typography.caption.copy(
                                             fontSize = 14.sp,
                                             fontWeight = FontWeight(200),
@@ -534,7 +533,7 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                                     Spacer(Modifier.height(10.dp))
                                     Row(Modifier.fillMaxWidth().padding(0.dp),
                                         horizontalArrangement = Arrangement.SpaceBetween) {
-                                        Text("Correct answer:  ${item.rightAnswer}",
+                                        Text("${LocalizedStrings.get(CORRECT_ANSWER)}:  ${item.rightAnswer}",
                                             style = MaterialTheme.typography.caption.copy(
                                                 fontSize = 14.sp,
                                                 fontWeight = FontWeight(200),
@@ -543,7 +542,7 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                                             ))
 
                                         if(!item.isAssertion && quizFinalScore?.quiz?.pending.toBoolean()) {
-                                            Text("No graded yet",
+                                            Text(LocalizedStrings.get(NO_GRADED_YET),
                                                 color = Color(0XFF338dff),
                                                 style = MaterialTheme.typography.caption.copy(
                                                     fontSize = 14.sp,
@@ -577,9 +576,7 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
             }
         }
         else {
-            val welcomeText = "Welcome the assessments and Quizzes section." +
-                    " \nHere is where you can take a quiz and also see the result for a quiz taken." +
-                    "\nSelect the quiz you want to take or see the score in the above selection."
+            val welcomeText = LocalizedStrings.get(WELCOME_TO_ASSESSMENT)
 
             Column(Modifier.fillMaxWidth()
                 .heightIn(300.dp, 450.dp),

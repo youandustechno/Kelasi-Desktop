@@ -27,6 +27,12 @@ import models.CoursesListResponse
 import models.video.CourseComponent
 import models.video.Module
 import models.video.VideoComponent
+import ui.LocalizedStrings
+import ui.LocalizedStrings.DOCUMENTATION
+import ui.LocalizedStrings.FILE_NO_FOUND
+import ui.LocalizedStrings.QUIZZES
+import ui.LocalizedStrings.SELECTED
+import ui.LocalizedStrings.VIDEO_NO_FOUND
 import ui.NavHelper
 import ui.NavKeys.COURSE
 import ui.NavKeys.COURSE_ID
@@ -203,7 +209,7 @@ fun Videos(
 
                             Row(Modifier.align(Alignment.CenterEnd)) {
 
-                                LinkButton("Documentation", color = Color(0XFFc5aca0)) {
+                                LinkButton(LocalizedStrings.get(DOCUMENTATION), color = Color(0XFFc5aca0)) {
                                     val courseMap = mutableMapOf<String, Any>()
                                     courseMap[MODULE] = selectedModule!!
                                     courseMap[COURSE] = course as CourseComponent
@@ -213,7 +219,7 @@ fun Videos(
 
                                 Spacer(Modifier.width(8.dp))
 
-                                LinkButton("Quizzes") {
+                                LinkButton(LocalizedStrings.get(QUIZZES)) {
                                     val courseMap = mutableMapOf<String, Any>()
                                     courseMap[MODULE] = selectedModule!!
                                     courseMap[COURSE] = course as CourseComponent
@@ -259,7 +265,8 @@ fun Videos(
                                     .padding(10.dp),
                                     horizontalArrangement = Arrangement.Start) {
 
-                                    Text("SELECTED : ${ selectedVideo?.title }", style = MaterialTheme.typography.caption
+                                    Text("${LocalizedStrings.get(SELECTED)}: ${ selectedVideo?.title }",
+                                        style = MaterialTheme.typography.caption
                                         .copy(
                                             fontSize = 14.sp,
                                             fontWeight = FontWeight(200),
@@ -292,7 +299,8 @@ fun Videos(
                                         )
                                     } else {
                                         VideoCard {
-                                            Text("Video No Available", style = MaterialTheme.typography
+                                            Text(LocalizedStrings.get(VIDEO_NO_FOUND),
+                                                style = MaterialTheme.typography
                                                 .button
                                                 .copy(color = Color.White))
                                         }
@@ -407,7 +415,7 @@ fun Videos(
                         .height(60.dp),
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically) {
-                        Text("No Video Available")
+                        Text(LocalizedStrings.get(VIDEO_NO_FOUND))
                     }
                 }
             }

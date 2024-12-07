@@ -25,6 +25,9 @@ import kotlinx.coroutines.withContext
 import models.video.CourseComponent
 import models.video.DocumentComponent
 import models.video.Module
+import ui.LocalizedStrings
+import ui.LocalizedStrings.FILE_NO_FOUND
+import ui.LocalizedStrings.WELCOME
 import ui.NavHelper
 import ui.NavKeys.COURSE
 import ui.NavKeys.EMPTY
@@ -191,12 +194,10 @@ fun Documents(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Center) {
 
-                                Text("No file found", style = MaterialTheme.typography.caption)
+                                Text(LocalizedStrings.get(FILE_NO_FOUND), style = MaterialTheme.typography.caption)
                             }
                         } else {
-                            val welcomeText = "Welcome Documentation Page ." +
-                                    " \nHere is where you can see you instructor course documentation" +
-                                    "\nTo view a content, please select above."
+                            val welcomeText = LocalizedStrings.get(WELCOME)
 
                             Column(Modifier.fillMaxWidth()
                                 .heightIn(300.dp, 450.dp),

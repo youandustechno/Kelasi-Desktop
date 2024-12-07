@@ -21,6 +21,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import models.auth.EmailAndPassComponent
 import ui.Cache.userCache
+import ui.LocalizedStrings
+import ui.LocalizedStrings.EMAIL
+import ui.LocalizedStrings.LOGIN_HELP
+import ui.LocalizedStrings.LOGIN_TITLE
+import ui.LocalizedStrings.PHONE
+import ui.LocalizedStrings.REGISTER
+import ui.LocalizedStrings.VALIDATE
+import ui.LocalizedStrings.VERIFICATION_CODE_TITLE
 import ui.NavHelper
 import ui.NavKeys.EMPTY
 import ui.NavKeys.USER_KEY
@@ -44,8 +52,8 @@ fun Login(onClick: (NavHelper) -> Unit) {
     var phoneSave by remember { mutableStateOf(EMPTY) }
 
     var userCode by remember { mutableStateOf(EMPTY) }
-    var loginButton by remember { mutableStateOf("LOGIN") }
-    var loginMode by remember { mutableStateOf("Phone") }
+    var loginButton by remember { mutableStateOf(LocalizedStrings.get(LOGIN_TITLE)) }
+    var loginMode by remember { mutableStateOf(LocalizedStrings.get(PHONE)) }
     var isPhoneAuth by remember { mutableStateOf(false) }
     var isTokenValid by remember { mutableStateOf(false) }
 
@@ -72,9 +80,9 @@ fun Login(onClick: (NavHelper) -> Unit) {
                         .padding(5.dp)) {
 
                         val titleText = if (isTokenValid) {
-                            "VERIFICATION CODE"
+                            LocalizedStrings.get(VERIFICATION_CODE_TITLE)
                         } else {
-                            "LOGIN"
+                            LocalizedStrings.get(LOGIN_TITLE)
                         }
 
                         Box(
@@ -101,7 +109,7 @@ fun Login(onClick: (NavHelper) -> Unit) {
                                 //todo remove auth code and clear everything
 
                                 if(isTokenValid) {
-                                    loginButton = "LOGIN"
+                                    loginButton = LocalizedStrings.get(LOGIN_TITLE)
                                     isTokenValid = false
 
                                 } else {
@@ -114,7 +122,7 @@ fun Login(onClick: (NavHelper) -> Unit) {
                     Row(Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.End,
                         verticalAlignment = Alignment.CenterVertically) {
-                        loginMode = if(isPhoneAuth)  "Email" else "Phone"
+                        loginMode = if(isPhoneAuth)  LocalizedStrings.get(EMAIL) else LocalizedStrings.get(PHONE)
                         if(!isTokenValid) {
                             Text(loginMode, style = MaterialTheme.typography.caption,
                                 color = Color(0XFF3b1b49))
@@ -142,11 +150,10 @@ fun Login(onClick: (NavHelper) -> Unit) {
                         }
 
                     } else if(isTokenValid) {
-                        loginButton = "VALIDATE"
+                        loginButton = LocalizedStrings.get(VALIDATE)
 
                         PinView { pinCode ->
                             userCode = pinCode
-                            println("Entered PIN: $pinCode")
                         }
                     }
                     else {
@@ -171,7 +178,7 @@ fun Login(onClick: (NavHelper) -> Unit) {
                 .widthIn(300.dp, 400.dp)) {
                 LoginButton(loginButton) {
 
-                    if(loginButton.equals("VALIDATE", true)) {
+                    if(loginButton.equals(LocalizedStrings.get(VALIDATE), true)) {
 
                         if(isTokenValid) {
                             coroutineScope.launch(Dispatchers.IO) {
@@ -258,11 +265,11 @@ fun Login(onClick: (NavHelper) -> Unit) {
                 verticalAlignment = Alignment.CenterVertically) {
 
                 Row(Modifier.wrapContentWidth()) {
-                    LinkButton("Register", color = Color(0XFFc5aca0)) {
+                    LinkButton(LocalizedStrings.get(REGISTER), color = Color(0XFFc5aca0)) {
                         onClick.invoke(NavHelper(Route.Register))
                     }
                     Spacer(Modifier.width(8.dp))
-                    LinkButton("Help Login") {
+                    LinkButton(LocalizedStrings.get(LOGIN_HELP)) {
                         onClick.invoke(NavHelper(Route.HelpLogin))
                     }
                 }

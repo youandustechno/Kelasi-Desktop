@@ -14,6 +14,10 @@ import models.video.CourseComponent
 import models.video.VideoComponent
 import ui.Cache
 import ui.Cache.userCache
+import ui.LocalizedStrings
+import ui.LocalizedStrings.PERSONAL_INFO
+import ui.LocalizedStrings.UPDATE_BUTTON
+import ui.LocalizedStrings.UPDATE_PICTURE
 import ui.NavHelper
 import ui.NavKeys.CONFIRM
 import ui.NavKeys.EMAIL
@@ -105,7 +109,7 @@ fun Settings(navHelper: NavHelper, onClick:((NavHelper) -> Unit)? = null) {
                                     }
 
                                     Spacer(Modifier.width(8.dp))
-                                    UserPictureButton("Update Picture") {
+                                    UserPictureButton(LocalizedStrings.get(UPDATE_PICTURE)) {
                                         fileToUpload = showFileChooser()
                                     }
                                     if(!fileToUpload.isNullOrEmpty()) {
@@ -133,7 +137,7 @@ fun Settings(navHelper: NavHelper, onClick:((NavHelper) -> Unit)? = null) {
                                 .fillMaxHeight()
                                 .padding(20.dp)) {
 
-                                SectionTitle("Personal Information")
+                                SectionTitle(LocalizedStrings.get(PERSONAL_INFO))
 
                                 Spacer(modifier = Modifier.height(16.dp))
                                 // Name Input
@@ -201,7 +205,7 @@ fun Settings(navHelper: NavHelper, onClick:((NavHelper) -> Unit)? = null) {
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically) {
 
-                ConfirmButton("UPDATE") {
+                ConfirmButton(LocalizedStrings.get(UPDATE_BUTTON)) {
                    // onClick?.invoke(NavHelper(Route.Payments))
                     val validDataMap = validateEntries(
                         firstName = firstname,

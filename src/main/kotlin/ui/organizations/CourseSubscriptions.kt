@@ -13,6 +13,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import ui.LocalizedStrings
+import ui.LocalizedStrings.CARD_NUMBER
+import ui.LocalizedStrings.CVV
+import ui.LocalizedStrings.EXPIRATION_DATE
+import ui.LocalizedStrings.NAME_ON_CARD
+import ui.LocalizedStrings.PAY_WITH_PAYPAL
+import ui.LocalizedStrings.SUBSCRIPTION_PAYMENT
 import ui.NavHelper
 import ui.NavKeys.EMPTY
 
@@ -30,7 +37,7 @@ fun CoursesSubscriptionList(onClick:((NavHelper) -> Unit)? = null, onPayClick: (
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Subscription Payment", style = MaterialTheme.typography.h5)
+        Text(LocalizedStrings.get(SUBSCRIPTION_PAYMENT), style = MaterialTheme.typography.h5)
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -38,7 +45,7 @@ fun CoursesSubscriptionList(onClick:((NavHelper) -> Unit)? = null, onPayClick: (
         OutlinedTextField(
             value = name,
             onValueChange = { name = it },
-            label = { Text("Name on Card") },
+            label = { Text(LocalizedStrings.get(NAME_ON_CARD)) },
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -48,7 +55,7 @@ fun CoursesSubscriptionList(onClick:((NavHelper) -> Unit)? = null, onPayClick: (
         OutlinedTextField(
             value = cardNumber,
             onValueChange = { cardNumber = it },
-            label = { Text("Card Number") },
+            label = { Text(LocalizedStrings.get(CARD_NUMBER)) },
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
             modifier = Modifier.fillMaxWidth()
         )
@@ -60,7 +67,7 @@ fun CoursesSubscriptionList(onClick:((NavHelper) -> Unit)? = null, onPayClick: (
             OutlinedTextField(
                 value = expirationDate,
                 onValueChange = { expirationDate = it },
-                label = { Text("Expiration Date (MM/YY)") },
+                label = { Text(LocalizedStrings.get(EXPIRATION_DATE)) },
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                 modifier = Modifier.weight(1f).padding(end = 8.dp)
             )
@@ -69,7 +76,7 @@ fun CoursesSubscriptionList(onClick:((NavHelper) -> Unit)? = null, onPayClick: (
             OutlinedTextField(
                 value = cvv,
                 onValueChange = { cvv = it },
-                label = { Text("CVV") },
+                label = { Text(LocalizedStrings.get(CVV)) },
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                 modifier = Modifier.weight(1f).padding(start = 8.dp)
             )
@@ -82,7 +89,7 @@ fun CoursesSubscriptionList(onClick:((NavHelper) -> Unit)? = null, onPayClick: (
             onClick = { onPayClick?.invoke() },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Pay with PayPal")
+            Text(LocalizedStrings.get(PAY_WITH_PAYPAL))
         }
     }
 }

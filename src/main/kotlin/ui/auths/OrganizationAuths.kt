@@ -19,8 +19,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import ui.LocalizedStrings
+import ui.LocalizedStrings.INSTITUTION
+import ui.LocalizedStrings.VERIFY
 import ui.NavHelper
 import ui.NavKeys.EMPTY
+import ui.NavKeys.VERIFICATION_CODE
 import ui.Route
 import ui.utilities.ErrorCard
 import ui.utilities.FieldsValidation.isValid
@@ -42,7 +46,7 @@ fun OrgAuth(orgFound:(NavHelper) -> Unit) {
         verticalArrangement = Arrangement.Center) {
 
         var text by remember { mutableStateOf(EMPTY) }
-        val buttonText by remember { mutableStateOf("VERIFY") }
+        val buttonText by remember { mutableStateOf(LocalizedStrings.get(VERIFY)) }
 
         Column (Modifier
             .width(500.dp)
@@ -56,7 +60,7 @@ fun OrgAuth(orgFound:(NavHelper) -> Unit) {
                     .fillMaxWidth()
                     .heightIn(40.dp, 60.dp)
             ) {
-                Text("INSTITUTION",
+                Text(LocalizedStrings.get(INSTITUTION),
                     style = MaterialTheme.typography.caption.copy(
                         fontSize = 18.sp,
                         color = Color.Black,
@@ -96,10 +100,13 @@ fun OrgAuth(orgFound:(NavHelper) -> Unit) {
                                 val result =  authViewModel.verifyAuthCode(text)
                                 delay(500L)
                                 withContext(Dispatchers.Main) {
-                                    if(result.org != null) {
+                                    if(result.auth != null) {
                                         //prefs.put("group", result.org!!.tenantCode)
-                                        result.org?.tenantCode?.let {
+                                        result.auth?.org?.tenantCode?.let {
                                             //PreferenceHelper().saveAuthCode(it)
+                                            val lang = result.auth?.tenantLang
+                                            LocalizedStrings.setLanguage(if(lang == "en") LocalizedStrings.LanguageOption.EN
+                                            else LocalizedStrings.LanguageOption.FR)
                                             StorageHelper().saveInStorage(AUTH_CODE, it)
                                         }
                                         orgFound.invoke(NavHelper(Route.AuthLogin))

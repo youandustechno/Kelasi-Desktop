@@ -3,6 +3,11 @@ package models.group
 import com.google.gson.annotations.SerializedName
 import ui.NavKeys.EMPTY
 
+data class AuthResponseComponent(
+    val tenantLang: String,
+    val org: OrganizationComponent
+)
+
 data class OrganizationComponent(
     var _id: String? = null,
     var cloudinaryId: String = EMPTY,

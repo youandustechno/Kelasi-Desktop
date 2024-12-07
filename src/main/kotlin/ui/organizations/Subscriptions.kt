@@ -9,6 +9,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import ui.LocalizedStrings
+import ui.LocalizedStrings.ORGANIZATION_NAME
 import ui.NavHelper
 import ui.utilities.SubscriptionCards
 
@@ -39,7 +41,7 @@ fun Subscriptions( onClick:(NavHelper) -> Unit) {
                         verticalArrangement = Arrangement.Center) {
                         SubscriptionCards {
                             //VideoImageUrl()
-                            Text(text = "Organization Name: $it")
+                            Text(text = " ${LocalizedStrings.get(ORGANIZATION_NAME)}: $it")
                         }
                     }
                 }

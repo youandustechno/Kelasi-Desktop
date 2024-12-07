@@ -24,6 +24,9 @@ import models.CoursesListResponse
 import models.auth.UserDataModel
 import models.video.CourseComponent
 import ui.Cache
+import ui.LocalizedStrings
+import ui.LocalizedStrings.LOADING
+import ui.LocalizedStrings.SORRY_FOR_INCOVENIENCE
 import ui.NavHelper
 import ui.NavKeys.COURSE
 import ui.NavKeys.EMPTY
@@ -151,18 +154,17 @@ fun Dashboard(navigationState: NavHelper,
             else {
                 if(isCoursesAvailable == null){
                     Column {
-                        Text("Loading")
+                        Text(LocalizedStrings.get(LOADING))
                     }
                 }  else if(isCoursesAvailable == true && coursesList?.errorComponent != null) {
                     ErrorCard {
-                        Text("Sorry for the inconvenience, we are unable to find the resource requested",
+                        Text(LocalizedStrings.get(SORRY_FOR_INCOVENIENCE),
                             style = MaterialTheme.typography
                                 .button
                                 .copy(color = Color.DarkGray))
                     }
                 }
             }
-
         }
     }
 }

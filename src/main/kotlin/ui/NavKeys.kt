@@ -19,9 +19,12 @@ object NavKeys {
     const val EMAIL= "email"
     const val PHONE= "phone"
     const val PASSWORD= "password"
+    const val USERNAME= "username"
+    const val VERIFICATION_CODE= "verificationCode"
     const val EMPTY =""
 
     fun clearAllBeforeLogout() {
+        //TODO
         BaseValues.KEY = ""
     }
 }

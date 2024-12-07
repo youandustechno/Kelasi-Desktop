@@ -15,6 +15,16 @@ import androidx.compose.ui.unit.dp
 import helpers.StorageHelper
 import models.CoursesListResponse
 import models.video.CourseComponent
+import ui.LocalizedStrings.AUTH_CODE
+import ui.LocalizedStrings.DOCUMENTS
+import ui.LocalizedStrings.HOME
+import ui.LocalizedStrings.LOGOUT
+import ui.LocalizedStrings.MANAGE_QUIZZES
+import ui.LocalizedStrings.MANAGE_VIDEOS
+import ui.LocalizedStrings.QUIZ
+import ui.LocalizedStrings.REGISTER
+import ui.LocalizedStrings.SETTINGS
+import ui.LocalizedStrings.VIDEOS
 import ui.NavKeys.COURSE
 import ui.NavKeys.COURSE_ID
 import ui.NavKeys.EMPTY
@@ -233,28 +243,28 @@ fun ContentWrapper(withNav: Boolean, navigationState: NavHelper, onClick:(NavHel
                     .padding(start = 20.dp)) {
 
                     if(navigationState.route == Route.Dashboard) {
-                        Text("Home", style = MaterialTheme.typography.h6)
+                        Text(LocalizedStrings.get(HOME), style = MaterialTheme.typography.h6)
                     }
                     else if(navigationState.route == Route.ManageVideo) {
-                        Text("Manage Videos", style = MaterialTheme.typography.h6)
+                        Text(LocalizedStrings.get(MANAGE_VIDEOS), style = MaterialTheme.typography.h6)
                     }
                     else if(navigationState.route == Route.Quiz) {
-                        Text("Quiz", style = MaterialTheme.typography.h6)
+                        Text(LocalizedStrings.get(QUIZ), style = MaterialTheme.typography.h6)
                     }
                     else if(navigationState.route == Route.ManageQuizzes) {
-                        Text("Manage Quizzes", style = MaterialTheme.typography.h6)
+                        Text(LocalizedStrings.get(MANAGE_QUIZZES), style = MaterialTheme.typography.h6)
                     }
                     else if(navigationState.route == Route.VideosList) {
-                        Text("Videos", style = MaterialTheme.typography.h6)
+                        Text(LocalizedStrings.get(VIDEOS), style = MaterialTheme.typography.h6)
                     }
                     else if(navigationState.route == Route.Register) {
-                        Text("Register", style = MaterialTheme.typography.h6)
+                        Text(LocalizedStrings.get(REGISTER), style = MaterialTheme.typography.h6)
                     }
                     else if(navigationState.route == Route.Settings) {
-                        Text("Settings", style = MaterialTheme.typography.h6)
+                        Text(LocalizedStrings.get(SETTINGS), style = MaterialTheme.typography.h6)
                     }
                     else if(navigationState.route == Route.ViewDocument) {
-                        Text("Module Documents", style = MaterialTheme.typography.h6)
+                        Text(LocalizedStrings.get(DOCUMENTS), style = MaterialTheme.typography.h6)
                     }
                     else {
                         Text(EMPTY, style = MaterialTheme.typography.h6)
@@ -267,23 +277,23 @@ fun ContentWrapper(withNav: Boolean, navigationState: NavHelper, onClick:(NavHel
                     .wrapContentHeight()) {
 
                     if(navigationState.route == Route.Dashboard) {
-                        TabButton("Settings") {
+                        TabButton(LocalizedStrings.get(SETTINGS)) {
                             //Todo Settings
                             onClick.invoke(NavHelper(Route.Settings))
                         }
 
-                        TabButton("Logout") {
+                        TabButton(LocalizedStrings.get(LOGOUT)) {
                             onClick.invoke(NavHelper(Route.AuthLogin))
                         }
                     }
                     else if(navigationState.route == Route.ManageVideo) {
                         courseId = navigationState.dataMap[COURSE_ID].toString()
 
-                        TabButton("Home") {
+                        TabButton(LocalizedStrings.get(HOME)) {
                             onClick.invoke(NavHelper(Route.Dashboard))
                         }
 
-                        TabButton("Videos") {
+                        TabButton(LocalizedStrings.get(VIDEOS)) {
                             val courseMap = mutableMapOf<String, Any>()
                             courseMap[COURSE_ID] = courseId
                             onClick.invoke(NavHelper(Route.VideosList, courseMap))
@@ -298,11 +308,11 @@ fun ContentWrapper(withNav: Boolean, navigationState: NavHelper, onClick:(NavHel
                             courseId = navigationState.dataMap[COURSE_ID].toString()
                         }
 
-                        TabButton("Home") {
+                        TabButton(LocalizedStrings.get(HOME)) {
                             onClick.invoke(NavHelper(Route.Dashboard))
                         }
 
-                        TabButton("Videos") {
+                        TabButton(LocalizedStrings.get(VIDEOS)) {
                             val courseMap = mutableMapOf<String, Any>()
                             if(course != null) {
                                 courseMap[COURSE] = course!!
@@ -318,21 +328,21 @@ fun ContentWrapper(withNav: Boolean, navigationState: NavHelper, onClick:(NavHel
                         if(navigationState.dataMap.containsKey(COURSE)) {
                             course = navigationState.dataMap[COURSE] as CourseComponent
 
-                        } else if(navigationState.dataMap.containsKey("courseId")) {
-                            courseId = navigationState.dataMap["courseId"].toString()
+                        } else if(navigationState.dataMap.containsKey(COURSE_ID)) {
+                            courseId = navigationState.dataMap[COURSE_ID].toString()
                         }
 
-                        TabButton("Home") {
+                        TabButton(LocalizedStrings.get(HOME)) {
                             onClick.invoke(NavHelper(Route.Dashboard))
                         }
 
-                        TabButton("Videos") {
+                        TabButton(LocalizedStrings.get(VIDEOS)) {
                             val courseMap = mutableMapOf<String, Any>()
                             if(course != null) {
                                 courseMap[COURSE] = course!!
 
                             } else if(courseId.isNotEmpty()) {
-                                courseMap["courseId"] = courseId
+                                courseMap[COURSE_ID] = courseId
                             }
                             onClick.invoke(NavHelper(Route.VideosList, courseMap))
                         }
@@ -346,27 +356,27 @@ fun ContentWrapper(withNav: Boolean, navigationState: NavHelper, onClick:(NavHel
                             courseId = navigationState.dataMap[COURSE_ID].toString()
                         }
 
-                        TabButton("Home") {
+                        TabButton(LocalizedStrings.get(HOME)) {
                             val courseMap = mutableMapOf<String, Any>()
                             if(course != null) {
                                 courseMap[COURSE] = course!!
 
                             } else if(courseId.isNotEmpty()) {
-                                courseMap["courseId"] = courseId
+                                courseMap[COURSE_ID] = courseId
                             }
                             onClick.invoke(NavHelper(Route.Dashboard, courseMap))
                         }
 
-                        TabButton("Logout") {
+                        TabButton(LocalizedStrings.get(LOGOUT)) {
                             onClick.invoke(NavHelper(Route.AuthLogin))
                         }
                     }
                     else if(navigationState.route == Route.Subscriptions) {
-                        TabButton("Home") {
+                        TabButton(LocalizedStrings.get(HOME)) {
                             onClick.invoke(NavHelper(Route.Dashboard))
                         }
 
-                        TabButton("Logout") {
+                        TabButton(LocalizedStrings.get(LOGOUT)) {
 
                             onClick.invoke(NavHelper(Route.AuthLogin))
                         }
@@ -380,11 +390,11 @@ fun ContentWrapper(withNav: Boolean, navigationState: NavHelper, onClick:(NavHel
                             courseId = navigationState.dataMap[COURSE_ID].toString()
                         }
 
-                        TabButton("Home") {
+                        TabButton(LocalizedStrings.get(HOME)) {
                             onClick.invoke(NavHelper(Route.Dashboard))
                         }
 
-                        TabButton("Videos") {
+                        TabButton(LocalizedStrings.get(VIDEOS)) {
                             val courseMap = mutableMapOf<String, Any>()
                             if(course != null) {
                                 courseMap[COURSE] = course!!
@@ -396,17 +406,17 @@ fun ContentWrapper(withNav: Boolean, navigationState: NavHelper, onClick:(NavHel
                         }
                     }
                     else if(navigationState.route == Route.Settings) {
-                        TabButton("Home") {
+                        TabButton(LocalizedStrings.get(HOME)) {
                             onClick.invoke(NavHelper(Route.Dashboard))
                         }
 
-                        TabButton("Logout") {
+                        TabButton(LocalizedStrings.get(LOGOUT)) {
                             onClick.invoke(NavHelper(Route.AuthLogin))
                         }
                     }
                     else if(navigationState.route == Route.Register) {
 
-                        TabButton("Auth Code") {
+                        TabButton(LocalizedStrings.get(AUTH_CODE)) {
                             onClick.invoke(NavHelper(Route.AuthOrg))
                         }
                     }
