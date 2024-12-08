@@ -196,7 +196,7 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                     verticalArrangement = Arrangement.Top) {
                     Spacer(Modifier.height(10.dp))
                     Column(Modifier.width(450.dp)
-                        .height(300.dp),
+                        .heightIn(300.dp, 400.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center) {
 
@@ -219,10 +219,10 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
 
                         Spacer(Modifier.height(20.dp))
                         Row(Modifier
-                            .sizeIn(150.dp, 70.dp, 300.dp, 90.dp)
+                            .sizeIn(150.dp, 70.dp, 300.dp, 100.dp)
                             .padding(20.dp)) {
 
-                            SubmitQuizButton(LocalizedStrings.get(START_QUIZ)) {
+                            SubmitQuizButton(LocalizedStrings.get(START_QUIZ).ifEmpty { "START" }) {
                                 coroutineScope.launch(Dispatchers.IO) {
                                     score = quizViewModel.validateAnswer(answers)
                                     val response = userCache?.let { user ->

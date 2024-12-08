@@ -26,7 +26,7 @@ import models.video.CourseComponent
 import ui.Cache
 import ui.LocalizedStrings
 import ui.LocalizedStrings.LOADING
-import ui.LocalizedStrings.SORRY_FOR_INCOVENIENCE
+import ui.LocalizedStrings.SORRY_FOR_INCONVENIENCE
 import ui.NavHelper
 import ui.NavKeys.COURSE
 import ui.NavKeys.EMPTY
@@ -158,7 +158,7 @@ fun Dashboard(navigationState: NavHelper,
                     }
                 }  else if(isCoursesAvailable == true && coursesList?.errorComponent != null) {
                     ErrorCard {
-                        Text(LocalizedStrings.get(SORRY_FOR_INCOVENIENCE),
+                        Text(LocalizedStrings.get(SORRY_FOR_INCONVENIENCE),
                             style = MaterialTheme.typography
                                 .button
                                 .copy(color = Color.DarkGray))

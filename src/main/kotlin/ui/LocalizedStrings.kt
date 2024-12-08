@@ -24,6 +24,8 @@ object LocalizedStrings {
     const val DOCUMENTS= "Documents"
 
     const val EMAIL = "Email"
+    const val EMAIL_ERROR = "EmailError"
+    const val EMAIL_SAMPLE = "EmailSample"
     const val ENTER_PIN = "EnteredPIN"
     const val EXPIRATION_DATE = "ExpirationDate"
 
@@ -56,9 +58,11 @@ object LocalizedStrings {
     const val ORGANIZATION_NAME = "OrganizationName"
 
     const val PASSWORD = "Password"
+    const val PASSWORD_ERROR = "PasswordError"
     const val PAY_WITH_PAYPAL = "PayWithPayPal"
     const val PERSONAL_INFO = "PersonalInfo"
     const val PHONE = "Phone"
+    const val PHONE_ERROR = "PhoneError"
     const val PHONE_NUMBER = "PhoneNumber"
 
     const val QUESTION = "Question"
@@ -72,7 +76,7 @@ object LocalizedStrings {
     const val SELECT_FILE = "SelectFile"
     const val SELECTED  = "Selected"
     const val SETTINGS  = "Settings"
-    const val SORRY_FOR_INCOVENIENCE  = "SorryForInconvenience"
+    const val SORRY_FOR_INCONVENIENCE  = "SorryForInconvenience"
     const val SUBMIT_QUIZ  = "SubmitQuiz"
     const val SUBSCRIPTION_PAYMENT = "SubscriptionPayment"
     const val START_QUIZ  = "StartQuiz"
@@ -92,6 +96,7 @@ object LocalizedStrings {
 
     const val WELCOME = "Welcome"
     const val WELCOME_TO_ASSESSMENT = "WelcomeAssessment"
+    const val WRONG_CODE = "WrongCode"
 
     const val YOUR_ANSWER = "YourAnswer"
 
@@ -120,6 +125,8 @@ object LocalizedStrings {
         DOCUMENTS  to "Documents",
         //E
         EMAIL to "Email",
+        EMAIL_ERROR to "The value you entered does not match the email format address@domain.extension",
+        EMAIL_SAMPLE to "address@domain.extension",
         ENTER_PIN  to "ENTER PIN",
         EXPIRATION_DATE  to "Expiration Date (MM/YY)",
         //F
@@ -151,9 +158,11 @@ object LocalizedStrings {
         ORGANIZATION_NAME to "Organization Name",
         //P
         PASSWORD to "Password",
+        PASSWORD_ERROR to "A Password should be 8 - 10 characters with at least one special character, one lowercase and one uppercase letter",
         PAY_WITH_PAYPAL to "Pay with PayPal",
         PERSONAL_INFO to "Personal Information",
         PHONE to "Phone",
+        PHONE_ERROR to "Your phone does not match this pattern {pattern}",
         PHONE_NUMBER to "Phone Number",
         //Q
         QUESTION to "Question",
@@ -167,7 +176,7 @@ object LocalizedStrings {
         SELECTED to "SELECTED",
         SELECT_FILE to "Select File",
         SETTINGS to "Settings",
-        SORRY_FOR_INCOVENIENCE to "Sorry for the inconvenience, we are unable to find the resource requested",
+        SORRY_FOR_INCONVENIENCE to "Sorry for the inconvenience, we are unable to find the resource requested",
         SUBMIT_QUIZ to "SUBMIT QUIZ",
         SUBSCRIPTION_PAYMENT to "Subscription Payment",
         START_QUIZ to "START QUIZ",
@@ -191,6 +200,7 @@ object LocalizedStrings {
         WELCOME_TO_ASSESSMENT to "Welcome the assessments and Quizzes section." +
                 " \nHere is where you can take a quiz and also see the result for a quiz taken." +
                 "\nSelect the quiz you want to take or see the score in the above selection.",
+        WRONG_CODE to "Please enter a valid code",
         //Y
         YOUR_ANSWER to "Your answer"
     )
@@ -201,7 +211,7 @@ object LocalizedStrings {
         ALREADY_TAKEN to "Déjà fait",
         ASSERTION to "option",
         ANSWER to "Réponse",
-        AUTH_CODE to "Code d'authentification",
+        AUTH_CODE to "Institution",
         //B
         BEFORE_YOU_TAKE to "Avant de commencer cette épreuve, assurez-vous d'avoir une connexion Internet stable\n" +
                 "et une fois que vous cliquez sur continuer, vous ne pouvez pas quitter cet écran " +
@@ -211,7 +221,7 @@ object LocalizedStrings {
         CARD_NUMBER to "Numéro de carte",
         CLOSE to "FERMER",
         CONFIRM_PASSWORD to "Confirmer Password",
-        CONFIRM_NEW_PASSWORD to "Confirmer Nouveau Password",
+        CONFIRM_NEW_PASSWORD to "Confirmer Nouveau Mot De Passe",
         CORRECT_ANSWER  to "Réponse correcte",
         COURSE_DESCRIPTION  to "Déscription",
         CVV  to "CVV",
@@ -220,6 +230,8 @@ object LocalizedStrings {
         DOCUMENTS  to "Documents",
         //E
         EMAIL to "Email",
+        EMAIL_ERROR to "Votre email ne pas valide. Please enter un email avec ce format address@domain.extension",
+        EMAIL_SAMPLE to "address@domain.extension",
         ENTER_PIN  to "ENTRER LE CODE",
         EXPIRATION_DATE  to "Date d'expiration (MM/AA)",
         //F
@@ -250,9 +262,11 @@ object LocalizedStrings {
         ORGANIZATION_NAME to "Nom de l'institution",
         //P
         PASSWORD to "Mot de passe",
+        PASSWORD_ERROR to "Le mot de passe doit avoir 8 - 10 alpha-numerique long avec aumoins un special character, une lettre miniscule and une en majuscule",
         PAY_WITH_PAYPAL to "Payer avec PayPal",
         PERSONAL_INFO to "Informations personnelles",
         PHONE to "Téléphone",
+        PHONE_ERROR to "Votre numéro ne ressemble pas à cet format {pattern}",
         PHONE_NUMBER to "Numéro De Téléphone",
         //Q
         QUESTION to "Question",
@@ -266,13 +280,13 @@ object LocalizedStrings {
         SELECTED to "SÉLECTIONNÉ",
         SELECT_FILE to "Sélectionner un fichier",
         SETTINGS to "Paramètres",
-        SORRY_FOR_INCOVENIENCE to "Désolé pour le désagrément, nous ne pouvons pas trouver la ressource demandée.",
+        SORRY_FOR_INCONVENIENCE to "Désolé pour le désagrément, nous ne pouvons pas trouver la ressource demandée.",
         SUBMIT_QUIZ to "SOUMETTRE L'EPREUVE POUR CORRECTION",
         SUBSCRIPTION_PAYMENT to "Paiement de l'abonnement",
         START_QUIZ to "COMMENCER L'EPREUVE",
         //U
         UPDATE_BUTTON to "Mettre à jour",
-        UPDATE_PICTURE to "Confirmer le choix l'image",
+        UPDATE_PICTURE to "Changer l'image",
         USERNAME to "nom d'utilisateur",
         //V
         VALIDATE to "CONFIRMER",
@@ -290,6 +304,7 @@ object LocalizedStrings {
         WELCOME_TO_ASSESSMENT to "Bienvenue dans la section des évaluations et des épreuves." +
                 "\nC'est ici que vous pouvez passer une épreuve et voir le résultat d'une épreuve passée." +
                 "\nSélectionnez l'épreuve que vous souhaitez passer ou consultez la note dans la sélection ci-dessus.",
+        WRONG_CODE to "S'il vous plait, entrez un code valide",
         //Y
         YOUR_ANSWER to "Votre réponse"
     )

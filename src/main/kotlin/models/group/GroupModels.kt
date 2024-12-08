@@ -5,7 +5,10 @@ import ui.NavKeys.EMPTY
 
 data class AuthResponseComponent(
     val tenantLang: String,
-    val org: OrganizationComponent
+    val org: OrganizationComponent,
+    val regex: String,
+    val format: String,
+    val key: String
 )
 
 data class OrganizationComponent(

@@ -2,7 +2,6 @@ package ui.auths
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -11,19 +10,22 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import models.CoursesListResponse
 import models.auth.UserDataModel
-import models.video.CourseComponent
-import models.video.VideoComponent
+import ui.LocalizedStrings
+import ui.LocalizedStrings.PERSONAL_INFO
+import ui.LocalizedStrings.REGISTER
+import ui.LocalizedStrings.UPDATE_PICTURE
 import ui.NavHelper
-import ui.NavKeys.CONFIRM
 import ui.NavKeys.EMPTY
 import ui.NavKeys.USER_KEY
-import ui.NavKeys.VALID
 import ui.Route
 import ui.utilities.*
 import ui.utilities.FieldsValidation.isValid
-import ui.videos.VideosViewModel
+import ui.utilities.FieldsValidation.isValidEmail
+import ui.utilities.FieldsValidation.isValidLevel
+import ui.utilities.FieldsValidation.isValidName
+import ui.utilities.FieldsValidation.isValidPassword
+import ui.utilities.FieldsValidation.isValidPhone
 import java.io.File
 
 @Composable
@@ -41,7 +43,6 @@ fun Registration(navHelper: NavHelper, onClick:((NavHelper) -> Unit)? = null) {
 
     //CHANGE PASSWORD
     var passwordField by remember { mutableStateOf(EMPTY) }
-    var newPasswordField by remember { mutableStateOf(EMPTY) }
     var confirmNewPasswordField by remember { mutableStateOf(EMPTY) }
 
     //PERSONAL INFORMATION
@@ -51,6 +52,18 @@ fun Registration(navHelper: NavHelper, onClick:((NavHelper) -> Unit)? = null) {
     var lastname by remember { mutableStateOf(EMPTY) }
     var middlename by remember { mutableStateOf(EMPTY) }
     var level by remember { mutableStateOf(EMPTY) }
+    //var errorType by remember { mutableStateOf(LoginErrorState.None) }
+
+    //VALIDATION
+    var emailError by remember { mutableStateOf(false) }
+    var phoneError by remember { mutableStateOf(false) }
+    var passwordError by remember { mutableStateOf(false) }
+    var confirmPasswordError by remember { mutableStateOf(false) }
+    var firstNameError by remember { mutableStateOf(false) }
+    var lastNameError by remember { mutableStateOf(false) }
+    var middleNameError by remember { mutableStateOf(false) }
+    var levelError by remember { mutableStateOf(false) }
+
 
     LazyColumn(Modifier.padding(start = 32.dp, end = 32.dp)) {
         item {
@@ -93,7 +106,7 @@ fun Registration(navHelper: NavHelper, onClick:((NavHelper) -> Unit)? = null) {
                                     }
 
                                     Spacer(Modifier.width(8.dp))
-                                    UserPictureButton("Update Picture") {
+                                    UserPictureButton(LocalizedStrings.get(UPDATE_PICTURE)) {
                                         fileToUpload = showFileChooser()
                                     }
                                     if(!fileToUpload.isNullOrEmpty()) {
@@ -121,57 +134,59 @@ fun Registration(navHelper: NavHelper, onClick:((NavHelper) -> Unit)? = null) {
                                 .fillMaxHeight()
                                 .padding(20.dp)) {
 
-                                SectionTitle("Personal Information")
+                                SectionTitle(LocalizedStrings.get(PERSONAL_INFO))
 
                                 Spacer(modifier = Modifier.height(16.dp))
                                 // Name Input
-                                FirstNameFields(firstname) {
+                                FirstNameFields(firstname, firstNameError) {
                                     firstname = it
+                                    firstNameError = false
                                 }
                                 Spacer(modifier = Modifier.height(16.dp))
 
-                                LastNameFields(lastname) {
+                                LastNameFields(lastname, lastNameError) {
                                     lastname = it
+                                    lastNameError = false
                                 }
                                 Spacer(modifier = Modifier.height(16.dp))
 
-                                MiddleFields(middlename) {
+                                MiddleFields(middlename, middleNameError) {
                                     middlename = it
+                                    middleNameError = false
                                 }
 
                                 Spacer(modifier = Modifier.height(16.dp))
 
-                                LevelFields(level) {
+                                LevelFields(level, levelError) {
                                     level = it
+                                    levelError = false
                                 }
 
                                 Spacer(modifier = Modifier.height(16.dp))
                                 // Card Number Input
-                                UserEmailFields(email) {
+                                UserEmailFields(email, emailError) {
                                     email = it
+                                    emailError = false
                                 }
                                 Spacer(modifier = Modifier.height(16.dp))
                                 // Card Number Input
-                                UserPhoneFields(phone) {
+                                UserPhoneFields(phone, phoneError) {
                                     phone = it
+                                    phoneError = false
                                 }
 
                                 Spacer(modifier = Modifier.height(16.dp))
                                 // Name Input
-                                UserPasswordFields(passwordField) {
+                                UserPasswordFields(passwordField, passwordError) {
                                     passwordField = it
+                                    passwordError = false
                                 }
 
                                 Spacer(modifier = Modifier.height(16.dp))
                                 // Card Number Input
-                                UserNewPasswordFields(newPasswordField) {
-                                    newPasswordField = it
-                                }
-
-                                Spacer(modifier = Modifier.height(16.dp))
-                                // Card Number Input
-                                UserConfirmPasswordFields(confirmNewPasswordField) {
+                                UserConfirmPasswordFields(confirmNewPasswordField, isRegistration = true, isError = passwordError) {
                                     confirmNewPasswordField = it
+                                    passwordError = false
                                 }
                             }
                         }
@@ -188,19 +203,53 @@ fun Registration(navHelper: NavHelper, onClick:((NavHelper) -> Unit)? = null) {
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically) {
 
-                ConfirmButton("REGISTER") {
+                ConfirmButton(LocalizedStrings.get(REGISTER)) {
                    // onClick?.invoke(NavHelper(Route.Payments))
-                    val validDataMap = validateEntries(
-                        firstName = firstname,
-                        lastName = lastname,
-                        middleName = middlename,
-                        level = level,
-                        email = email,
-                        phoneNumber = phone,
-                        password = passwordField,
-                        confirmPassword = confirmNewPasswordField
-                    )
-                    if(validDataMap.containsKey(VALID)) {
+                    if(!phone.isValidPhone()) {
+                        phoneError = true
+                    }
+
+                    if(!email.isValidEmail()) {
+                        emailError = true
+                    }
+
+                    if(!passwordField.isValidPassword()) {
+                        passwordError = true
+                    }
+
+                    if(!confirmNewPasswordField.isValidPassword() && confirmNewPasswordField != passwordField) {
+                        confirmPasswordError = true
+                    }
+
+                    if(!firstname.isValidName()) {
+                        firstNameError = true
+                    }
+
+                    if(!middlename.isValidName()) {
+                        middleNameError = true
+                    }
+
+                    if(!lastname.isValidName()) {
+                        lastNameError = true
+                    }
+
+                    if(!email.isValidEmail()) {
+                        emailError = true
+                    }
+
+                    if(!level.isValidLevel()) {
+                        levelError = true
+                    }
+
+                    if(phone.isValidPhone()
+                        && email.isValidEmail()
+                        && passwordField.isValidPassword()
+                        && (confirmNewPasswordField.isValidPassword() && confirmNewPasswordField != passwordField)
+                        && firstname.isValidName()
+                        && level.isValidLevel()
+                        && middlename.isValidName()
+                        && lastname.isValidName()) {
+
                         coroutineScope.launch(Dispatchers.IO) {
                             val userSuccess = authViewModel.startRegistration(
                                 UserDataModel(
@@ -228,64 +277,9 @@ fun Registration(navHelper: NavHelper, onClick:((NavHelper) -> Unit)? = null) {
                                 }
                             }
                         }
-
-                    } else {
-                        //Handle validation
                     }
                 }
             }
         }
     }
-}
-
-private fun validateEntries(
-    firstName: String,
-    lastName: String,
-    middleName: String,
-    level: String,
-    email: String,
-    phoneNumber:String,
-    password: String,
-    confirmPassword: String
-): Map<String, Boolean> {
-
-    val map = mutableMapOf<String, Boolean>()
-
-    if(!firstName.isValid()) {
-        map["first"] = false
-    }
-
-    if(!lastName.isValid()) {
-        map["last"] = false
-    }
-
-    if(!middleName.isValid()) {
-        map["middle"] = false
-    }
-
-    if(!level.isValid()) {
-        map["middle"] = false
-    }
-
-    if(!email.isValid()) {
-        map["email"] = false
-    }
-
-    if(!phoneNumber.isValid()) {
-        map["phone"] = false
-    }
-
-    if(!password.isValid()) {
-        map["password"] = false
-    }
-
-    if(!confirmPassword.isValid() || password != confirmPassword) {
-        map[CONFIRM] = false
-    }
-
-    if(map.keys.size == 0) {
-        map[VALID] = true
-    }
-
-    return map
 }

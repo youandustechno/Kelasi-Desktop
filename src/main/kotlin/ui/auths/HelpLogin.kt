@@ -19,6 +19,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import models.auth.UserCredentials
 import ui.Cache.userCache
+import ui.LocalizedStrings
+import ui.LocalizedStrings.VALIDATE
 import ui.NavHelper
 import ui.NavKeys.EMPTY
 import ui.Route
@@ -32,7 +34,7 @@ fun HelpLogin(onClick: (NavHelper) -> Unit) {
 
     var email by remember { mutableStateOf(EMPTY) }
     var phone by remember { mutableStateOf(EMPTY) }
-    var loginButton by remember { mutableStateOf("VALIDATE") }
+    var loginButton by remember { mutableStateOf(LocalizedStrings.get(VALIDATE)) }
     var isUserFound by remember { mutableStateOf(false) }
 
     var firstname by remember { mutableStateOf(userCache?.firstName?:EMPTY) }
@@ -124,7 +126,7 @@ fun HelpLogin(onClick: (NavHelper) -> Unit) {
                     .padding(start = 4.dp, end = 4.dp)) {
 
                 LoginButton(loginButton) {
-                    if(loginButton.equals("VALIDATE", true)) {
+                    if(loginButton.equals(LocalizedStrings.get(VALIDATE), true)) {
 
                         coroutineScope.launch(Dispatchers.IO) {
                             val result  = authViewModel

@@ -3,7 +3,10 @@ package ui.auths
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Switch
+import androidx.compose.material.SwitchDefaults
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -13,7 +16,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import helpers.StorageHelper
-import helpers.StorageHelper.Companion.AUTH_CODE
 import helpers.StorageHelper.Companion.TOKEN_CODE
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -34,7 +36,9 @@ import ui.NavKeys.EMPTY
 import ui.NavKeys.USER_KEY
 import ui.Route
 import ui.utilities.*
-import ui.utilities.FieldsValidation.isValid
+import ui.utilities.FieldsValidation.isValidEmail
+import ui.utilities.FieldsValidation.isValidPassword
+import ui.utilities.FieldsValidation.isValidPhone
 
 
 @Composable
@@ -56,6 +60,7 @@ fun Login(onClick: (NavHelper) -> Unit) {
     var loginMode by remember { mutableStateOf(LocalizedStrings.get(PHONE)) }
     var isPhoneAuth by remember { mutableStateOf(false) }
     var isTokenValid by remember { mutableStateOf(false) }
+    var errorType by remember { mutableStateOf(ErrorState.None) }
 
     Column(Modifier
         .fillMaxSize(),
@@ -64,7 +69,7 @@ fun Login(onClick: (NavHelper) -> Unit) {
 
         Column (Modifier
             .width(500.dp)
-            .height(400.dp)
+            .heightIn(400.dp, 700.dp)
             .background(Color.White, shape = RoundedCornerShape(10.dp))
             .padding(10.dp),
             horizontalAlignment = Alignment.CenterHorizontally) {
@@ -124,12 +129,16 @@ fun Login(onClick: (NavHelper) -> Unit) {
                         verticalAlignment = Alignment.CenterVertically) {
                         loginMode = if(isPhoneAuth)  LocalizedStrings.get(EMAIL) else LocalizedStrings.get(PHONE)
                         if(!isTokenValid) {
+                            //switch phone or email auth type
                             Text(loginMode, style = MaterialTheme.typography.caption,
                                 color = Color(0XFF3b1b49))
                             Spacer(Modifier.width(8.dp))
                             Switch(
                                 isPhoneAuth,
-                                onCheckedChange = { isPhoneAuth = it },
+                                onCheckedChange = {
+                                    isPhoneAuth = it
+                                    errorType = ErrorState.None
+                                                  },
                                 colors = SwitchDefaults.colors(
                                     checkedThumbColor = Color(0XFF4A3125),
                                     uncheckedThumbColor = Color(0XFF4A3125),
@@ -141,38 +150,50 @@ fun Login(onClick: (NavHelper) -> Unit) {
                     }
                     Spacer(Modifier.height(10.dp))
                     if(isPhoneAuth && !isTokenValid) {
+                        //Phone
                         Box(Modifier
                             .widthIn(300.dp, 400.dp)) {
 
                             UserPhoneFields(phone) {
                                 phone = it
+                                errorType = ErrorState.None
                             }
                         }
 
                     } else if(isTokenValid) {
+                        //PinView
                         loginButton = LocalizedStrings.get(VALIDATE)
 
                         PinView { pinCode ->
                             userCode = pinCode
+                            errorType = ErrorState.None
                         }
                     }
                     else {
+                        //Email and Password
                         Column(Modifier
                             .widthIn(300.dp, 400.dp)
                             .wrapContentHeight()) {
 
                             UserEmailFields(email) {
                                 email = it
+                                errorType = ErrorState.None
                             }
                             Spacer(Modifier.height(10.dp))
                             UserPasswordFields(password) {
                                 password = it
+                                errorType = ErrorState.None
                             }
                         }
+                    }
 
+                    if(ErrorState.None != errorType) {
+                        Spacer(Modifier.height(5.dp))
+                        DisplayError(errorType)
                     }
                 }
             }
+            //Button
             Spacer(Modifier.height(20.dp))
             Column(Modifier
                 .widthIn(300.dp, 400.dp)) {
@@ -208,10 +229,12 @@ fun Login(onClick: (NavHelper) -> Unit) {
                                             //Todo persist
                                             onClick.invoke(NavHelper(Route.Dashboard, map))
                                         } else {
-                                            //Todo show error for authentication failure
+
+                                            errorType = ErrorState.Auth_Failure
                                         }
                                     } else {
-                                        //Todo show error for authentication failure
+
+                                        errorType = ErrorState.Auth_Failure
                                     }
                                 }
                             }
@@ -220,17 +243,20 @@ fun Login(onClick: (NavHelper) -> Unit) {
 
                         coroutineScope.launch(Dispatchers.IO) {
 
-                            if(phone.isValid() && email.isValid() && password.isValid()) {
-                                //TODO show error and say you can not login with email and phone credentials the same time.
+                            if(phone.isValidPhone() && email.isValidEmail() && password.isValidPassword()) {
+                                 errorType = ErrorState.Bad_Entry
                             }
-                            else if(phone.isValid() && !email.isValid() && password.isValid()) {
-                                //TODO show error and say you can not login with email and phone credentials the same time.
+                            else if(!password.isValidPassword() && !isPhoneAuth) {
+                                errorType = ErrorState.Password
                             }
-                            else if(!phone.isValid() && !email.isValid()) {
-                                //TODO show error and say you can not login with email and phone credentials the same time.
+                            else if(!phone.isValidPhone() && isPhoneAuth) {
+                                errorType = ErrorState.Phone
+                            }
+                            else if(!email.isValidEmail() && !isPhoneAuth) {
+                                errorType = ErrorState.Email
                             }
                             else {
-                                val result = if(email.isValid() && password.isValid()) {
+                                val result = if(email.isValidEmail() && password.isValidPassword()) {
                                     authViewModel.startLoginEmail(EmailAndPassComponent(email, password))
                                 } else {
                                     authViewModel.startLoginPhone(phone)
@@ -247,13 +273,12 @@ fun Login(onClick: (NavHelper) -> Unit) {
                                         phone = EMPTY
                                         isTokenValid = true
                                     } else {
-                                        //Todo show error for authentication failure
+                                        errorType = ErrorState.Login_Failure
                                     }
                                 }
                             }
                         }
                     }
-
                 }
 
                 Spacer(Modifier.height(20.dp))
@@ -278,3 +303,5 @@ fun Login(onClick: (NavHelper) -> Unit) {
         }
     }
 }
+
+

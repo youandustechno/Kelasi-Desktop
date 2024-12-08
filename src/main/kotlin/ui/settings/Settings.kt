@@ -33,6 +33,11 @@ import ui.NavKeys.VALID
 import ui.Route
 import ui.utilities.*
 import ui.utilities.FieldsValidation.isValid
+import ui.utilities.FieldsValidation.isValidEmail
+import ui.utilities.FieldsValidation.isValidLevel
+import ui.utilities.FieldsValidation.isValidName
+import ui.utilities.FieldsValidation.isValidPassword
+import ui.utilities.FieldsValidation.isValidPhone
 import ui.videos.VideosViewModel
 import java.io.File
 
@@ -62,6 +67,16 @@ fun Settings(navHelper: NavHelper, onClick:((NavHelper) -> Unit)? = null) {
     var lastname by remember { mutableStateOf(userCache?.lastName?:EMPTY) }
     var middlename by remember { mutableStateOf(userCache?.middleName?:EMPTY) }
     var level by remember { mutableStateOf(userCache?.level?:EMPTY) }
+
+    //VALIDATION
+    var emailError by remember { mutableStateOf(false) }
+    var phoneError by remember { mutableStateOf(false) }
+    var passwordError by remember { mutableStateOf(false) }
+    var confirmPasswordError by remember { mutableStateOf(false) }
+    var firstNameError by remember { mutableStateOf(false) }
+    var lastNameError by remember { mutableStateOf(false) }
+    var middleNameError by remember { mutableStateOf(false) }
+    var levelError by remember { mutableStateOf(false) }
 
     //UPDATE CHECKER
     var isInfoUpdated : Boolean by remember { mutableStateOf(false) }
@@ -141,54 +156,63 @@ fun Settings(navHelper: NavHelper, onClick:((NavHelper) -> Unit)? = null) {
 
                                 Spacer(modifier = Modifier.height(16.dp))
                                 // Name Input
-                                FirstNameFields(firstname) {
+                                FirstNameFields(firstname, firstNameError) {
                                     firstname = it
+                                    firstNameError = false
                                 }
                                 Spacer(modifier = Modifier.height(16.dp))
 
-                                LastNameFields(lastname) {
+                                LastNameFields(lastname, lastNameError) {
                                     lastname = it
+                                    lastNameError = false
                                 }
                                 Spacer(modifier = Modifier.height(16.dp))
 
-                                MiddleFields(middlename) {
+                                MiddleFields(middlename, middleNameError) {
                                     middlename = it
+                                    middleNameError = false
                                 }
 
                                 Spacer(modifier = Modifier.height(16.dp))
 
-                                LevelFields(level) {
+                                LevelFields(level, levelError) {
                                     level = it
+                                    levelError = false
                                 }
 
                                 Spacer(modifier = Modifier.height(16.dp))
                                 // Card Number Input
-                                UserEmailFields(email) {
+                                UserEmailFields(email, emailError) {
                                     email = it
+                                    emailError = false
                                 }
                                 Spacer(modifier = Modifier.height(16.dp))
                                 // Card Number Input
-                                UserPhoneFields(phone) {
+                                UserPhoneFields(phone, phoneError) {
                                     phone = it
+                                    phoneError = false
                                 }
 
                                 Spacer(modifier = Modifier.height(16.dp))
                                 // Name Input
-                                UserPasswordFields(passwordField) {
+                                UserPasswordFields(passwordField, passwordError) {
                                     passwordField = it
+                                    passwordError = false
                                 }
                                 if(isRegistration) {
                                     Spacer(modifier = Modifier.height(16.dp))
                                     // Card Number Input
-                                    UserNewPasswordFields(newPasswordField) {
+                                    UserNewPasswordFields(newPasswordField, isError = passwordError) {
                                         newPasswordField = it
+                                        passwordError = false
                                     }
                                 }
 
                                 Spacer(modifier = Modifier.height(16.dp))
                                 // Card Number Input
-                                UserConfirmPasswordFields(confirmNewPasswordField) {
+                                UserConfirmPasswordFields(confirmNewPasswordField, isRegistration = false, isError = passwordError ) {
                                     confirmNewPasswordField = it
+                                    passwordError = false
                                 }
                             }
                         }
@@ -207,17 +231,51 @@ fun Settings(navHelper: NavHelper, onClick:((NavHelper) -> Unit)? = null) {
 
                 ConfirmButton(LocalizedStrings.get(UPDATE_BUTTON)) {
                    // onClick?.invoke(NavHelper(Route.Payments))
-                    val validDataMap = validateEntries(
-                        firstName = firstname,
-                        lastName = lastname,
-                        middleName = middlename,
-                        level = level,
-                        email = email,
-                        phoneNumber = phone,
-                        password = passwordField,
-                        confirmPassword = confirmNewPasswordField
-                    )
-                    if(validDataMap.containsKey(VALID)) {
+                    if(!phone.isValidPhone()) {
+                        phoneError = true
+                    }
+
+                    if(!email.isValidEmail()) {
+                        emailError = true
+                    }
+
+                    if(!passwordField.isValidPassword()) {
+                        passwordError = true
+                    }
+
+                    if(!confirmNewPasswordField.isValidPassword() && confirmNewPasswordField != passwordField) {
+                        confirmPasswordError = true
+                    }
+
+                    if(!firstname.isValidName()) {
+                        firstNameError = true
+                    }
+
+                    if(!middlename.isValidName()) {
+                        middleNameError = true
+                    }
+
+                    if(!lastname.isValidName()) {
+                        lastNameError = true
+                    }
+
+                    if(!email.isValidEmail()) {
+                        emailError = true
+                    }
+
+                    if(!level.isValidLevel()) {
+                        levelError = true
+                    }
+
+                    if(phone.isValidPhone()
+                        && email.isValidEmail()
+                        && passwordField.isValidPassword()
+                        && (confirmNewPasswordField.isValidPassword() && confirmNewPasswordField != passwordField)
+                        && firstname.isValidName()
+                        && level.isValidLevel()
+                        && middlename.isValidName()
+                        && lastname.isValidName()) {
+
                         coroutineScope.launch(Dispatchers.IO) {
                             val userSuccess = userCache?.let {
                                 settingsViewModel.updateUserInfo(
@@ -256,9 +314,6 @@ fun Settings(navHelper: NavHelper, onClick:((NavHelper) -> Unit)? = null) {
                                 }
                             }
                         }
-
-                    } else {
-                        //Handle validation
                     }
                 }
                 if(isInfoUpdated) {
@@ -299,7 +354,7 @@ private fun validateEntries(
         map[LEVEL] = false
     }
 
-    if(!email.isValid()) {
+    if(!email.isValidEmail()) {
         map[EMAIL] = false
     }
 

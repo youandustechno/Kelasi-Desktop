@@ -19,6 +19,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import models.BaseValues
 import ui.LocalizedStrings
 import ui.LocalizedStrings.ADD_DURATION
 import ui.LocalizedStrings.ANSWER
@@ -28,6 +29,7 @@ import ui.LocalizedStrings.CONFIRM_PASSWORD
 import ui.LocalizedStrings.COURSE_DESCRIPTION
 import ui.LocalizedStrings.COURSE_NAME
 import ui.LocalizedStrings.EMAIL
+import ui.LocalizedStrings.EMAIL_SAMPLE
 import ui.LocalizedStrings.FIRST_NAME
 import ui.LocalizedStrings.INSTRUCTOR
 import ui.LocalizedStrings.LAST_NAME
@@ -48,7 +50,7 @@ import ui.LocalizedStrings.VIDEO_TITLE
 @Composable
 fun PhoneText(phoneNumber: String, onChange: (String) -> Unit) {
     var text by remember { mutableStateOf(TextFieldValue(phoneNumber)) }
-    AuthTextFieldWithIcons(text.text, Icons.Default.Phone, "Phone", onChange)
+    AuthTextFieldWithIcons(text.text, Icons.Default.Phone, LocalizedStrings.get(PHONE), onChange)
 }
 
 @Composable
@@ -159,50 +161,50 @@ fun AssertionFields(question: String, onChange: (String) -> Unit) {
 }
 
 @Composable
-fun UserPasswordFields(userName: String, onChange: (String) -> Unit) {
-    PaymentTextFieldWithIcon(userName, Icons.Default.Lock, LocalizedStrings.get(PASSWORD), onChange)
+fun UserPasswordFields(userName: String, isError: Boolean = false, onChange: (String) -> Unit) {
+    PaymentTextFieldWithIcon(userName, Icons.Default.Lock, LocalizedStrings.get(PASSWORD), isError, onChange)
 }
 
 @Composable
-fun UserNewPasswordFields(userName: String, onChange: (String) -> Unit) {
-    PaymentTextFieldWithIcon(userName, Icons.Default.Lock, LocalizedStrings.get(NEW_PASSWORD), onChange)
+fun UserNewPasswordFields(userName: String, isError: Boolean = false, onChange: (String) -> Unit) {
+    PaymentTextFieldWithIcon(userName, Icons.Default.Lock, LocalizedStrings.get(NEW_PASSWORD), isError, onChange)
 }
 
 @Composable
-fun UserConfirmPasswordFields(userName: String, isRegistration: Boolean = false, onChange: (String) -> Unit) {
+fun UserConfirmPasswordFields(userName: String, isRegistration: Boolean = false, isError: Boolean, onChange: (String) -> Unit) {
     PaymentTextFieldWithIcon(userName, Icons.Default.Lock,
         if(!isRegistration)LocalizedStrings.get(CONFIRM_NEW_PASSWORD)
-        else LocalizedStrings.get(CONFIRM_PASSWORD), onChange)
+        else LocalizedStrings.get(CONFIRM_PASSWORD), isError, onChange)
 }
 
 @Composable
-fun UserEmailFields(userName: String, onChange: (String) -> Unit) {
-    PaymentTextFieldWithIcon(userName, Icons.Default.Email, LocalizedStrings.get(EMAIL), onChange)
+fun UserEmailFields(userName: String, isError: Boolean = false, onChange: (String) -> Unit) {
+    PaymentTextFieldWithIcon(userName, Icons.Default.Email, LocalizedStrings.get(EMAIL), isError, onChange)
 }
 
 @Composable
-fun UserPhoneFields(userName: String, onChange: (String) -> Unit) {
-    PaymentTextFieldWithIcon(userName, Icons.Default.Phone, LocalizedStrings.get(PHONE_NUMBER), onChange)
+fun UserPhoneFields(userName: String, isError: Boolean = false, onChange: (String) -> Unit) {
+    PaymentTextFieldWithIcon(userName, Icons.Default.Phone, LocalizedStrings.get(PHONE_NUMBER), isError, onChange)
 }
 
 @Composable
-fun MiddleFields(userName: String, onChange: (String) -> Unit) {
-    PaymentTextFieldWithIcon(userName, Icons.Default.Person, LocalizedStrings.get(MIDDLE_NAME), onChange)
+fun MiddleFields(userName: String, isError: Boolean = false, onChange: (String) -> Unit) {
+    PaymentTextFieldWithIcon(userName, Icons.Default.Person, LocalizedStrings.get(MIDDLE_NAME), isError, onChange)
 }
 
 @Composable
-fun FirstNameFields(userName: String, onChange: (String) -> Unit) {
-    PaymentTextFieldWithIcon(userName, Icons.Default.Person, LocalizedStrings.get(FIRST_NAME), onChange)
+fun FirstNameFields(userName: String, isError: Boolean = false, onChange: (String) -> Unit) {
+    PaymentTextFieldWithIcon(userName, Icons.Default.Person, LocalizedStrings.get(FIRST_NAME), isError,onChange)
 }
 
 @Composable
-fun LastNameFields(userName: String, onChange: (String) -> Unit) {
-    PaymentTextFieldWithIcon(userName, Icons.Default.Person, LocalizedStrings.get(LAST_NAME), onChange)
+fun LastNameFields(userName: String, isError: Boolean = false, onChange: (String) -> Unit) {
+    PaymentTextFieldWithIcon(userName, Icons.Default.Person, LocalizedStrings.get(LAST_NAME), isError, onChange)
 }
 
 @Composable
-fun LevelFields(userName: String, onChange: (String) -> Unit) {
-    PaymentTextFieldWithIcon(userName, Icons.Default.Edit, LocalizedStrings.get(LEVEL), onChange)
+fun LevelFields(userName: String, isError: Boolean = false, onChange: (String) -> Unit) {
+    PaymentTextFieldWithIcon(userName, Icons.Default.Edit, LocalizedStrings.get(LEVEL), isError,  onChange)
 }
 
 
@@ -285,6 +287,7 @@ private fun DataValueFields(value: String, label: String, onChange: (String) -> 
 @Composable
 fun TextFieldWithIcons(value: String, icon: ImageVector, description: String, onChange: (String) -> Unit) {
     var text by remember { mutableStateOf(value) }
+    val isPhoneNumber by remember { mutableStateOf(description.equals(LocalizedStrings.get(PHONE_NUMBER), true)) }
 
     Column(Modifier.wrapContentWidth()
         .wrapContentHeight(),
@@ -294,7 +297,7 @@ fun TextFieldWithIcons(value: String, icon: ImageVector, description: String, on
             value = text,
             leadingIcon = { Icon(imageVector = icon, contentDescription = description) },
             //trailingIcon = { Icon(imageVector = Icons.Default.Add, contentDescription = null) },
-            keyboardOptions = KeyboardOptions(keyboardType = if(description.equals(LocalizedStrings.get(PHONE), true))KeyboardType.Number
+            keyboardOptions = KeyboardOptions(keyboardType = if(isPhoneNumber)KeyboardType.Number
             else KeyboardType.Text),
             onValueChange = {
                 text = it
@@ -304,7 +307,9 @@ fun TextFieldWithIcons(value: String, icon: ImageVector, description: String, on
                 .wrapContentWidth(),
             //.background(color = Color.White),
             label = { Text(text = description) },
-            // placeholder = { Text(text = description) },
+            placeholder = { Text(getPlaceHolderValue(description),
+                fontSize = 12.sp,
+                color = Color.LightGray) },
         )
     }
 }
@@ -312,6 +317,7 @@ fun TextFieldWithIcons(value: String, icon: ImageVector, description: String, on
 @Composable
 fun AuthTextFieldWithIcons(value: String, icon: ImageVector, description: String, onChange: (String) -> Unit) {
     var text by remember { mutableStateOf(value) }
+    val isPhoneNumber by remember { mutableStateOf(description.equals(LocalizedStrings.get(PHONE_NUMBER), true)) }
 
     Column(Modifier.fillMaxWidth()
         .wrapContentHeight(),
@@ -321,7 +327,7 @@ fun AuthTextFieldWithIcons(value: String, icon: ImageVector, description: String
             value = text,
             leadingIcon = { Icon(imageVector = icon, contentDescription = description) },
             //trailingIcon = { Icon(imageVector = Icons.Default.Add, contentDescription = null) },
-            keyboardOptions = KeyboardOptions(keyboardType = if(description.equals(LocalizedStrings.get(PHONE), true))KeyboardType.Number
+            keyboardOptions = KeyboardOptions(keyboardType = if(isPhoneNumber)KeyboardType.Number
             else KeyboardType.Text),
             onValueChange = {
                 text = it
@@ -331,13 +337,17 @@ fun AuthTextFieldWithIcons(value: String, icon: ImageVector, description: String
                 .fillMaxWidth(),
             //.background(color = Color.White),
             label = { Text(text = description) },
-            // placeholder = { Text(text = description) },
+            placeholder = { Text(text = getPlaceHolderValue(description),
+                color = Color.LightGray,
+                fontSize = 12.sp) },
         )
     }
 }
 
 @Composable
-fun PaymentTextFieldWithIcon(value: String, icon: ImageVector, description: String, onChange: (String) -> Unit) {
+fun PaymentTextFieldWithIcon(value: String, icon: ImageVector, description: String, isError: Boolean = false, onChange: (String) -> Unit) {
+
+    val isPhoneNumber by remember { mutableStateOf(description.equals(LocalizedStrings.get(PHONE_NUMBER), true)) }
 
     Column(Modifier.fillMaxWidth()
         .wrapContentHeight(),
@@ -347,7 +357,7 @@ fun PaymentTextFieldWithIcon(value: String, icon: ImageVector, description: Stri
             value = value,
             leadingIcon = { Icon(imageVector = icon, contentDescription = description) },
             //trailingIcon = { Icon(imageVector = Icons.Default.Add, contentDescription = null) },
-            keyboardOptions = KeyboardOptions(keyboardType = if(description.equals(LocalizedStrings.get(PHONE), true)) {
+            keyboardOptions = KeyboardOptions(keyboardType = if(isPhoneNumber) {
                 KeyboardType.Number
             }
             else KeyboardType.Text),
@@ -358,11 +368,26 @@ fun PaymentTextFieldWithIcon(value: String, icon: ImageVector, description: Stri
                 .fillMaxWidth()
                 .background(Color.Transparent)
                 .height(60.dp),
+            isError = isError,
             //.background(color = Color.White),
             label = { Text(text = description, style = TextStyle(fontSize = 10.sp)) },
-            // placeholder = { Text(text = description) },
+            placeholder = {
+                Text(text = getPlaceHolderValue(description),
+                    color = Color.LightGray,
+                    fontSize = 12.sp)
+                          },
             textStyle = TextStyle(fontSize = 12.sp),
-            colors = TextFieldDefaults.outlinedTextFieldColors(backgroundColor = Color.White)
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+                backgroundColor = Color.White
+            )
         )
+    }
+}
+
+private fun getPlaceHolderValue(description: String) : String {
+    return when (description.lowercase()) {
+        LocalizedStrings.get(PHONE_NUMBER).lowercase() -> BaseValues.PhoneSample
+        LocalizedStrings.get(EMAIL).lowercase() -> LocalizedStrings.get(EMAIL_SAMPLE)
+        else -> description
     }
 }

@@ -19,15 +19,17 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import models.BaseValues
 import ui.LocalizedStrings
 import ui.LocalizedStrings.INSTITUTION
 import ui.LocalizedStrings.VERIFY
 import ui.NavHelper
 import ui.NavKeys.EMPTY
-import ui.NavKeys.VERIFICATION_CODE
 import ui.Route
-import ui.utilities.ErrorCard
+import ui.utilities.DisplayError
+import ui.utilities.ErrorState
 import ui.utilities.FieldsValidation.isValid
+import ui.utilities.FieldsValidation.isValidCode
 import ui.utilities.LoginButton
 import ui.utilities.OrgaAuthText
 
@@ -38,7 +40,7 @@ fun OrgAuth(orgFound:(NavHelper) -> Unit) {
     val authViewModel = AuthViewModel()
     val coroutineScope = rememberCoroutineScope()
     var isFailure: Boolean? by remember { mutableStateOf(null) }
-    var failureMessage: String? by remember { mutableStateOf(null) }
+    var errorType by remember { mutableStateOf(ErrorState.None) }
 
     Column(Modifier
         .fillMaxSize(),
@@ -87,6 +89,10 @@ fun OrgAuth(orgFound:(NavHelper) -> Unit) {
                     }
                 }
 
+                if(ErrorState.None != errorType) {
+                    Spacer(Modifier.height(5.dp))
+                    DisplayError(errorType)
+                }
                 Spacer(Modifier.height(20.dp))
 
                 Box(Modifier
@@ -95,24 +101,35 @@ fun OrgAuth(orgFound:(NavHelper) -> Unit) {
 
                     LoginButton(buttonText) {
                         //Make http call
-                        coroutineScope.launch(Dispatchers.IO) {
-                            if(text.isValid()) {
-                                val result =  authViewModel.verifyAuthCode(text)
-                                delay(500L)
-                                withContext(Dispatchers.Main) {
-                                    if(result.auth != null) {
-                                        //prefs.put("group", result.org!!.tenantCode)
-                                        result.auth?.org?.tenantCode?.let {
-                                            //PreferenceHelper().saveAuthCode(it)
-                                            val lang = result.auth?.tenantLang
-                                            LocalizedStrings.setLanguage(if(lang == "en") LocalizedStrings.LanguageOption.EN
-                                            else LocalizedStrings.LanguageOption.FR)
-                                            StorageHelper().saveInStorage(AUTH_CODE, it)
+                        if(!text.isValidCode()) {
+                            errorType = ErrorState.Wrong_Code
+                        } else {
+                            coroutineScope.launch(Dispatchers.IO) {
+                                if(text.isValid()) {
+                                    val result =  authViewModel.verifyAuthCode(text)
+                                    delay(500L)
+                                    withContext(Dispatchers.Main) {
+                                        if(result.auth != null) {
+                                            //prefs.put("group", result.org!!.tenantCode)
+                                            result.auth?.org?.tenantCode?.let {
+                                                //PreferenceHelper().saveAuthCode(it)
+                                                val lang = result.auth?.tenantLang
+                                                result.auth?.let { tenant ->
+                                                    BaseValues.KEY = tenant.key
+                                                    BaseValues.PhoneRegex = tenant.regex
+                                                    BaseValues.PhoneSample = tenant.format
+                                                }
+                                                LocalizedStrings.setLanguage(if(lang == "en") LocalizedStrings.LanguageOption.EN
+                                                else LocalizedStrings.LanguageOption.FR)
+                                                StorageHelper().saveInStorage(AUTH_CODE, it)
+                                            }
+                                            orgFound.invoke(NavHelper(Route.AuthLogin))
+                                        } else {
+                                            errorType = when(result.error?.errorMessage?.lowercase())  {
+                                                "timeout" -> ErrorState.IT_US
+                                                else -> ErrorState.Auth_Failure
+                                            }
                                         }
-                                        orgFound.invoke(NavHelper(Route.AuthLogin))
-                                    } else {
-                                        isFailure = true
-                                        failureMessage = result.error?.errorMessage
                                     }
                                 }
                             }
@@ -120,20 +137,6 @@ fun OrgAuth(orgFound:(NavHelper) -> Unit) {
                     }
 
                     Spacer(Modifier.height(10.dp))
-                }
-
-                if(isFailure == true) {
-                    Spacer(Modifier.height(10.dp))
-                    Column(Modifier
-                        .sizeIn(150.dp, 100.dp, 400.dp, 150.dp)
-                        .widthIn(300.dp, 400.dp)){
-                        ErrorCard {
-                            Text("$failureMessage",
-                                style = MaterialTheme.typography
-                                    .button
-                                    .copy(color = Color.DarkGray))
-                        }
-                    }
                 }
                 Spacer(Modifier.height(30.dp))
             }
