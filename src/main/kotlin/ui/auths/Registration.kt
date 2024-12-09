@@ -244,7 +244,7 @@ fun Registration(navHelper: NavHelper, onClick:((NavHelper) -> Unit)? = null) {
                     if(phone.isValidPhone()
                         && email.isValidEmail()
                         && passwordField.isValidPassword()
-                        && (confirmNewPasswordField.isValidPassword() && confirmNewPasswordField != passwordField)
+                        && (confirmNewPasswordField.isValidPassword() && confirmNewPasswordField == passwordField)
                         && firstname.isValidName()
                         && level.isValidLevel()
                         && middlename.isValidName()

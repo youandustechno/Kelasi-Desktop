@@ -24,7 +24,7 @@ object FieldsValidation {
     fun String.isValidPhone(): Boolean {
         if(BaseValues.PhoneRegex.isNotEmpty())
             return BaseValues.PhoneRegex.toRegex().matches(this) && !this.hasBadCommands()
-                    && (this.length == BaseValues.PhoneSample.length || this.length == BaseValues.PhoneSample.length -1)
+                    && this.length == BaseValues.PhoneSample.length
                     && this.startsWith("+")
 
         return false
