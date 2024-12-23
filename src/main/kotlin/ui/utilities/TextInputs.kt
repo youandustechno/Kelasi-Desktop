@@ -297,7 +297,7 @@ fun TextFieldWithIcons(value: String, icon: ImageVector, description: String, on
             value = text,
             leadingIcon = { Icon(imageVector = icon, contentDescription = description) },
             //trailingIcon = { Icon(imageVector = Icons.Default.Add, contentDescription = null) },
-            keyboardOptions = KeyboardOptions(keyboardType = if(isPhoneNumber)KeyboardType.Number
+            keyboardOptions = KeyboardOptions(keyboardType = if(isPhoneNumber)KeyboardType.Phone
             else KeyboardType.Text),
             onValueChange = {
                 text = it
@@ -327,7 +327,7 @@ fun AuthTextFieldWithIcons(value: String, icon: ImageVector, description: String
             value = text,
             leadingIcon = { Icon(imageVector = icon, contentDescription = description) },
             //trailingIcon = { Icon(imageVector = Icons.Default.Add, contentDescription = null) },
-            keyboardOptions = KeyboardOptions(keyboardType = if(isPhoneNumber)KeyboardType.Number
+            keyboardOptions = KeyboardOptions(keyboardType = if(isPhoneNumber) KeyboardType.Phone
             else KeyboardType.Text),
             onValueChange = {
                 text = it

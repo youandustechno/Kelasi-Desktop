@@ -163,7 +163,7 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                 && totalMinutes == 0 && quizState == QuizState.START) {
                 totalMinutes = selectedQuiz!!.time
                 selectedQuiz!!.problems?.forEach {
-                    answers.add(Answer(it.question, "", rightAnswer = it.answer))
+                    answers.add(Answer(it.question, EMPTY, rightAnswer = it.answer))
                 }
             }
 

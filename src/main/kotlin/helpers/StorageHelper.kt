@@ -68,9 +68,9 @@ class StorageHelper {
         val osName = System.getProperty("os.name").lowercase(Locale.getDefault())
 
         return when {
-            osName.contains("win") -> System.getenv("APPDATA") + "\\PesaKelasi"
-            osName.contains("mac") -> System.getProperty("user.home") + "/Library/Application Support/PesaKelasi"
-            osName.contains("nux") -> System.getProperty("user.home") + "/.config/PesaKelasi"
+            osName.contains("win") -> System.getenv("APPDATA") + "\\Mateya"
+            osName.contains("mac") -> System.getProperty("user.home") + "/Library/Application Support/Mateya"
+            osName.contains("nux") -> System.getProperty("user.home") + "/.config/Mateya"
             else -> System.getProperty("user.dir") // Fallback to current directory
         }
     }

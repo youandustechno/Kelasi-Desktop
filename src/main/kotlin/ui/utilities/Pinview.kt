@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 
 
 @Composable
-fun PinView(pinLength: Int = 8, onPinEntered: (String) -> Unit) {
+fun PinView(pinLength: Int = 7, onPinEntered: (String) -> Unit) {
     val pinValues = remember { mutableStateListOf(*Array(pinLength){""}) }
     val focusRequesters = remember { List(pinLength) { FocusRequester() } }
     val focusManager = LocalFocusManager.current
