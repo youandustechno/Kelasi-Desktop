@@ -2,6 +2,7 @@ package ui.auths
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -63,6 +64,11 @@ fun Registration(navHelper: NavHelper, onClick:((NavHelper) -> Unit)? = null) {
     var lastNameError by remember { mutableStateOf(false) }
     var middleNameError by remember { mutableStateOf(false) }
     var levelError by remember { mutableStateOf(false) }
+
+    var passwordErrorMessage by remember { mutableStateOf(EMPTY) }
+    var confirmPassErrorMessage by remember { mutableStateOf(EMPTY) }
+    var emailErrorMessage by remember { mutableStateOf(EMPTY) }
+    var phoneErrorMessage by remember { mutableStateOf(EMPTY) }
 
 
     LazyColumn(Modifier.padding(start = 32.dp, end = 32.dp)) {
@@ -168,25 +174,46 @@ fun Registration(navHelper: NavHelper, onClick:((NavHelper) -> Unit)? = null) {
                                     email = it
                                     emailError = false
                                 }
-                                Spacer(modifier = Modifier.height(16.dp))
+                                if(emailError) {
+                                    Spacer(modifier = Modifier.height(2.dp))
+                                    DisplayError(ErrorState.Email)
+                                    Spacer(modifier = Modifier.height(5.dp))
+                                } else {
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                }
                                 // Card Number Input
                                 UserPhoneFields(phone, phoneError) {
                                     phone = it
                                     phoneError = false
                                 }
-
-                                Spacer(modifier = Modifier.height(16.dp))
+                                if(phoneError) {
+                                    Spacer(modifier = Modifier.height(2.dp))
+                                    DisplayError(ErrorState.Phone)
+                                    Spacer(modifier = Modifier.height(5.dp))
+                                } else {
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                }
                                 // Name Input
                                 UserPasswordFields(passwordField, passwordError) {
                                     passwordField = it
                                     passwordError = false
                                 }
 
-                                Spacer(modifier = Modifier.height(16.dp))
+                                if(passwordError) {
+                                    Spacer(modifier = Modifier.height(2.dp))
+                                    DisplayError(ErrorState.Password)
+                                    Spacer(modifier = Modifier.height(5.dp))
+                                } else {
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                }
                                 // Card Number Input
                                 UserConfirmPasswordFields(confirmNewPasswordField, isRegistration = true, isError = passwordError) {
                                     confirmNewPasswordField = it
-                                    passwordError = false
+                                    confirmPasswordError = false
+                                }
+
+                                if(confirmPasswordError) {
+                                    DisplayError(ErrorState.ConfirmPassword)
                                 }
                             }
                         }

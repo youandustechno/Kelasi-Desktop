@@ -158,7 +158,7 @@ object LocalizedStrings {
         ORGANIZATION_NAME to "Organization Name",
         //P
         PASSWORD to "Password",
-        PASSWORD_ERROR to "A Password should be 8 - 10 characters with at least one special character, one lowercase and one uppercase letter",
+        PASSWORD_ERROR to "A password should contains a uppercase, a lowercase, 8 - 10 characters with at least one of these special characters: #, @, !",
         PAY_WITH_PAYPAL to "Pay with PayPal",
         PERSONAL_INFO to "Personal Information",
         PHONE to "Phone",
@@ -244,7 +244,7 @@ object LocalizedStrings {
         INSTRUCTOR to "Nom de l'enseignant",
         //L
         LAST_NAME to "Nome de Famille",
-        LEVEL to "Level",
+        LEVEL to "Niveau",
         LOGIN_FAILURE to "Échec de la connexion",
         LOADING to "En train téléchargé ...",
         LOGOUT to "Déconnexion",
@@ -262,7 +262,7 @@ object LocalizedStrings {
         ORGANIZATION_NAME to "Nom de l'institution",
         //P
         PASSWORD to "Mot de passe",
-        PASSWORD_ERROR to "Le mot de passe doit avoir 8 - 10 alpha-numerique long avec aumoins un special character, une lettre miniscule and une en majuscule",
+        PASSWORD_ERROR to "Le mot de passe doit avoir 8 - 10 alpha-numerique long avec au moins un de ces speciaux characters: #, @, !, et une lettre miniscule and une en majuscule",
         PAY_WITH_PAYPAL to "Payer avec PayPal",
         PERSONAL_INFO to "Informations personnelles",
         PHONE to "Téléphone",

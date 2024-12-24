@@ -31,6 +31,9 @@ fun DisplayError(errorState: ErrorState) {
                 errorState == ErrorState.Password -> {
                     LocalizedStrings.get(PASSWORD_ERROR)
                 }
+                errorState == ErrorState.ConfirmPassword -> {
+                    LocalizedStrings.get(PASSWORD_ERROR)
+                }
                 errorState == ErrorState.Phone -> {
                     val map = mutableMapOf<String, String>()
                     map["pattern"] = BaseValues.PhoneSample
@@ -53,7 +56,7 @@ fun DisplayError(errorState: ErrorState) {
                 .widthIn(300.dp, 380.dp)
                 .wrapContentHeight()){
                 Text(message,
-                    color = Color.Red,
+                    color = MaterialTheme.colors.error,
                     style = MaterialTheme.typography
                         .caption.copy(
                             fontSize = 12.sp,
@@ -66,6 +69,7 @@ fun DisplayError(errorState: ErrorState) {
 
 enum class ErrorState {
     Password,
+    ConfirmPassword,
     Email,
     Phone,
     Auth_Failure,

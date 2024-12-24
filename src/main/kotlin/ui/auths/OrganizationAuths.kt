@@ -110,17 +110,17 @@ fun OrgAuth(orgFound:(NavHelper) -> Unit) {
                                     delay(500L)
                                     withContext(Dispatchers.Main) {
                                         if(result.auth != null) {
+                                            val lang = result.auth?.tenantLang
+                                            result.auth?.let { tenant ->
+                                                BaseValues.KEY = tenant.key
+                                                BaseValues.PhoneRegex = tenant.regex
+                                                BaseValues.PhoneSample = tenant.format
+                                            }
+                                            LocalizedStrings.setLanguage(if(lang == "en") LocalizedStrings.LanguageOption.EN
+                                            else LocalizedStrings.LanguageOption.FR)
                                             //prefs.put("group", result.org!!.tenantCode)
                                             result.auth?.org?.tenantCode?.let {
                                                 //PreferenceHelper().saveAuthCode(it)
-                                                val lang = result.auth?.tenantLang
-                                                result.auth?.let { tenant ->
-                                                    BaseValues.KEY = tenant.key
-                                                    BaseValues.PhoneRegex = tenant.regex
-                                                    BaseValues.PhoneSample = tenant.format
-                                                }
-                                                LocalizedStrings.setLanguage(if(lang == "en") LocalizedStrings.LanguageOption.EN
-                                                else LocalizedStrings.LanguageOption.FR)
                                                 StorageHelper().saveInStorage(AUTH_CODE, it)
                                             }
                                             orgFound.invoke(NavHelper(Route.AuthLogin))
