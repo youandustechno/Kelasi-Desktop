@@ -181,38 +181,61 @@ fun Settings(navHelper: NavHelper, onClick:((NavHelper) -> Unit)? = null) {
                                 }
 
                                 Spacer(modifier = Modifier.height(16.dp))
-                                // Card Number Input
+                                //Email
                                 UserEmailFields(email, emailError) {
                                     email = it
                                     emailError = false
                                 }
-                                Spacer(modifier = Modifier.height(16.dp))
-                                // Card Number Input
+                                if(emailError) {
+                                    Spacer(modifier = Modifier.height(2.dp))
+                                    DisplayError(ErrorState.Email)
+                                    Spacer(modifier = Modifier.height(5.dp))
+                                } else {
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                }
+
+                                //Phone
                                 UserPhoneFields(phone, phoneError) {
                                     phone = it
                                     phoneError = false
                                 }
+                                if(phoneError) {
+                                    Spacer(modifier = Modifier.height(2.dp))
+                                    DisplayError(ErrorState.Phone)
+                                    Spacer(modifier = Modifier.height(5.dp))
+                                } else {
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                }
 
-                                Spacer(modifier = Modifier.height(16.dp))
-                                // Name Input
+                                //Password
                                 UserPasswordFields(passwordField, passwordError) {
                                     passwordField = it
                                     passwordError = false
                                 }
-                                if(isRegistration) {
+                                if(passwordError) {
+                                    Spacer(modifier = Modifier.height(2.dp))
+                                    DisplayError(ErrorState.Password)
+                                    Spacer(modifier = Modifier.height(5.dp))
+                                } else {
                                     Spacer(modifier = Modifier.height(16.dp))
-                                    // Card Number Input
+                                }
+
+                                if(isRegistration) {
+                                    //New Password
                                     UserNewPasswordFields(newPasswordField, isError = passwordError) {
                                         newPasswordField = it
                                         passwordError = false
                                     }
+                                    Spacer(modifier = Modifier.height(16.dp))
                                 }
 
-                                Spacer(modifier = Modifier.height(16.dp))
-                                // Card Number Input
+                                //Confirm Password
                                 UserConfirmPasswordFields(confirmNewPasswordField, isRegistration = false, isError = passwordError ) {
                                     confirmNewPasswordField = it
                                     passwordError = false
+                                }
+                                if(confirmPasswordError) {
+                                    DisplayError(ErrorState.ConfirmPassword)
                                 }
                             }
                         }

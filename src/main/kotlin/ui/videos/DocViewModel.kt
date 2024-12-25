@@ -10,7 +10,6 @@ import java.io.File
 
 class MangeDocViewModel {
 
-
     var documentPath by mutableStateOf<String?>(null)
         private set
 
