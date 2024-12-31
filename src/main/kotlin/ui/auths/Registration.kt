@@ -113,7 +113,7 @@ fun Registration(navHelper: NavHelper, onClick:((NavHelper) -> Unit)? = null) {
 
                                     Spacer(Modifier.width(8.dp))
                                     UserPictureButton(LocalizedStrings.get(UPDATE_PICTURE)) {
-                                        fileToUpload = showFileChooser()
+                                        fileToUpload = showImageFileChooser()
                                     }
                                     if(!fileToUpload.isNullOrEmpty()) {
                                         fileToUpload?.let {

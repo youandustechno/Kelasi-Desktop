@@ -39,6 +39,7 @@ import ui.utilities.*
 import ui.utilities.FieldsValidation.isValidEmail
 import ui.utilities.FieldsValidation.isValidPassword
 import ui.utilities.FieldsValidation.isValidPhone
+import ui.utilities.LoginUtils.UID
 
 
 @Composable
@@ -193,6 +194,7 @@ fun Login(onClick: (NavHelper) -> Unit) {
                     }
                 }
             }
+
             //Button
             Spacer(Modifier.height(20.dp))
             Column(Modifier
@@ -265,6 +267,13 @@ fun Login(onClick: (NavHelper) -> Unit) {
                                 withContext(Dispatchers.Main) {
                                     if (result.token != null) {
                                         StorageHelper().saveInStorage(TOKEN_CODE, result.token.token)
+                                        try {
+                                            UID = result.token.uid!!
+                                        }
+                                        catch (e: Exception) {
+                                            errorType = ErrorState.Login_Failure
+                                        }
+
                                         passwordSave = password
                                         emailSave = email
                                         phoneSave = phone

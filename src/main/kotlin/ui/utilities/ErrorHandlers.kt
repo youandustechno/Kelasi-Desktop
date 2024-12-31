@@ -11,6 +11,7 @@ import androidx.compose.ui.unit.sp
 import models.BaseValues
 import ui.LocalizedStrings
 import ui.LocalizedStrings.EMAIL_ERROR
+import ui.LocalizedStrings.INVALID_CREDENTIALS
 import ui.LocalizedStrings.PASSWORD_ERROR
 import ui.LocalizedStrings.PHONE_ERROR
 import ui.LocalizedStrings.SORRY_FOR_INCONVENIENCE
@@ -43,6 +44,12 @@ fun DisplayError(errorState: ErrorState) {
                 }
                 errorState == ErrorState.IT_US -> {
                     LocalizedStrings.get(SORRY_FOR_INCONVENIENCE)
+                }
+                errorState == ErrorState.Login_Failure -> {
+                    LocalizedStrings.get(INVALID_CREDENTIALS)
+                }
+                errorState == ErrorState.Auth_Failure -> {
+                    LocalizedStrings.get(INVALID_CREDENTIALS)
                 }
                 errorState == ErrorState.Wrong_Code -> {
                     LocalizedStrings.get(WRONG_CODE)

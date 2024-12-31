@@ -29,6 +29,7 @@ object LocalizedStrings {
     const val ENTER_PIN = "EnteredPIN"
     const val EXPIRATION_DATE = "ExpirationDate"
 
+    const val FAIL_TO_UPDATE = "FailToUpdate"
     const val FILE_NO_FOUND = "NoFound"
     const val FIRST_NAME = "FirstName"
 
@@ -36,6 +37,7 @@ object LocalizedStrings {
 
     const val INSTITUTION = "Institution"
     const val INSTRUCTOR = "InstructorName"
+    const val INVALID_CREDENTIALS = "InvalidCredentials"
 
     const val LAST_NAME = "LastName"
     const val LEVEL = "Level"
@@ -130,6 +132,7 @@ object LocalizedStrings {
         ENTER_PIN  to "ENTER PIN",
         EXPIRATION_DATE  to "Expiration Date (MM/YY)",
         //F
+        FAIL_TO_UPDATE to "Fail to update account. Please try later",
         FIRST_NAME to "First Name",
         FILE_NO_FOUND to "No file found",
         //H
@@ -137,6 +140,7 @@ object LocalizedStrings {
         //I
         INSTITUTION to "INSTITUTION",
         INSTRUCTOR to "Instructor Name",
+        INVALID_CREDENTIALS to "Your credentials are not valid",
         //L
         LAST_NAME to "Last Name",
         LEVEL  to "Level",
@@ -235,6 +239,7 @@ object LocalizedStrings {
         ENTER_PIN  to "ENTRER LE CODE",
         EXPIRATION_DATE  to "Date d'expiration (MM/AA)",
         //F
+        FAIL_TO_UPDATE to "Desolé, votre compte n'a pas changé. Veuillez essayer plutard.",
         FIRST_NAME to "Prénom",
         FILE_NO_FOUND to "Aucun document trouvé",
         //H
@@ -242,6 +247,7 @@ object LocalizedStrings {
         //I
         INSTITUTION to "INSTITUTION",
         INSTRUCTOR to "Nom de l'enseignant",
+        INVALID_CREDENTIALS to "Vos identifiants ne sont pas corrects",
         //L
         LAST_NAME to "Nome de Famille",
         LEVEL to "Niveau",

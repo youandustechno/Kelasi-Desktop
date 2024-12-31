@@ -20,6 +20,7 @@ import kotlinx.coroutines.withContext
 import models.auth.UserCredentials
 import ui.Cache.userCache
 import ui.LocalizedStrings
+import ui.LocalizedStrings.CLOSE
 import ui.LocalizedStrings.VALIDATE
 import ui.NavHelper
 import ui.NavKeys.EMPTY
@@ -35,7 +36,7 @@ fun HelpLogin(onClick: (NavHelper) -> Unit) {
     var email by remember { mutableStateOf(EMPTY) }
     var phone by remember { mutableStateOf(EMPTY) }
     var loginButton by remember { mutableStateOf(LocalizedStrings.get(VALIDATE)) }
-    var isUserFound by remember { mutableStateOf(false) }
+    var isUserFound:Boolean? by remember { mutableStateOf(null) }
 
     var firstname by remember { mutableStateOf(userCache?.firstName?:EMPTY) }
     var lastname by remember { mutableStateOf(userCache?.lastName?:EMPTY) }
@@ -95,7 +96,7 @@ fun HelpLogin(onClick: (NavHelper) -> Unit) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally) {
                     Spacer(Modifier.height(10.dp))
-                    if(!isUserFound) {
+                    if(isUserFound == null) {
 
                         FirstNameFields(firstname) {
                             firstname = it
@@ -111,12 +112,15 @@ fun HelpLogin(onClick: (NavHelper) -> Unit) {
                             phone = it
                         }
                     }
-                    else {
+                    else if(isUserFound == true) {
                         Text("The email you use to login is: ")
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(email)
                     }
                 }
+            }
+            if(isUserFound == false) {
+                DisplayError(ErrorState.Auth_Failure)
             }
             Spacer(Modifier.height(20.dp))
             Box (
@@ -126,6 +130,7 @@ fun HelpLogin(onClick: (NavHelper) -> Unit) {
                     .padding(start = 4.dp, end = 4.dp)) {
 
                 LoginButton(loginButton) {
+                    isUserFound = null
                     if(loginButton.equals(LocalizedStrings.get(VALIDATE), true)) {
 
                         coroutineScope.launch(Dispatchers.IO) {
@@ -142,12 +147,15 @@ fun HelpLogin(onClick: (NavHelper) -> Unit) {
                             withContext(Dispatchers.Main) {
                                 if (result.user != null) {
                                     email = result.user.email
+                                    loginButton = LocalizedStrings.get(CLOSE)
                                     isUserFound = true
                                 } else {
-                                    //Todo show error for authentication failure
+                                   isUserFound = false
                                 }
                             }
                         }
+                    } else if(loginButton.equals(LocalizedStrings.get(CLOSE), true)) {
+                        onClick.invoke(NavHelper(Route.AuthLogin))
                     }
                 }
             }

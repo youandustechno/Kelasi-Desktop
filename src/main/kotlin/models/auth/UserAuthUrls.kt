@@ -64,6 +64,11 @@ interface UserAuthUrls {
         @Part ("isApproved") isApproved : RequestBody?,
     ): UserDataModel?
 
+    @POST("/auths/password")
+    suspend fun updateUserPassword(
+        @Body passwordModel: ChangePasswordModel
+    ): UserDataModel?
+
     @POST("users/get")
     suspend fun getUser(@Body userValues: UserValues) : UserDataModel?
 

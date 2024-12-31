@@ -3,7 +3,7 @@ package models.auth
 import com.auth0.jwt.interfaces.Verification
 import ui.NavKeys.EMPTY
 
-data class TokenComponent(val token: String)
+data class TokenComponent(val token: String, var uid: String? = null)
 
 data class PhoneComponent(val phoneNumber: String = EMPTY)
 
@@ -40,3 +40,7 @@ data class Score(
     var topicName: String,
     var topicId: String,
     var moduleId: String)
+
+data class ChangePasswordModel(
+    var newPassword: String,
+    var uid: String)

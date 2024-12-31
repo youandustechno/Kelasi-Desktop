@@ -6,24 +6,24 @@ import models.BaseValues
 object FieldsValidation {
 
     fun String.isValid(): Boolean {
-        return this.isNotEmpty()
+        return this.isNotEmpty() && ! this.hasBadCharacters()
     }
 
     fun String.isValidCode(): Boolean {
-        return this.isNotEmpty() && this.length <= 10 && !this.hasBadCommands()
+        return this.isNotEmpty() && this.length <= 10 && !this.hasBadCharacters()
     }
 
     fun String.isValidLevel(): Boolean {
-        return this.isNotEmpty() && this.length < 8 && !this.hasBadCommands()
+        return this.isNotEmpty() && this.length < 8 && !this.hasBadCharacters()
     }
 
     fun String.isValidName(): Boolean {
-        return this.isNotEmpty() && this.length < 20 && !this.hasBadCommands()
+        return this.isNotEmpty() && this.length < 20 && !this.hasBadCharacters()
     }
 
     fun String.isValidPhone(): Boolean {
         if(BaseValues.PhoneRegex.isNotEmpty())
-            return BaseValues.PhoneRegex.toRegex().matches(this) && !this.hasBadCommands()
+            return BaseValues.PhoneRegex.toRegex().matches(this) && !this.hasBadCharacters()
                     && this.length == BaseValues.PhoneSample.length
                     && this.startsWith("+")
 
@@ -39,7 +39,7 @@ object FieldsValidation {
     fun String.isValidPassword(): Boolean {
         //Minimum eight and maximum 10 characters, at least one uppercase letter, one lowercase letter,
         //one number and one special character
-        val passwordRegex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,10}$"
+        val passwordRegex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&#])[A-Za-z\\d@$!%*?&#]{8,10}$"
         return passwordRegex.toRegex().matches(this) && !hasBadCharacters()
         //return this.isNotEmpty()
     }

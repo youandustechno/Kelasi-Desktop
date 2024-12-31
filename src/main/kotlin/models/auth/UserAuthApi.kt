@@ -10,7 +10,6 @@ import models.auth.UserRetrofitClient.setInterceptor
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
-import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Retrofit
@@ -61,15 +60,16 @@ class UserAuthApi {
 
                 if(token != null) {
                     val code: String = token.headers()["Authorization"]?.replace("Bearer", "")?:""
-                    TokenResponse(TokenComponent(code))
+                    var uid = token.body()?.uid
+                    TokenResponse(TokenComponent(code, uid))
                 }
                 else {
-                    TokenResponse(null, TokenError(0,
+                    TokenResponse(null,  TokenError(0,
                         "Token is null"))
                 }
             }
         } catch (exception: Exception) {
-            TokenResponse(null, TokenError(0,
+            TokenResponse(null,  TokenError(0,
                 exception.message?:"exception"))
         }
     }
@@ -83,18 +83,19 @@ class UserAuthApi {
 
                 if(token != null) {
                     val code: String = token.headers()["Authorization"]?.replace("Bearer", "")?:""
+                    var uid = token.body()?.uid
                     if (code.isNotEmpty()) {
-                        TokenResponse(TokenComponent(code))
+                        TokenResponse(TokenComponent(code, uid))
                     } else {
                         TokenResponse(null, TokenError(0, "Token is null"))
                     }
                 }
                 else {
-                    TokenResponse(null, TokenError(0, "Token is null"))
+                    TokenResponse(null,  TokenError(0, "Token is null"))
                 }
             }
         } catch (exception: Exception) {
-            TokenResponse(null, TokenError(0,
+            TokenResponse(null,  TokenError(0,
                 exception.message?:"exception"))
         }
     }
@@ -110,12 +111,12 @@ class UserAuthApi {
                     TokenResponse(token)
                 }
                 else {
-                    TokenResponse(null, TokenError(0,
+                    TokenResponse(null,  TokenError(0,
                         "Token is null"))
                 }
             }
         } catch (exception: Exception) {
-            TokenResponse(null, TokenError(0,
+            TokenResponse(null,  TokenError(0,
                 exception.message?:"exception"))
         }
     }
@@ -175,6 +176,24 @@ class UserAuthApi {
         } catch (exception: Exception) {
             UserResponse(null, TokenError(0,
                 exception.message?:"exception"))
+        }
+    }
+
+    suspend fun changeUserPassword(passwordModel: ChangePasswordModel): UserResponse {
+        return try {
+            withContext(Dispatchers.IO) {
+                val authCode = StorageHelper().retrieveFromStorage(StorageHelper.AUTH_CODE)
+                val user = UserRetrofitClient
+                    .setInterceptor(authCode!!)
+                    .getApiService()
+                    .updateUserPassword(passwordModel)
+                UserResponse(user)
+            }
+
+        }
+        catch (e: Exception) {
+            UserResponse(null, TokenError(0,
+                e.message?:"exception"))
         }
     }
 

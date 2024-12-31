@@ -2,16 +2,15 @@ package ui.settings
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.*
-import models.CoursesListResponse
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import models.auth.UserDataModel
-import models.video.CourseComponent
-import models.video.VideoComponent
 import ui.Cache
 import ui.Cache.userCache
 import ui.LocalizedStrings
@@ -38,8 +37,9 @@ import ui.utilities.FieldsValidation.isValidLevel
 import ui.utilities.FieldsValidation.isValidName
 import ui.utilities.FieldsValidation.isValidPassword
 import ui.utilities.FieldsValidation.isValidPhone
-import ui.videos.VideosViewModel
+import ui.utilities.LoginUtils.UID
 import java.io.File
+
 
 @Composable
 fun Settings(navHelper: NavHelper, onClick:((NavHelper) -> Unit)? = null) {
@@ -125,7 +125,7 @@ fun Settings(navHelper: NavHelper, onClick:((NavHelper) -> Unit)? = null) {
 
                                     Spacer(Modifier.width(8.dp))
                                     UserPictureButton(LocalizedStrings.get(UPDATE_PICTURE)) {
-                                        fileToUpload = showFileChooser()
+                                        fileToUpload = showImageFileChooser()
                                     }
                                     if(!fileToUpload.isNullOrEmpty()) {
                                         fileToUpload?.let {
@@ -293,7 +293,7 @@ fun Settings(navHelper: NavHelper, onClick:((NavHelper) -> Unit)? = null) {
                     if(phone.isValidPhone()
                         && email.isValidEmail()
                         && passwordField.isValidPassword()
-                        && (confirmNewPasswordField.isValidPassword() && confirmNewPasswordField != passwordField)
+                        && (confirmNewPasswordField.isValidPassword() && confirmNewPasswordField == passwordField)
                         && firstname.isValidName()
                         && level.isValidLevel()
                         && middlename.isValidName()
@@ -312,7 +312,8 @@ fun Settings(navHelper: NavHelper, onClick:((NavHelper) -> Unit)? = null) {
                                         phoneNumber = phone,
                                         password = passwordField,
                                         confirmPassword = confirmNewPasswordField
-                                    )
+                                    ),
+                                    UID
                                 )
                             }
                             isInfoUpdated = true
