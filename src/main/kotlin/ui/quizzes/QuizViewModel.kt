@@ -45,9 +45,6 @@ class QuizViewModel: ViewModel() {
             total = max.toDouble())
     }
 
-    var course by mutableStateOf<CourseResponse?>(null)
-        private set
-
     var questions by mutableStateOf(emptyList<Question>().toMutableList())
         private set
 }

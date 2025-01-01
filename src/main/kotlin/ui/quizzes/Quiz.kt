@@ -63,6 +63,7 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
     var countDownText: String?  by remember {  mutableStateOf(null) }
     var selectedOptions by remember { mutableStateOf<Map<String, Int>>(emptyMap()) }
     var isContinueClick : Boolean? by remember { mutableStateOf(null) }
+    var isSubmitted by remember { mutableStateOf(false) }
     var quizState : QuizState by remember { mutableStateOf(QuizState.NONE) }
 
     val quizScores: MutableList<QuizScore>? by remember { mutableStateOf(mutableListOf()) }
@@ -75,7 +76,7 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
 
     val quizViewModel = QuizViewModel()
 
-    if (navHelper.dataMap.isNotEmpty() && navHelper.dataMap.containsKey(COURSE)) {
+    if (navHelper.dataMap.isNotEmpty() && navHelper.dataMap.containsKey(COURSE) && quizState == QuizState.NONE) {
         course = navHelper.dataMap[COURSE] as CourseComponent
         if(navHelper.dataMap.containsKey(MODULE)) {
             LaunchedEffect(Unit) {
@@ -363,6 +364,7 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
                                     withContext(Dispatchers.Main) {
                                         if(response?.userScores != null) {
                                             //display score
+                                            isSubmitted = true
                                             quizState = QuizState.SUBMIT
                                         } else {
                                             quizState = QuizState.SUBMIT
@@ -376,7 +378,19 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
             }
 
             else if(quizState == QuizState.SUBMIT) {
-
+                if(isSubmitted) {
+                    //refresh to get scores updates
+                    coroutineScope.launch (Dispatchers.IO){
+                        val courseResponse = course?._id?.let { quizViewModel.getCourse(it) }
+                        withContext(Dispatchers.Main) {
+                            if(courseResponse?.courses != null) {
+                                course = courseResponse.courses
+                                module = module?._id?.let {id -> course?.modules?.find { it._id?.equals(id) == true } }
+                            }
+                            isSubmitted = false
+                        }
+                    }
+                }
                 Column(Modifier.fillMaxWidth()
                     .wrapContentHeight(),
                     horizontalAlignment = Alignment.CenterHorizontally,
