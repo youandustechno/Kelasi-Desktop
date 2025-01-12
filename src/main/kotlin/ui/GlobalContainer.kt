@@ -41,6 +41,7 @@ import ui.quizzes.Quiz
 import ui.settings.Settings
 import ui.utilities.FieldsValidation.isValid
 import ui.utilities.Headers
+import ui.utilities.LoginUtils
 import ui.utilities.TabButton
 import ui.videos.Documents
 import ui.videos.Videos
@@ -220,6 +221,22 @@ fun ContentWrapper(withNav: Boolean, navigationState: NavHelper, onClick:(NavHel
 
     var courseId by remember { mutableStateOf(EMPTY) }
     var course : CourseComponent? by remember { mutableStateOf(null) }
+    val globalViewModel by mutableStateOf(GlobalViewModel())
+    var logoutIsClick by remember { mutableStateOf(false) }
+
+    if(logoutIsClick) {
+       LaunchedEffect(Unit) {
+           val isLoggedOut = globalViewModel.startLogout()
+           if(isLoggedOut) {
+             onClick.invoke(NavHelper(Route.AuthLogin))
+           }
+           else {
+            //Todo tell the user the issue
+             onClick.invoke(NavHelper(Route.AuthLogin))
+          }
+           logoutIsClick = false
+       }
+    }
 
     if(withNav) {
         Column(modifier = Modifier
@@ -283,7 +300,7 @@ fun ContentWrapper(withNav: Boolean, navigationState: NavHelper, onClick:(NavHel
                         }
 
                         TabButton(LocalizedStrings.get(LOGOUT)) {
-                            onClick.invoke(NavHelper(Route.AuthLogin))
+                            logoutIsClick = true
                         }
                     }
                     else if(navigationState.route == Route.ManageVideo) {
@@ -368,7 +385,7 @@ fun ContentWrapper(withNav: Boolean, navigationState: NavHelper, onClick:(NavHel
                         }
 
                         TabButton(LocalizedStrings.get(LOGOUT)) {
-                            onClick.invoke(NavHelper(Route.AuthLogin))
+                            logoutIsClick = true
                         }
                     }
                     else if(navigationState.route == Route.Subscriptions) {
@@ -377,8 +394,7 @@ fun ContentWrapper(withNav: Boolean, navigationState: NavHelper, onClick:(NavHel
                         }
 
                         TabButton(LocalizedStrings.get(LOGOUT)) {
-
-                            onClick.invoke(NavHelper(Route.AuthLogin))
+                            logoutIsClick = true
                         }
                     }
                     else if(navigationState.route == Route.ViewDocument) {
@@ -411,7 +427,7 @@ fun ContentWrapper(withNav: Boolean, navigationState: NavHelper, onClick:(NavHel
                         }
 
                         TabButton(LocalizedStrings.get(LOGOUT)) {
-                            onClick.invoke(NavHelper(Route.AuthLogin))
+                            logoutIsClick = true
                         }
                     }
                     else if(navigationState.route == Route.Register) {

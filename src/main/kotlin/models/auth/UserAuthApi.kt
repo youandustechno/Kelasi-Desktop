@@ -297,4 +297,22 @@ class UserAuthApi {
             UserResponse(null)
         }
     }
+
+    suspend fun logout(token: String, UID: String): Boolean {
+        val authCode = StorageHelper().retrieveFromStorage(StorageHelper.AUTH_CODE)
+
+        return try {
+            withContext(Dispatchers.IO) {
+                val isLoggedOut =  UserRetrofitClient
+                    .setInterceptor(authCode?: Cache.authCode)
+                    .getApiService()
+                    .logout(TokenComponent(token, UID))
+
+                isLoggedOut?.isSuccessful == true
+            }
+        }
+        catch (e: Exception) {
+            false
+        }
+    }
 }

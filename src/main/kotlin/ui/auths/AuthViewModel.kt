@@ -21,7 +21,7 @@ import java.time.LocalDateTime
 import java.util.*
 
 
-class AuthViewModel: SettingsViewModel () {
+open class AuthViewModel: SettingsViewModel () {
 
     companion object {
         var currentToken: String? = null

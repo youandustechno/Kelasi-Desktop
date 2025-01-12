@@ -74,4 +74,7 @@ interface UserAuthUrls {
 
     @POST("users/recover")
     suspend fun recoverUser(@Body userValues: UserCredentials) : UserDataModel?
+
+    @POST("auths/logout")
+    suspend fun logout(@Body userValues: TokenComponent) : LogoutSuccess?
 }

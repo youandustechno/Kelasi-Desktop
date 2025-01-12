@@ -17,6 +17,8 @@ data class TokenError(val code: Int = 0, val error: String = EMPTY)
 
 data class UserResponse(val user: UserDataModel? = null, val error: TokenError? = null)
 
+data class LogoutSuccess(val isSuccessful: Boolean? = null)
+
 data class UserDataModel(
     var _id: String = EMPTY,
     var firstName: String,
