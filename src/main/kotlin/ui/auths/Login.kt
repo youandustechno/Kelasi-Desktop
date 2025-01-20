@@ -119,7 +119,7 @@ fun Login(onClick: (NavHelper) -> Unit) {
                                     isTokenValid = false
 
                                 } else {
-                                    onClick.invoke(NavHelper(Route.AuthOrg))
+                                    onClick.invoke(NavHelper(Route.Terms))
                                 }
                             }
                         }
@@ -258,11 +258,7 @@ fun Login(onClick: (NavHelper) -> Unit) {
                                 errorType = ErrorState.Email
                             }
                             else {
-                                val result = if(email.isValidEmail() && password.isValidPassword()) {
-                                    authViewModel.startLoginEmail(EmailAndPassComponent(email, password))
-                                } else {
-                                    authViewModel.startLoginPhone(phone)
-                                }
+                                val result = authViewModel.startLoginEmail(EmailAndPassComponent(email, password))
                                 delay(500L)
                                 withContext(Dispatchers.Main) {
                                     if (result.token != null) {

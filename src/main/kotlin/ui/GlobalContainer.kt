@@ -12,7 +12,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import helpers.StorageHelper
 import models.CoursesListResponse
 import models.video.CourseComponent
 import ui.LocalizedStrings.AUTH_CODE
@@ -30,7 +29,6 @@ import ui.NavKeys.COURSE_ID
 import ui.NavKeys.EMPTY
 import ui.auths.HelpLogin
 import ui.auths.Login
-import ui.auths.OrgAuth
 import ui.auths.Registration
 import ui.dashboards.Dashboard
 import ui.groups.Group
@@ -39,9 +37,9 @@ import ui.organizations.Subscriptions
 import ui.organizations.UsersSubscription
 import ui.quizzes.Quiz
 import ui.settings.Settings
+import ui.terms.TermsAndConditions
 import ui.utilities.FieldsValidation.isValid
 import ui.utilities.Headers
-import ui.utilities.LoginUtils
 import ui.utilities.TabButton
 import ui.videos.Documents
 import ui.videos.Videos
@@ -57,7 +55,7 @@ fun GlobalContainer() {
 
     LaunchedEffect(Unit) {
         groupCode = try {
-            StorageHelper().retrieveFromStorage(StorageHelper.AUTH_CODE)!!
+            ""//StorageHelper().retrieveFromStorage(StorageHelper.AUTH_CODE)!!
         } catch (exc: Exception) {
             ""
         }
@@ -66,7 +64,7 @@ fun GlobalContainer() {
     var navigationState by remember { mutableStateOf(if(groupCode.isValid()) {
          NavHelper(Route.AuthLogin)
     } else  {
-        NavHelper(Route.AuthOrg)
+        NavHelper(Route.Terms)
     })}
 
     var coursesGlobalList : CoursesListResponse? by remember { mutableStateOf(CoursesListResponse()) }
@@ -83,9 +81,9 @@ fun GlobalContainer() {
 
             when(navigationState.route) {
 
-                Route.AuthOrg -> {
+                Route.Terms -> {
                     ContentWrapper(false, navigationState, {}) {
-                        OrgAuth { org ->
+                        TermsAndConditions {
                             navigationState = NavHelper(Route.AuthLogin)
                         }
                     }
@@ -433,7 +431,7 @@ fun ContentWrapper(withNav: Boolean, navigationState: NavHelper, onClick:(NavHel
                     else if(navigationState.route == Route.Register) {
 
                         TabButton(LocalizedStrings.get(AUTH_CODE)) {
-                            onClick.invoke(NavHelper(Route.AuthOrg))
+                            onClick.invoke(NavHelper(Route.Terms))
                         }
                     }
                     else { }
@@ -467,7 +465,7 @@ data class NavHelper(val route: Route, val dataMap: MutableMap<String, Any> = mu
 enum class Route(route: String) {
     AuthLogin("Login"),
     HelpLogin("HelpLogin"),
-    AuthOrg ("Org"),
+    Terms ("Terms"),
     Organization("Organization"),
     Quiz("Quiz"),
     ViewDocument("UploadDocument"),

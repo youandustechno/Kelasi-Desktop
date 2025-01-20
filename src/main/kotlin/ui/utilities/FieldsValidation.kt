@@ -1,6 +1,7 @@
 package ui.utilities
 
 import models.BaseValues
+import ui.NavKeys.EMPTY
 
 
 object FieldsValidation {
@@ -59,6 +60,11 @@ object FieldsValidation {
         )
 
         return prohibitedCommands.any {  this.contains(it) }
+    }
+
+    fun String.getDomain(): String {
+        if(!this.isValidEmail()) return EMPTY
+        return this.substring(this.indexOf("@"))
     }
 
     fun String.hasBadCharacters() : Boolean {

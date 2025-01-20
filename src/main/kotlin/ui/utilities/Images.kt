@@ -161,12 +161,17 @@ fun CouseImageUrl(image: String = imageDefault) {
     LaunchedEffect(imageBitmap) {
         imageBitmap = loadNetworkImage(image)
     }
-    imageBitmap?.let {
-        Image(bitmap = it,
-        contentDescription = "video image",
-        modifier = Modifier
-            .width(200.dp)
-            .height(100.dp))
+    Box(Modifier.height(100.dp)
+        .width(200.dp)
+        .padding(2.dp)) {
+        imageBitmap?.let {
+            Image(bitmap = it,
+                contentScale = ContentScale.Crop,
+                contentDescription = "video image",
+                modifier = Modifier
+                    .width(196.dp)
+                    .height(96.dp))
+        }
     }
 }
 

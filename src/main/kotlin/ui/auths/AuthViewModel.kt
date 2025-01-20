@@ -3,6 +3,7 @@ package ui.auths
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import helpers.StorageHelper
+import helpers.StorageHelper.Companion.AUTH_CODE
 import models.AuthCodeResponse
 import models.BaseValues
 import models.auth.*
@@ -12,8 +13,12 @@ import ui.LocalizedStrings.AUTHENTICATION_FAILURE
 import ui.LocalizedStrings.LOGIN_FAILURE
 import ui.LocalizedStrings.USERNAME
 import ui.LocalizedStrings.VERIFICATION_CODE_KEY
+import ui.NavHelper
 import ui.NavKeys
+import ui.Route
 import ui.settings.SettingsViewModel
+import ui.utilities.ErrorState
+import ui.utilities.FieldsValidation.getDomain
 import ui.utilities.Others.isTokenExpired
 import ui.utilities.Others.timeStampToLocalDateTime
 import java.io.File
@@ -44,12 +49,36 @@ open class AuthViewModel: SettingsViewModel () {
     }
 
     suspend fun startLoginEmail(credentials: EmailAndPassComponent): TokenResponse  {
-        val authApi = UserAuthApi()
-        val response = authApi.loginWithEmail(credentials)
-        return if(response.token != null) {
-            response
+
+        val result = verifyAuthCode(credentials.email.getDomain())
+
+        if(result.auth != null) {
+            val lang = result.auth?.tenantLang
+            result.auth?.let { tenant ->
+                BaseValues.KEY = tenant.key
+                BaseValues.PhoneRegex = tenant.regex
+                BaseValues.PhoneSample = tenant.format
+                BaseValues.LEVELS = tenant.levels
+            }
+            LocalizedStrings.setLanguage(if(lang == "en") LocalizedStrings.LanguageOption.EN
+            else LocalizedStrings.LanguageOption.FR)
+            //prefs.put("group", result.org!!.tenantCode)
+            result.auth?.org?.tenantCode?.let {
+                //PreferenceHelper().saveAuthCode(it)
+                StorageHelper().saveInStorage(AUTH_CODE, it)
+            }
+
+            val authApi = UserAuthApi()
+            val response = authApi.loginWithEmail(credentials)
+
+            return if(response.token != null) {
+                response
+            } else {
+                TokenResponse (error = TokenError(error = LocalizedStrings.get(LOGIN_FAILURE)))
+            }
+
         } else {
-            TokenResponse (error = TokenError(error = LocalizedStrings.get(LOGIN_FAILURE)))
+            return TokenResponse (error = TokenError(error = LocalizedStrings.get(LOGIN_FAILURE)))
         }
     }
 

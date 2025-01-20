@@ -131,7 +131,11 @@ fun Dashboard(navigationState: NavHelper,
                                         horizontalArrangement = Arrangement.Start ) {
                                         Column(Modifier
                                             .padding(start = 5.dp, end = 5.dp, top = 3.dp, bottom = 1.dp)) {
-                                            ResourceImageDashboard("image/black_people.webp")
+                                            if(course.url.isNotEmpty()) {
+                                                CouseImageUrl(course.url)
+                                            } else {
+                                                ResourceImageDashboard("image/black_people.webp")
+                                            }
                                             Text(text = EMPTY+course.name, style = MaterialTheme.typography.caption
                                                 .copy(
                                                     fontSize = 14.sp,
@@ -143,6 +147,9 @@ fun Dashboard(navigationState: NavHelper,
                                             Spacer(Modifier.height(2.dp))
                                             Text(text = EMPTY+course.description, style = MaterialTheme.typography.caption
                                                 .copy(fontSize = 12.sp, lineHeight = 15.sp))
+                                            Spacer(Modifier.height(6.dp))
+                                            Text(text = EMPTY+course.instructor, style = MaterialTheme.typography.caption
+                                                .copy(fontSize = 10.sp, lineHeight = 15.sp))
                                         }
                                     }
                                 }

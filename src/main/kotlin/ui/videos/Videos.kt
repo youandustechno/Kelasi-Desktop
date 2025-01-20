@@ -265,7 +265,7 @@ fun Videos(
                                     .padding(10.dp),
                                     horizontalArrangement = Arrangement.Start) {
 
-                                    Text("${LocalizedStrings.get(SELECTED)}: ${ selectedVideo?.title }",
+                                    Text("${LocalizedStrings.get(SELECTED)}: ${ selectedVideo?.title?: EMPTY }",
                                         style = MaterialTheme.typography.caption
                                         .copy(
                                             fontSize = 14.sp,

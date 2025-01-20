@@ -6,11 +6,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.sp
 import models.video.VideoComponent
 
 @Composable
@@ -189,6 +192,33 @@ fun PersonalInformationCard(content: @Composable() () -> Unit) {
                 verticalArrangement = Arrangement.Center
             ){
                 content()
+            }
+        }
+    }
+}
+
+@Composable
+fun TConditionsCards() {
+    Cards {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color(0xFFFFFFFF), shape = RoundedCornerShape(8.dp))
+                    .padding(16.dp)
+            ) {
+                Text(
+                    text = "We use essential cookies to make our site work. With your consent," +
+                            " we may also use non-essential cookies to improve user experience " +
+                            "and analyze website traffic. By clicking “Accept,” you agree to " +
+                            "our website’s cookie use as described in our Cookie Policy. You can " +
+                            "change your cookie settings at any time by clicking “Preferences.”",
+                    style = MaterialTheme.typography.body2.copy(color = Color(0xFF4A4A4A)),
+                    lineHeight = 20.sp
+                )
             }
         }
     }
