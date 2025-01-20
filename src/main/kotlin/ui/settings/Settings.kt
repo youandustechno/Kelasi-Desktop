@@ -2,6 +2,7 @@ package ui.settings
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.Card
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -10,6 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import models.BaseValues
 import models.auth.UserDataModel
 import ui.Cache
 import ui.Cache.userCache
@@ -66,7 +68,7 @@ fun Settings(navHelper: NavHelper, onClick:((NavHelper) -> Unit)? = null) {
     var firstname by remember { mutableStateOf(userCache?.firstName?:EMPTY) }
     var lastname by remember { mutableStateOf(userCache?.lastName?:EMPTY) }
     var middlename by remember { mutableStateOf(userCache?.middleName?:EMPTY) }
-    var level by remember { mutableStateOf(userCache?.level?:EMPTY) }
+    var level by remember { mutableStateOf(BaseValues.getStudentsLevels()[0]) }
 
     //VALIDATION
     var emailError by remember { mutableStateOf(false) }
@@ -175,9 +177,14 @@ fun Settings(navHelper: NavHelper, onClick:((NavHelper) -> Unit)? = null) {
 
                                 Spacer(modifier = Modifier.height(16.dp))
 
-                                LevelFields(level, levelError) {
-                                    level = it
-                                    levelError = false
+                                Card(Modifier.fillMaxWidth()
+                                    .wrapContentHeight(),
+                                    elevation = 6.dp
+                                ) {
+                                    DropDown(BaseValues.getStudentsLevels()) {
+                                        level = it
+                                        levelError = false
+                                    }
                                 }
 
                                 Spacer(modifier = Modifier.height(16.dp))

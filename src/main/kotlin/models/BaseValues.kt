@@ -13,6 +13,7 @@ object BaseValues {
     var KEY = ""
     var PhoneRegex = ""
     var PhoneSample = ""
+    var LEVELS: List<String> = emptyList()
 
     fun setDebug() {
         isDebug = true
@@ -20,5 +21,9 @@ object BaseValues {
 
     fun setPorTest() {
         isDebug = false
+    }
+
+    fun getStudentsLevels() : List<String> {
+        return  LEVELS.filter {! it.equals("admin", true) && !it.equals("prof", true) }
     }
 }

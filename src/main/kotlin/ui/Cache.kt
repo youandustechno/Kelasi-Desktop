@@ -26,4 +26,8 @@ object Cache {
         userCache?.url = user.url?: EMPTY
         userCache?.urlId = user.urlId?: EMPTY
     }
+
+    fun getUserFullName(): String {
+        return  userCache?.firstName + " "+ userCache?.lastName
+    }
 }

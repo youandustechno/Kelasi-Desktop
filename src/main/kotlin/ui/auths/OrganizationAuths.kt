@@ -115,6 +115,7 @@ fun OrgAuth(orgFound:(NavHelper) -> Unit) {
                                                 BaseValues.KEY = tenant.key
                                                 BaseValues.PhoneRegex = tenant.regex
                                                 BaseValues.PhoneSample = tenant.format
+                                                BaseValues.LEVELS = tenant.levels
                                             }
                                             LocalizedStrings.setLanguage(if(lang == "en") LocalizedStrings.LanguageOption.EN
                                             else LocalizedStrings.LanguageOption.FR)

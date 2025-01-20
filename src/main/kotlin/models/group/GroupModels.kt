@@ -8,7 +8,8 @@ data class AuthResponseComponent(
     val org: OrganizationComponent,
     val regex: String,
     val format: String,
-    val key: String
+    val key: String,
+    val levels: List<String>
 )
 
 data class OrganizationComponent(
