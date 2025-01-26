@@ -4,8 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Switch
-import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -16,14 +14,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import helpers.StorageHelper
+import helpers.StorageHelper.Companion.AUTH_CODE
 import helpers.StorageHelper.Companion.TOKEN_CODE
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import models.BaseValues
+import models.BaseValues.getStudentsLevels
 import models.auth.EmailAndPassComponent
 import ui.Cache.userCache
 import ui.LocalizedStrings
+import ui.LocalizedStrings.CHANGE_INSTITUTION
 import ui.LocalizedStrings.EMAIL
 import ui.LocalizedStrings.LOGIN_HELP
 import ui.LocalizedStrings.LOGIN_TITLE
@@ -36,6 +38,7 @@ import ui.NavKeys.EMPTY
 import ui.NavKeys.USER_KEY
 import ui.Route
 import ui.utilities.*
+import ui.utilities.FieldsValidation.getDomain
 import ui.utilities.FieldsValidation.isValidEmail
 import ui.utilities.FieldsValidation.isValidPassword
 import ui.utilities.FieldsValidation.isValidPhone
@@ -62,6 +65,35 @@ fun Login(onClick: (NavHelper) -> Unit) {
     var isPhoneAuth by remember { mutableStateOf(false) }
     var isTokenValid by remember { mutableStateOf(false) }
     var errorType by remember { mutableStateOf(ErrorState.None) }
+
+    var groupCode by remember { mutableStateOf(EMPTY) }
+    LaunchedEffect(Unit) {
+        groupCode = try {
+            StorageHelper().retrieveFromStorage(AUTH_CODE)!!
+        } catch (exc: Exception) {
+            EMPTY
+        }
+    }
+
+    if(groupCode.isNotEmpty() && BaseValues.LEVELS.isEmpty()) {
+         LaunchedEffect(Unit) {
+             val result =  authViewModel.verifyAuthCode(groupCode)
+             if(result.auth != null) {
+                 val lang = result.auth?.tenantLang
+                 result.auth?.let { tenant ->
+                     BaseValues.KEY = tenant.key
+                     BaseValues.PhoneRegex = tenant.regex
+                     BaseValues.PhoneSample = tenant.format
+                     BaseValues.LEVELS = tenant.levels
+                     //Preference saved
+                     StorageHelper().saveInStorage(AUTH_CODE, tenant.domain)
+                 }
+                 LocalizedStrings.setLanguage(if(lang == "en") LocalizedStrings.LanguageOption.EN
+                 else LocalizedStrings.LanguageOption.FR)
+
+             }
+         }
+    }
 
     Column(Modifier
         .fillMaxSize(),
@@ -128,26 +160,26 @@ fun Login(onClick: (NavHelper) -> Unit) {
                     Row(Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.End,
                         verticalAlignment = Alignment.CenterVertically) {
-                        loginMode = if(isPhoneAuth)  LocalizedStrings.get(EMAIL) else LocalizedStrings.get(PHONE)
-                        if(!isTokenValid) {
-                            //switch phone or email auth type
-                            Text(loginMode, style = MaterialTheme.typography.caption,
-                                color = Color(0XFF3b1b49))
-                            Spacer(Modifier.width(8.dp))
-                            Switch(
-                                isPhoneAuth,
-                                onCheckedChange = {
-                                    isPhoneAuth = it
-                                    errorType = ErrorState.None
-                                                  },
-                                colors = SwitchDefaults.colors(
-                                    checkedThumbColor = Color(0XFF4A3125),
-                                    uncheckedThumbColor = Color(0XFF4A3125),
-                                    checkedTrackColor = Color(0XFF4A3125),
-                                    uncheckedTrackColor = Color(0XFFc5aca0)
-                                )
-                            )
-                        }
+                        loginMode = LocalizedStrings.get(EMAIL)
+//                        if(!isTokenValid) {
+//                            //switch phone or email auth type
+////                            Text(loginMode, style = MaterialTheme.typography.caption,
+////                                color = Color(0XFF3b1b49))
+////                            Spacer(Modifier.width(8.dp))
+////                            Switch(
+////                                isPhoneAuth,
+////                                onCheckedChange = {
+////                                    isPhoneAuth = it
+////                                    errorType = ErrorState.None
+////                                                  },
+////                                colors = SwitchDefaults.colors(
+////                                    checkedThumbColor = Color(0XFF4A3125),
+////                                    uncheckedThumbColor = Color(0XFF4A3125),
+////                                    checkedTrackColor = Color(0XFF4A3125),
+////                                    uncheckedTrackColor = Color(0XFFc5aca0)
+////                                )
+////                            )
+//                        }
                     }
                     Spacer(Modifier.height(10.dp))
                     if(isPhoneAuth && !isTokenValid) {
@@ -221,15 +253,22 @@ fun Login(onClick: (NavHelper) -> Unit) {
                                         val map = mutableMapOf<String, Any>()
                                         val isVerified = authViewModel.isTokenStillValid(result.user, userCode)
                                         if(isVerified) {
+                                            //should be a student to login
+                                            if(getStudentsLevels().contains(result.user.level)) {
+                                                userCode = EMPTY
+                                                passwordSave = EMPTY
+                                                emailSave = EMPTY
+                                                phoneSave = EMPTY
+                                                userCache = result.user
+                                                map[USER_KEY] = result.user
+                                                //Todo persist
+                                                onClick.invoke(NavHelper(Route.Dashboard, map))
 
-                                            userCode = EMPTY
-                                            passwordSave = EMPTY
-                                            emailSave = EMPTY
-                                            phoneSave = EMPTY
-                                            userCache = result.user
-                                            map[USER_KEY] = result.user
-                                            //Todo persist
-                                            onClick.invoke(NavHelper(Route.Dashboard, map))
+                                            } else {
+                                                // user is not a student
+                                                errorType = ErrorState.Auth_Failure
+                                            }
+
                                         } else {
 
                                             errorType = ErrorState.Auth_Failure
@@ -301,6 +340,10 @@ fun Login(onClick: (NavHelper) -> Unit) {
                     Spacer(Modifier.width(8.dp))
                     LinkButton(LocalizedStrings.get(LOGIN_HELP)) {
                         onClick.invoke(NavHelper(Route.HelpLogin))
+                    }
+                    Spacer(Modifier.width(8.dp))
+                    LinkButton(LocalizedStrings.get(CHANGE_INSTITUTION)) {
+                        onClick.invoke(NavHelper(Route.AuthOrg))
                     }
                 }
             }

@@ -15,6 +15,7 @@ import kotlinx.coroutines.withContext
 import models.BaseValues
 import models.auth.UserDataModel
 import ui.LocalizedStrings
+import ui.LocalizedStrings.ALREADY_HAVE_ACCOUNT
 import ui.LocalizedStrings.PERSONAL_INFO
 import ui.LocalizedStrings.REGISTER
 import ui.LocalizedStrings.UPDATE_PICTURE
@@ -75,8 +76,9 @@ fun Registration(navHelper: NavHelper, onClick:((NavHelper) -> Unit)? = null) {
 
     LazyColumn(Modifier.padding(start = 32.dp, end = 32.dp)) {
         item {
-            // TODO Add subscription row to take with a click in subscription screen to select type of subscription.
-            // And also show message if subscription expired.
+            LinkButton(LocalizedStrings.get(ALREADY_HAVE_ACCOUNT)) {
+                onClick?.invoke(NavHelper(Route.AuthLogin))
+            }
         }
         item {
             Row(Modifier.fillMaxSize()) {

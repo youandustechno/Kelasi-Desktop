@@ -451,7 +451,7 @@ fun  PasswordTextFieldWithIcon(
                     onChange.invoke(it)
                 }
             },
-            visualTransformation = if (isHidden) VisualTransformation.None else PasswordVisualTransformation(),
+            visualTransformation = if (isHidden) PasswordVisualTransformation() else VisualTransformation.None,
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Color.Transparent)

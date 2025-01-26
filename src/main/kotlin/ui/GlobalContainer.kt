@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import helpers.StorageHelper
 import models.CoursesListResponse
 import models.video.CourseComponent
 import ui.LocalizedStrings.AUTH_CODE
@@ -29,6 +30,7 @@ import ui.NavKeys.COURSE_ID
 import ui.NavKeys.EMPTY
 import ui.auths.HelpLogin
 import ui.auths.Login
+import ui.auths.OrgAuth
 import ui.auths.Registration
 import ui.dashboards.Dashboard
 import ui.groups.Group
@@ -53,19 +55,20 @@ fun GlobalContainer() {
     var groupCode by remember { mutableStateOf(EMPTY) }
     //val prefs = Preferences.userNodeForPackage(App::class.java)
 
-    LaunchedEffect(Unit) {
+    var navigationState by remember { mutableStateOf(NavHelper(Route.None))}
+
+    LaunchedEffect(groupCode) {
         groupCode = try {
-            ""//StorageHelper().retrieveFromStorage(StorageHelper.AUTH_CODE)!!
+            StorageHelper().retrieveFromStorage(StorageHelper.AUTH_CODE)!!
         } catch (exc: Exception) {
-            ""
+            EMPTY
+        }
+        navigationState = if(groupCode.isValid()) {
+            NavHelper(Route.AuthLogin)
+        } else  {
+            NavHelper(Route.Terms)
         }
     }
-
-    var navigationState by remember { mutableStateOf(if(groupCode.isValid()) {
-         NavHelper(Route.AuthLogin)
-    } else  {
-        NavHelper(Route.Terms)
-    })}
 
     var coursesGlobalList : CoursesListResponse? by remember { mutableStateOf(CoursesListResponse()) }
 
@@ -81,6 +84,13 @@ fun GlobalContainer() {
 
             when(navigationState.route) {
 
+                Route.AuthOrg-> {
+                    ContentWrapper(false, navigationState, {}) {
+                        OrgAuth { nav ->
+                            navigationState = nav
+                        }
+                    }
+                }
                 Route.Terms -> {
                     ContentWrapper(false, navigationState, {}) {
                         TermsAndConditions {
@@ -466,6 +476,7 @@ enum class Route(route: String) {
     AuthLogin("Login"),
     HelpLogin("HelpLogin"),
     Terms ("Terms"),
+    AuthOrg ("Org"),
     Organization("Organization"),
     Quiz("Quiz"),
     ViewDocument("UploadDocument"),
@@ -477,5 +488,6 @@ enum class Route(route: String) {
     Subscriptions("Subscription"),
     CourseSubscriptions("CourseSub"),
     ManageVideo("ManageVideo"),
-    Dashboard("ManageVideo")
+    Dashboard("ManageVideo"),
+    None("None")
 }

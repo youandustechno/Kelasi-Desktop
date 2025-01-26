@@ -3,6 +3,7 @@ package ui
 object LocalizedStrings {
 
     const val ADD_DURATION = "Add Duration"
+    const val ALREADY_HAVE_ACCOUNT = "AlreadyHaveAccount"
     const val ALREADY_TAKEN = "AlreadyTaken"
     const val ANSWER = "Answer"
     const val ASSERTION = "Assertion"
@@ -12,6 +13,7 @@ object LocalizedStrings {
     const val BEFORE_YOU_TAKE = "BeforeYouTake"
 
     const val CARD_NUMBER = "CardNumber"
+    const val CHANGE_INSTITUTION = "ChangeInstitution"
     const val CLOSE = "CLOSE"
     const val CONFIRM_NEW_PASSWORD = "ConfirmNewPassword"
     const val CONFIRM_PASSWORD = "ConfirmPassword"
@@ -26,6 +28,7 @@ object LocalizedStrings {
     const val EMAIL = "Email"
     const val EMAIL_ERROR = "EmailError"
     const val EMAIL_SAMPLE = "EmailSample"
+    const val ENTER_EMAIL= "EnterEmail"
     const val ENTER_PIN = "EnteredPIN"
     const val EXPIRATION_DATE = "ExpirationDate"
 
@@ -54,6 +57,7 @@ object LocalizedStrings {
     const val MODULE_NAME = "ModuleName"
 
     const val NAME_ON_CARD = "NameOnCard"
+    const val NEXT = "NEXT"
     const val NEW_PASSWORD = "NewPassword"
     const val NO_GRADED_YET = "NoGraded"
 
@@ -105,6 +109,7 @@ object LocalizedStrings {
     val en = mapOf(
         //A
         ADD_DURATION to "Add Duration",
+        ALREADY_HAVE_ACCOUNT to "Already have an Account? Login",
         ALREADY_TAKEN to "Already taken",
         ASSERTION to "Assertion",
         ANSWER to "Answer",
@@ -115,6 +120,7 @@ object LocalizedStrings {
                 "Failing to do so, you will get the lowest mark for this quiz",
         //C
         CARD_NUMBER to "Card Number",
+        CHANGE_INSTITUTION to "Change institution",
         CLOSE to "CLOSE",
         CONFIRM_PASSWORD to "Confirm Password",
         CONFIRM_NEW_PASSWORD to "Confirm New Password",
@@ -129,6 +135,7 @@ object LocalizedStrings {
         EMAIL to "Email",
         EMAIL_ERROR to "The value you entered does not match the email format address@domain.extension",
         EMAIL_SAMPLE to "address@domain.extension",
+        ENTER_EMAIL  to "ENTER EMAIL",
         ENTER_PIN  to "ENTER PIN",
         EXPIRATION_DATE  to "Expiration Date (MM/YY)",
         //F
@@ -156,6 +163,7 @@ object LocalizedStrings {
         MODULE_NAME to "Module Name",
         //N
         NAME_ON_CARD to "Name on Card",
+        NEXT to "CONFIRM",
         NEW_PASSWORD to "New Password",
         NO_GRADED_YET to "No graded yet",
         //O
@@ -191,7 +199,7 @@ object LocalizedStrings {
         //V
         VALIDATE to "VALIDATE",
         VERIFICATION_CODE_KEY to "Verification Code",
-        VERIFICATION_CODE_KEY to "VERIFICATION CODE",
+        VERIFICATION_CODE_TITLE to "VERIFICATION CODE",
         VERIFY to "VERIFY",
         VIDEOS to "Videos",
         VIDEO_TITLE to "Video Title",
@@ -212,6 +220,7 @@ object LocalizedStrings {
     val fr = mapOf(
         //A
         ADD_DURATION to "Ajouter la durée de l'épreuve",
+        ALREADY_HAVE_ACCOUNT to "Avez-vous un compte? Login!",
         ALREADY_TAKEN to "Déjà fait",
         ASSERTION to "option",
         ANSWER to "Réponse",
@@ -223,6 +232,7 @@ object LocalizedStrings {
                 "Si vous ne respectez pas cela, vous obtiendrez la note la plus basse pour cette épreuve.",
         //C
         CARD_NUMBER to "Numéro de carte",
+        CHANGE_INSTITUTION to "Changer d'institution",
         CLOSE to "FERMER",
         CONFIRM_PASSWORD to "Confirmer Password",
         CONFIRM_NEW_PASSWORD to "Confirmer Nouveau Mot De Passe",
@@ -236,6 +246,7 @@ object LocalizedStrings {
         EMAIL to "Email",
         EMAIL_ERROR to "Votre email ne pas valide. Please enter un email avec ce format address@domain.extension",
         EMAIL_SAMPLE to "address@domain.extension",
+        ENTER_EMAIL  to "ENTRER VOTRE EMAIL",
         ENTER_PIN  to "ENTRER LE CODE",
         EXPIRATION_DATE  to "Date d'expiration (MM/AA)",
         //F
@@ -263,6 +274,7 @@ object LocalizedStrings {
         MODULE_NAME to "Nom du Module",
         //N
         NAME_ON_CARD to "Nom sur la carte",
+        NEXT to "CONFIRMER",
         NO_GRADED_YET to "Pas encore coté",
         //O
         ORGANIZATION_NAME to "Nom de l'institution",

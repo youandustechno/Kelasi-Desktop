@@ -187,7 +187,7 @@ fun Quiz(navHelper: NavHelper, onClick: (NavHelper) -> Unit) {
         }
 
         //if(selectedQuiz != null && selectedQuiz!!.problems?.isNotEmpty() == true) {
-        if(selectedQuiz != null) {
+        if(selectedQuiz != null && userCache?.level != "Parent") {
             Spacer(Modifier.height(10.dp))
             //Questions
             if(quizState == QuizState.CONTINUE) {

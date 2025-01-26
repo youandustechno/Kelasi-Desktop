@@ -59,14 +59,14 @@ open class AuthViewModel: SettingsViewModel () {
                 BaseValues.PhoneRegex = tenant.regex
                 BaseValues.PhoneSample = tenant.format
                 BaseValues.LEVELS = tenant.levels
+                //PreferenceHelper().saveAuthCode(it)
+                StorageHelper().saveInStorage(AUTH_CODE, tenant.domain)
+
             }
             LocalizedStrings.setLanguage(if(lang == "en") LocalizedStrings.LanguageOption.EN
             else LocalizedStrings.LanguageOption.FR)
             //prefs.put("group", result.org!!.tenantCode)
-            result.auth?.org?.tenantCode?.let {
-                //PreferenceHelper().saveAuthCode(it)
-                StorageHelper().saveInStorage(AUTH_CODE, it)
-            }
+
 
             val authApi = UserAuthApi()
             val response = authApi.loginWithEmail(credentials)

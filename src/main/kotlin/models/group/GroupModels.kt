@@ -6,9 +6,11 @@ import ui.NavKeys.EMPTY
 data class AuthResponseComponent(
     val tenantLang: String,
     val org: OrganizationComponent,
+    val tenantId: String,
     val regex: String,
     val format: String,
     val key: String,
+    val domain: String,
     val levels: List<String>
 )
 

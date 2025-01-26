@@ -20,18 +20,20 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import models.BaseValues
+import models.BaseValues.TENANT_CODE
 import ui.LocalizedStrings
+import ui.LocalizedStrings.ENTER_EMAIL
 import ui.LocalizedStrings.INSTITUTION
+import ui.LocalizedStrings.NEXT
 import ui.LocalizedStrings.VERIFY
 import ui.NavHelper
 import ui.NavKeys.EMPTY
 import ui.Route
-import ui.utilities.DisplayError
-import ui.utilities.ErrorState
+import ui.utilities.*
+import ui.utilities.FieldsValidation.getDomain
 import ui.utilities.FieldsValidation.isValid
 import ui.utilities.FieldsValidation.isValidCode
-import ui.utilities.LoginButton
-import ui.utilities.OrgaAuthText
+import ui.utilities.FieldsValidation.isValidEmail
 
 
 @Composable
@@ -48,7 +50,7 @@ fun OrgAuth(orgFound:(NavHelper) -> Unit) {
         verticalArrangement = Arrangement.Center) {
 
         var text by remember { mutableStateOf(EMPTY) }
-        val buttonText by remember { mutableStateOf(LocalizedStrings.get(VERIFY)) }
+        val buttonText by remember { mutableStateOf(LocalizedStrings.get(NEXT)) }
 
         Column (Modifier
             .width(500.dp)
@@ -62,7 +64,7 @@ fun OrgAuth(orgFound:(NavHelper) -> Unit) {
                     .fillMaxWidth()
                     .heightIn(40.dp, 60.dp)
             ) {
-                Text(LocalizedStrings.get(INSTITUTION),
+                Text(LocalizedStrings.get(ENTER_EMAIL),
                     style = MaterialTheme.typography.caption.copy(
                         fontSize = 18.sp,
                         color = Color.Black,
@@ -84,7 +86,7 @@ fun OrgAuth(orgFound:(NavHelper) -> Unit) {
                     .widthIn(300.dp, 400.dp)
                     .padding(start = 4.dp, end = 4.dp)) {
 
-                    OrgaAuthText(text) {
+                    UserEmailFields(text) {
                         text = it
                     }
                 }
@@ -101,12 +103,12 @@ fun OrgAuth(orgFound:(NavHelper) -> Unit) {
 
                     LoginButton(buttonText) {
                         //Make http call
-                        if(!text.isValidCode()) {
+                        if(!text.isValidEmail()) {
                             errorType = ErrorState.Wrong_Code
                         } else {
                             coroutineScope.launch(Dispatchers.IO) {
                                 if(text.isValid()) {
-                                    val result =  authViewModel.verifyAuthCode(text)
+                                    val result =  authViewModel.verifyAuthCode(text.getDomain())
                                     delay(500L)
                                     withContext(Dispatchers.Main) {
                                         if(result.auth != null) {
@@ -116,15 +118,16 @@ fun OrgAuth(orgFound:(NavHelper) -> Unit) {
                                                 BaseValues.PhoneRegex = tenant.regex
                                                 BaseValues.PhoneSample = tenant.format
                                                 BaseValues.LEVELS = tenant.levels
+                                                //PreferenceHelper().saveAuthCode(it)
+                                                TENANT_CODE = tenant.domain
+                                                StorageHelper().saveInStorage(AUTH_CODE, tenant.domain)
                                             }
-                                            LocalizedStrings.setLanguage(if(lang == "en") LocalizedStrings.LanguageOption.EN
+                                            LocalizedStrings.setLanguage(if(lang == "en") LocalizedStrings
+                                                .LanguageOption.EN
                                             else LocalizedStrings.LanguageOption.FR)
                                             //prefs.put("group", result.org!!.tenantCode)
-                                            result.auth?.org?.tenantCode?.let {
-                                                //PreferenceHelper().saveAuthCode(it)
-                                                StorageHelper().saveInStorage(AUTH_CODE, it)
-                                            }
-                                            orgFound.invoke(NavHelper(Route.AuthLogin))
+
+                                            orgFound.invoke(NavHelper(Route.Register))
                                         } else {
                                             errorType = when(result.error?.errorMessage?.lowercase())  {
                                                 "timeout" -> ErrorState.IT_US
